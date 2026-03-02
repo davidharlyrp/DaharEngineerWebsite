@@ -1,5 +1,5 @@
 import PocketBase from 'pocketbase';
-import type { Course, Mentor, Booking } from '@/types/courses';
+import type { Course, Mentor, Booking, SessionReview, ClientReview } from '@/types/courses';
 
 const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
 
@@ -8,7 +8,7 @@ export const courseService = {
         try {
             const records = await pb.collection('course_list').getFullList<Course>({
                 filter: 'isActive = true',
-                sort: '-created',
+                sort: 'created',
             });
             return records;
         } catch (error) {
@@ -47,17 +47,36 @@ export const courseService = {
         return `${import.meta.env.VITE_POCKETBASE_URL}/api/files/${record.collectionId}/${record.id}/${fileName}`;
     },
 
-    async createBooking(data: any): Promise<any> {
+    async getSessionReviews(): Promise<ClientReview[]> {
         try {
-            const record = await pb.collection('bookings').create(data);
-            return record;
-        } catch (error) {
-            console.error('Error creating booking:', error);
-            throw error;
-        }
-    },
+            const reviews = await pb.collection('session_reviews').getFullList<SessionReview>({
+                sort: '-created',
+            });
 
-    async getBookingById(bookingId: string): Promise<Booking> {
-        return await pb.collection('bookings').getOne<Booking>(bookingId);
+            if (reviews.length === 0) return [];
+
+            // Fetch associated bookings to get client and course info
+            // Note: booking_group_id is used to link
+            const groupIds = [...new Set(reviews.map(r => r.booking_group_id))];
+
+            const filter = groupIds.map(id => `booking_group_id = "${id}"`).join(' || ');
+            const bookings = await pb.collection('bookings').getFullList<Booking>({
+                filter: filter
+            });
+
+            return reviews.map(review => {
+                const booking = bookings.find(b => b.booking_group_id === review.booking_group_id);
+                return {
+                    ...review,
+                    clientName: booking?.full_name || 'Anonymous Client',
+                    courseTitle: booking?.course_title || 'Private Session',
+                    mentorId: booking?.mentor_id || '',
+                    sessionDate: booking?.session_date || review.created
+                };
+            }).sort((a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime());
+        } catch (error) {
+            console.error('Error fetching session reviews:', error);
+            return [];
+        }
     }
 };

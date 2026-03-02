@@ -102,3 +102,22 @@ export interface BookingRequest {
 
 export type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
+
+export interface SessionReview {
+  id: string;
+  collectionId: string;
+  user_id: string;
+  booking_group_id: string;
+  session_number: number;
+  rating: number;
+  comment: string;
+  created: string;
+  updated: string;
+}
+
+export interface ClientReview extends SessionReview {
+  clientName: string;
+  courseTitle: string;
+  mentorId: string;
+  sessionDate: string;
+}

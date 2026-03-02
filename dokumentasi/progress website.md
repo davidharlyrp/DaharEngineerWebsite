@@ -7,6 +7,10 @@ Services:
 1. Building Design
 2. Software (Done)
 3. Courses & Consultation
+    - Private Courses (Done)
+        - Coin Payment
+        - Email Notification
+    - Online Courses
 4. Digital Product (Done)
 
 Community:

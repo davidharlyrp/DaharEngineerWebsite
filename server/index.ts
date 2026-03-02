@@ -200,6 +200,138 @@ app.post('/api/booking/create', async (req, res) => {
     }
 });
 
+// Create Coin Purchase Invoice
+app.post('/api/coins/create', async (req, res) => {
+    try {
+        const {
+            userId,
+            userEmail,
+            userName,
+            packageType,
+            coinQuantity,
+            amount
+        } = req.body;
+
+        const adminPb = await getAdminPB();
+
+        // 1. Create initial record in coin_purchases
+        const record = await adminPb.collection('coin_purchases').create({
+            user_id: userId,
+            user_email: userEmail,
+            user_name: userName,
+            package_type: packageType,
+            coin_quantity: coinQuantity,
+            original_amount: amount,
+            final_amount: amount,
+            payment_status: 'pending'
+        });
+
+        // 2. Create Xendit Invoice
+        const invoice = await Invoice.createInvoice({
+            data: {
+                externalId: record.id,
+                amount: amount,
+                description: `Coin Purchase: ${packageType} (${coinQuantity} Coins)`,
+                invoiceDuration: 86400,
+                customer: {
+                    givenNames: userName,
+                    email: userEmail,
+                },
+                currency: 'IDR',
+                successRedirectUrl: `${process.env.FRONTEND_URL}/courses/private-courses?status=coin_success&purchaseId=${record.id}`,
+                failureRedirectUrl: `${process.env.FRONTEND_URL}/courses/private-courses?status=failed`,
+            }
+        });
+
+        // 3. Update record with Invoice ID
+        await adminPb.collection('coin_purchases').update(record.id, {
+            invoice_id: invoice.id
+        });
+
+        res.json({ invoiceUrl: invoice.invoiceUrl });
+    } catch (error: any) {
+        console.error('Coin Purchase Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Create Booking with Coin Payment
+app.post('/api/booking/coin-payment', async (req, res) => {
+    try {
+        const {
+            userId,
+            courseId,
+            courseTitle,
+            courseType,
+            mentorId,
+            mentorName,
+            mentorEmail,
+            sessionDate,
+            sessionTime,
+            userName,
+            userEmail,
+            whatsapp,
+            topic,
+            duration
+        } = req.body;
+
+        const adminPb = await getAdminPB();
+
+        // 1. Verify user coin balance
+        const user = await adminPb.collection('users').getOne(userId);
+        if ((user.total_coins || 0) < 1) {
+            return res.status(400).json({ error: 'Insufficient coin balance' });
+        }
+
+        // 2. Generate unique 16-char ID (Function copied for simplicity or move to utils)
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let bookingGroupId = '';
+        for (let i = 0; i < 16; i++) {
+            bookingGroupId += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        // 3. Create booking record
+        const record = await adminPb.collection('bookings').create({
+            user_id: userId,
+            booking_group_id: bookingGroupId,
+            full_name: userName,
+            email: userEmail,
+            whatsapp: whatsapp,
+            course_id: courseId,
+            course_title: courseTitle,
+            course_type: courseType,
+            mentor_id: mentorId,
+            mentor_name: mentorName,
+            mentor_email: mentorEmail,
+            session_date: sessionDate,
+            session_time: sessionTime,
+            topic: topic,
+            duration: duration,
+            session_number: 1,
+            total_sessions: 1,
+            price_per_session: 0,
+            subtotal: 0,
+            tax_percentage: 0,
+            tax_amount: 0,
+            total_amount: 0,
+            payment_status: 'paid',
+            booking_status: 'pending',
+            payment_method: 'coin',
+            payment_date: new Date().toISOString()
+        });
+
+        // 4. Deduct 1 coin from user
+        await adminPb.collection('users').update(userId, {
+            'total_coins-': 1
+        });
+
+        res.json({ success: true, bookingId: record.id });
+    } catch (error: any) {
+        console.error('Coin Booking Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Xendit Webhook
 app.post('/api/payment/webhook', async (req, res) => {
     try {
@@ -208,7 +340,7 @@ app.post('/api/payment/webhook', async (req, res) => {
         if (status === 'PAID' || status === 'SETTLED') {
             const adminPb = await getAdminPB();
 
-            // Try updating payment_history first (Products)
+            // Try updating payment_history (Products)
             try {
                 await adminPb.collection('payment_history').update(external_id, {
                     payment_status: 'paid',
@@ -217,7 +349,6 @@ app.post('/api/payment/webhook', async (req, res) => {
                     invoice_id: id
                 });
 
-                // Increment product stats
                 const payment = await adminPb.collection('payment_history').getOne(external_id);
                 await adminPb.collection('products').update(payment.product_id, {
                     'download_count+': 1
@@ -225,25 +356,42 @@ app.post('/api/payment/webhook', async (req, res) => {
 
                 return res.status(200).send('OK (Product)');
             } catch (err: any) {
-                // If not found in payment_history, try bookings
-                if (err.status === 404) {
+                if (err.status !== 404) throw err;
+
+                // Try updating bookings
+                try {
+                    await adminPb.collection('bookings').update(external_id, {
+                        payment_status: 'paid',
+                        payment_method: payment_method,
+                        payment_date: new Date().toISOString(),
+                        booking_status: 'pending'
+                    });
+                    return res.status(200).send('OK (Booking)');
+                } catch (bookErr: any) {
+                    if (bookErr.status !== 404) throw bookErr;
+
+                    // Try updating coin_purchases
                     try {
-                        await adminPb.collection('bookings').update(external_id, {
+                        const coinPurchase = await adminPb.collection('coin_purchases').update(external_id, {
                             payment_status: 'paid',
                             payment_method: payment_method,
-                            payment_date: new Date().toISOString(),
-                            booking_status: 'pending'
+                            payment_date: new Date().toISOString()
                         });
-                        return res.status(200).send('OK (Booking)');
-                    } catch (bookErr: any) {
-                        if (bookErr.status === 404) {
-                            console.error(`Record ${external_id} not found in any collection. Webhook ignored.`);
+
+                        // Update user's coin balance
+                        await adminPb.collection('users').update(coinPurchase.user_id, {
+                            'total_coins+': coinPurchase.coin_quantity
+                        });
+
+                        return res.status(200).send('OK (Coin Purchase)');
+                    } catch (coinErr: any) {
+                        if (coinErr.status === 404) {
+                            console.error(`Record ${external_id} not found in any collection.`);
                             return res.status(200).send('Record not found, ignoring');
                         }
-                        throw bookErr;
+                        throw coinErr;
                     }
                 }
-                throw err;
             }
         }
 

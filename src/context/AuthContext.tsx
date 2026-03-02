@@ -8,6 +8,7 @@ interface User {
   name: string;
   avatar?: string;
   role: 'user' | 'admin';
+  total_coins?: number;
   created: string;
   updated: string;
 }
@@ -90,9 +91,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         passwordConfirm: password,
         name,
       };
-      
+
       await pb.collection('users').create(data);
-      
+
       // Auto login after registration
       await login(email, password);
     } catch (error) {
@@ -127,6 +128,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    try {
+      if (pb.authStore.isValid && pb.authStore.model) {
+        const record = await pb.collection('users').getOne(pb.authStore.model.id);
+        setUser(record as unknown as User);
+      }
+    } catch (error) {
+      console.error('Refresh user error:', error);
+    }
+  }, []);
+
   const value: AuthContextType = {
     user,
     isLoading,
@@ -136,6 +148,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     register,
     logout,
     resetPassword,
+    refreshUser,
   };
 
   return (

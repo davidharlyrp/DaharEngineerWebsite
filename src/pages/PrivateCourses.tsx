@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import {
   GraduationCap,
   Search,
@@ -13,7 +13,10 @@ import {
   X,
   Loader2,
   AlertCircle,
-  ChevronDown
+  ChevronDown,
+  ChevronLeft,
+  Coins,
+  Wallet
 } from 'lucide-react';
 import { TextReveal, SectionReveal } from '@/components/ui-custom';
 import { Input } from '@/components/ui/input';
@@ -23,11 +26,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/context/AuthContext';
-import { useEffect } from 'react';
-import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
-import type { Course, Mentor, Booking } from '@/types/courses';
+import useEmblaCarousel from 'embla-carousel-react';
+import type { Course, Mentor, Booking, ClientReview } from '@/types/courses';
 import { courseService } from '@/services/pb/courses';
+import { bookingService } from '@/services/pb/booking';
+import { coinService } from '@/services/pb/coin';
 
 // Mock courses data
 
@@ -207,18 +211,11 @@ function MentorListItem({
     >
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 bg-army-700/20 flex items-center justify-center flex-shrink-0">
-          <User className="w-6 h-6 text-army-400" />
+          <img src={mentor.image ? courseService.getFileUrl(mentor, mentor.image) : '/placeholder-course.jpg'} alt={mentor.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
         </div>
         <div className="flex-1">
           <h4 className="text-sm font-semibold">{mentor.name}</h4>
           <p className="text-xs text-muted-foreground">{mentor.specialization}</p>
-        </div>
-        <div className="flex flex-col items-end">
-          <div className="flex items-center gap-1">
-            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-            <span className="text-xs font-medium">{mentor.rating ?? 5}</span>
-          </div>
-          <span className="text-[10px] text-muted-foreground">({mentor.reviewCount ?? 0} rev)</span>
         </div>
       </div>
     </div>
@@ -309,6 +306,116 @@ function BookingSuccessModal({
   );
 }
 
+// Coin Packages Modal Component
+function CoinPackagesModal({
+  isOpen,
+  onClose
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const { user, isAuthenticated } = useAuth();
+  const [isLoading, setIsLoading] = useState<string | null>(null);
+
+  const packages = [
+    {
+      id: 'small',
+      name: 'Small Package',
+      coins: 2,
+      price: 180000,
+      discount: 'Save 10%'
+    },
+    {
+      id: 'large',
+      name: 'Large Package',
+      coins: 4,
+      price: 300000,
+      discount: 'Save 25%'
+    }
+  ];
+
+  const handlePurchase = async (pkg: typeof packages[0]) => {
+    if (!isAuthenticated) return;
+    setIsLoading(pkg.id);
+    try {
+      const response = await coinService.createCoinPurchaseInvoice({
+        userId: user?.id,
+        userEmail: user?.email,
+        userName: user?.name,
+        packageType: pkg.name,
+        coinQuantity: pkg.coins,
+        amount: pkg.price
+      });
+      if (response.invoiceUrl) {
+        window.location.href = response.invoiceUrl;
+      }
+    } catch (error) {
+      console.error('Purchase error:', error);
+    } finally {
+      setIsLoading(null);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="relative bg-secondary/90 border border-border/50 w-full max-w-md overflow-hidden"
+      >
+        <div className="p-6 border-b border-border/30 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-bold italic uppercase tracking-tight">Purchase Coins</h2>
+            <p className="text-xs text-muted-foreground mt-1">Unlock sessions with engineering experts</p>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-secondary transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <div className="bg-army-500/10 border-l-2 border-army-400 p-4 mb-2">
+            <div className="flex gap-3">
+              <AlertCircle className="w-5 h-5 text-army-400 shrink-0" />
+              <div className="text-xs text-muted-foreground">
+                <p className="font-bold text-foreground mb-1">What are Coins?</p>
+                <p>1 Coin = 1 Private Course session. Coins cannot be used for 'Consultation' services.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            {packages.map((pkg) => (
+              <div key={pkg.id} className="bg-background/40 border border-border/50 p-5 group hover:border-army-500/30 transition-all flex justify-between items-center">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Coins className="w-5 h-5 text-army-400 font-bold" />
+                    <h3 className="font-bold text-lg">{pkg.coins} Coins</h3>
+                  </div>
+                  <Badge variant="outline" className="rounded-none border-army-500/30 text-army-400 text-[10px] uppercase">{pkg.discount}</Badge>
+                </div>
+                <div className="text-right">
+                  <div className="text-xl font-bold mb-3">Rp {pkg.price.toLocaleString('id-ID')}</div>
+                  <Button
+                    onClick={() => handlePurchase(pkg)}
+                    disabled={isLoading !== null}
+                    className="rounded-none bg-army-600 hover:bg-army-700 h-9 font-bold px-6"
+                  >
+                    {isLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'BUY'}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 function BookingModal({
   course,
   mentor,
@@ -320,7 +427,8 @@ function BookingModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, refreshUser } = useAuth();
+  const [paymentMethod, setPaymentMethod] = useState<'xendit' | 'coin'>('xendit');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -364,7 +472,7 @@ function BookingModal({
 
     try {
       if (!isAuthenticated) {
-        window.location.href = `/login?redirect=/private-courses`;
+        window.location.href = `/login?redirect=/courses/private-courses`;
         return;
       }
 
@@ -400,15 +508,22 @@ function BookingModal({
         courseType: course.serviceType === 'Consultation' ? 'Consultation' : 'Course'
       };
 
-      const response = await axios.post('https://api.daharengineer.com/api/booking/create', bookingData);
-
-      if (response.data.invoiceUrl) {
-        window.location.href = response.data.invoiceUrl;
+      if (paymentMethod === 'coin') {
+        const response = await bookingService.createCoinBooking(bookingData);
+        if (response.success) {
+          await refreshUser();
+          window.location.href = `/courses/private-courses?status=success&bookingId=${response.bookingId}`;
+        }
       } else {
-        throw new Error('Failed to get payment link');
+        const response = await bookingService.createBookingInvoice(bookingData);
+        if (response.invoiceUrl) {
+          window.location.href = response.invoiceUrl;
+        } else {
+          throw new Error('Failed to get payment link');
+        }
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to create booking. Please try again.');
+      setError(err.response?.data?.error || err.message || 'Failed to create booking. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -428,8 +543,8 @@ function BookingModal({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border/30">
           <div>
-            <h2 className="text-xl font-bold">Book Session</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-xl font-bold italic tracking-tight uppercase">Book Session</h2>
+            <p className="text-xs text-muted-foreground">
               {course.title} with {mentor.name}
             </p>
           </div>
@@ -442,176 +557,193 @@ function BookingModal({
         <div className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="rounded-none bg-red-500/10 border-red-500/20">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription className="text-xs">{error}</AlertDescription>
               </Alert>
             )}
 
-            {/* Mentor Info */}
-            <div className="bg-background p-4">
-              <div className="flex items-center gap-3 mb-3">
+            {/* Payment Method Switcher (Only if standard course) */}
+            {course.serviceType === 'Course' && (
+              <div className="space-y-3">
+                <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Select Payment Method</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('xendit')}
+                    className={`flex flex-col items-center justify-center p-4 border transition-all ${paymentMethod === 'xendit' ? 'bg-army-500/10 border-army-400' : 'bg-background border-border/50 hover:border-army-500/30'}`}
+                  >
+                    <Wallet className={`w-5 h-5 mb-2 ${paymentMethod === 'xendit' ? 'text-army-400' : 'text-muted-foreground'}`} />
+                    <span className="text-xs font-bold">Direct Payment</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('coin')}
+                    className={`flex flex-col items-center justify-center p-4 border transition-all ${paymentMethod === 'coin' ? 'bg-army-500/10 border-army-400' : 'bg-background border-border/50 hover:border-army-500/30'}`}
+                  >
+                    <Coins className={`w-5 h-5 mb-2 ${paymentMethod === 'coin' ? 'text-army-400' : 'text-muted-foreground'}`} />
+                    <span className="text-xs font-bold">Use 1 Coin</span>
+                    <span className="text-[10px] text-muted-foreground mt-1">Balance: {user?.total_coins || 0}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Mentor Info (Small) */}
+            <div className="bg-background/40 border border-border/50 p-4">
+              <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-army-700/20 flex items-center justify-center">
                   <User className="w-5 h-5 text-army-400" />
                 </div>
                 <div>
-                  <p className="font-medium">{mentor.name}</p>
-                  <p className="text-sm text-muted-foreground">{mentor.specialization}</p>
+                  <p className="text-sm font-bold">{mentor.name}</p>
+                  <p className="text-[10px] text-muted-foreground uppercase">{mentor.specialization}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-sm">
-                <span className="text-muted-foreground">
-                  Rp {course.price.toLocaleString('id-ID')} / session
-                </span>
-              </div>
             </div>
 
-            {/* Personal Data */}
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Full Name</Label>
-                <Input
-                  required
-                  value={formData.full_name}
-                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                  className="bg-background"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="bg-background"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>WhatsApp Number</Label>
-              <Input
-                required
-                placeholder="e.g. 08123456789"
-                value={formData.whatsapp}
-                onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                className="bg-background"
-              />
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              {/* Date */}
-              <div className="space-y-2">
-                <Label>Preferred Date</Label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+            {/* Form Fields */}
+            <div className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs">Full Name</Label>
                   <Input
-                    type="date"
                     required
-                    min={new Date().toISOString().split('T')[0]}
-                    value={formData.preferredDate}
-                    onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
-                    onClick={(e) => e.currentTarget.showPicker?.()}
-                    className={`pl-10 bg-background cursor-pointer ${formData.preferredDate && !isDateAvailable(formData.preferredDate) ? 'border-red-500' : ''}`}
+                    value={formData.full_name}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                    className="bg-background rounded-none h-10"
                   />
                 </div>
-                {mentor.dayAvail && (
-                  <p className="text-[10px] text-muted-foreground">
-                    Mentor days: {mentor.dayAvail.join(', ')}
-                  </p>
-                )}
+                <div className="space-y-2">
+                  <Label className="text-xs">Email Address</Label>
+                  <Input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="bg-background rounded-none h-10"
+                  />
+                </div>
               </div>
 
-              {/* Time */}
               <div className="space-y-2">
-                <Label>Preferred Time</Label>
-                <select
+                <Label className="text-xs">WhatsApp Number</Label>
+                <Input
                   required
-                  value={formData.preferredTime}
-                  onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
-                  className="w-full px-3 py-2 bg-background border border-border/50 rounded-md"
-                >
-                  <option value="">Select time</option>
-                  {availableTimes.map((time) => (
-                    <option key={time} value={time}>{time}</option>
-                  ))}
-                </select>
+                  placeholder="0812XXXXXXXX"
+                  value={formData.whatsapp}
+                  onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                  className="bg-background rounded-none h-10"
+                />
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs">Preferred Date</Label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <Input
+                      type="date"
+                      required
+                      min={new Date().toISOString().split('T')[0]}
+                      value={formData.preferredDate}
+                      onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
+                      onClick={(e) => e.currentTarget.showPicker?.()}
+                      className="pl-10 bg-background rounded-none h-10 cursor-pointer text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs">Preferred Time</Label>
+                  <select
+                    required
+                    value={formData.preferredTime}
+                    onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
+                    className="w-full h-10 px-3 bg-background border border-border/50 rounded-none text-xs"
+                  >
+                    <option value="">Select time slot</option>
+                    {availableTimes.map((time) => (
+                      <option key={time} value={time}>{time}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {course.serviceType === 'Consultation' && (
+                <div className="space-y-2">
+                  <Label className="text-xs">Session Duration</Label>
+                  <select
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    className="w-full h-10 px-3 bg-background border border-border/50 rounded-none text-xs"
+                  >
+                    {[1, 2, 3, 4].map(h => <option key={h} value={h}>{h} Hour{h > 1 ? 's' : ''}</option>)}
+                  </select>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label className="text-xs">Additional Notes</Label>
+                <Textarea
+                  placeholder="Learning goals or topics..."
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="bg-background rounded-none resize-none text-sm"
+                  rows={2}
+                />
               </div>
             </div>
 
-            {/* Duration - Only for Consultation */}
-            {course.serviceType === 'Consultation' && (
-              <div className="space-y-2">
-                <Label>Session Duration</Label>
-                <select
-                  value={formData.duration}
-                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                  className="w-full px-3 py-2 bg-background border border-border/50 rounded-md"
-                >
-                  <option value="1">1 hour</option>
-                  <option value="2">2 hours</option>
-                  <option value="3">3 hours</option>
-                  <option value="4">4 hours</option>
-                </select>
+            {/* Price Preview (Only for Direct Payment) */}
+            {paymentMethod === 'xendit' ? (
+              <div className="bg-secondary/80 p-5 border border-army-500/20">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs text-muted-foreground">Original Price</span>
+                  <span className="text-xs font-bold">Rp {(course.price * (course.serviceType === 'Consultation' ? parseInt(formData.duration) : 1)).toLocaleString('id-ID')}</span>
+                </div>
+                <div className="flex justify-between items-center mb-4 text-xs text-muted-foreground">
+                  <span>Tax (12%)</span>
+                  <span>Rp {Math.round(course.price * (course.serviceType === 'Consultation' ? parseInt(formData.duration) : 1) * 0.12).toLocaleString('id-ID')}</span>
+                </div>
+                <div className="pt-3 border-t border-border/50 flex justify-between items-center">
+                  <span className="font-bold text-sm">TOTAL AMOUNT</span>
+                  <span className="text-xl font-bold text-army-400">
+                    Rp {Math.round(course.price * (course.serviceType === 'Consultation' ? parseInt(formData.duration) : 1) * 1.12).toLocaleString('id-ID')}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-army-500/10 p-5 border border-army-400/30 flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <Coins className="w-5 h-5 text-army-400" />
+                  <div>
+                    <p className="text-sm font-bold italic tracking-tight uppercase">Payment with Coin</p>
+                    <p className="text-[10px] text-muted-foreground">1 session will be deducted</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xl font-bold">1 <span className="text-xs text-muted-foreground uppercase">Coin</span></div>
+                </div>
               </div>
             )}
 
-            {/* Notes */}
-            <div className="space-y-2">
-              <Label>Additional Notes (Optional)</Label>
-              <Textarea
-                placeholder="Tell us about your learning goals or any specific topics you want to cover..."
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="bg-background resize-none"
-                rows={3}
-              />
-            </div>
-
-            {/* Summary & Total */}
-            <div className="bg-army-700/10 p-4 border border-army-500/30 space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">
-                  Subtotal {course.serviceType === 'Consultation' ? `(${formData.duration}h)` : ''}
-                </span>
-                <span>Rp {(course.price * (course.serviceType === 'Consultation' ? parseInt(formData.duration) : 1)).toLocaleString('id-ID')}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Tax (12%)</span>
-                <span>Rp {Math.round(course.price * (course.serviceType === 'Consultation' ? parseInt(formData.duration) : 1) * 0.12).toLocaleString('id-ID')}</span>
-              </div>
-              <div className="pt-2 border-t border-army-500/20 flex items-center justify-between">
-                <span className="font-semibold">Total Amount</span>
-                <span className="text-xl font-bold text-army-400">
-                  Rp {Math.round(course.price * (course.serviceType === 'Consultation' ? parseInt(formData.duration) : 1) * 1.12).toLocaleString('id-ID')}
-                </span>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-3">
+            {/* Buttons */}
+            <div className="flex gap-3 pt-2">
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 onClick={onClose}
-                className="flex-1"
+                className="flex-1 rounded-none uppercase text-xs font-bold tracking-widest"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                disabled={isLoading}
-                className="flex-1 bg-army-700 hover:bg-army-600"
+                disabled={isLoading || (paymentMethod === 'coin' && (user?.total_coins || 0) < 1)}
+                className="flex-1 rounded-none bg-army-600 hover:bg-army-700 font-bold uppercase tracking-widest text-xs h-12"
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  'Proceed to Payment'
-                )}
+                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : paymentMethod === 'coin' ? 'BOOK WITH COIN' : 'PAY SECURELY'}
               </Button>
             </div>
           </form>
@@ -620,7 +752,6 @@ function BookingModal({
     </div>
   );
 }
-
 // Mentor Panel (Overlay)
 function MentorPanel({
   course,
@@ -728,10 +859,16 @@ function MentorPanel({
 // Courses List Section
 function CoursesListSection({
   courses,
-  onSelectCourse
+  onSelectCourse,
+  user,
+  isAuthenticated,
+  onBuyCoins
 }: {
   courses: Course[];
-  onSelectCourse: (course: Course) => void
+  onSelectCourse: (course: Course) => void;
+  user: any;
+  isAuthenticated: boolean;
+  onBuyCoins: () => void;
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | 'all'>('all');
@@ -746,9 +883,42 @@ function CoursesListSection({
   const tags = Array.from(new Set(courses.map(c => c.tag).filter(Boolean))) as string[];
 
   return (
-    <section className="section-fullscreen relative flex items-center bg-background">
+    <section className="relative flex items-center bg-background">
       <div className="w-full px-6 lg:px-20 py-20">
         <div className="max-w-7xl mx-auto">
+          {/* Coin Balance Banner */}
+          <div className="bg-secondary/40 border border-border/50 rounded-lg p-6 mb-12">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-army-700/20 flex items-center justify-center rounded-md">
+                  <Wallet className="w-5 h-5 text-army-400" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Your Balance</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-bold text-foreground">
+                      {isAuthenticated ? (user?.total_coins ?? 0) : 0}
+                    </span>
+                    <span className="text-sm text-muted-foreground font-medium">Coins</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <p className="text-xs text-muted-foreground hidden lg:block max-w-[200px]">
+                  Use coins to exchange private courses instantly.
+                </p>
+                <Button
+                  onClick={onBuyCoins}
+                  className="bg-army-600 hover:bg-army-700 text-white rounded-md h-10 px-6 flex items-center gap-2 text-xs font-bold transition-all"
+                >
+                  <Coins className="w-4 h-4" />
+                  BUY COINS
+                </Button>
+              </div>
+            </div>
+          </div>
+
           {/* Search and Filter */}
           <SectionReveal>
             <div className="flex flex-col lg:flex-row gap-4 mb-12">
@@ -817,33 +987,114 @@ function CoursesListSection({
   );
 }
 
-// Stats Section
-function StatsSection() {
-  const stats = [
-    { value: '7', label: 'Course Categories' },
-    { value: '10+', label: 'Expert Mentors' },
-    { value: '200+', label: 'Students Trained' },
-    { value: '4.8', label: 'Average Rating' }
-  ];
+// Review Slider Section
+function ReviewSlider({ reviews }: { reviews: ClientReview[] }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: 'start',
+    slidesToScroll: 1,
+    breakpoints: {
+      '(min-width: 768px)': { slidesToScroll: 2 },
+      '(min-width: 1024px)': { slidesToScroll: 3 }
+    }
+  });
+
+  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+
+  if (reviews.length === 0) return null;
 
   return (
-    <section className="section-fullscreen relative flex items-center bg-secondary/20">
-      <div className="w-full px-6 lg:px-20 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border/30">
-            {stats.map((stat, index) => (
-              <SectionReveal key={stat.label} delay={0.1 * (index + 1)}>
-                <div className="p-8 lg:p-12 bg-background text-center">
-                  <div className="text-4xl lg:text-5xl font-bold text-army-400 mb-2">
-                    {stat.value}
+    <section className="relative bg-secondary/10 py-24 overflow-hidden border-t border-border/50">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+          <SectionReveal>
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Badge variant="outline" className="rounded-none border-army-500/30 text-army-400 px-4 py-1">
+                  TESTIMONIALS
+                </Badge>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
+                  {reviews.length} Total Reviews
+                </span>
+              </div>
+              <h2 className="text-4xl font-bold tracking-tight">
+                What Our <span className="text-army-400">Students</span> Say
+              </h2>
+              <p className="text-muted-foreground max-w-md text-sm">
+                Real feedback from engineers who have accelerated their careers with our private sessions.
+              </p>
+            </div>
+          </SectionReveal>
+        </div>
+
+        <div className="embla overflow-hidden" ref={emblaRef}>
+          <div className="embla__container flex gap-6">
+            {reviews.map((review, index) => (
+              <div
+                key={review.id}
+                className="embla__slide flex-[0_0_100%] md:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)]"
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="h-full bg-background border border-border/50 p-8 flex flex-col group hover:border-army-500/30 transition-colors"
+                >
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3 h-3 ${i < review.rating ? 'text-amber-400 fill-amber-400' : 'text-muted/30'}`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-muted-foreground font-medium">
+                      {new Date(review.sessionDate).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                    </span>
                   </div>
-                  <div className="text-sm text-muted-foreground uppercase tracking-wider">
-                    {stat.label}
+
+                  <blockquote className="flex-grow text-sm italic text-foreground/90 mb-8 leading-relaxed line-clamp-4">
+                    "{review.comment}"
+                  </blockquote>
+
+                  <div className="pt-6 border-t border-border/50">
+                    <div className="font-bold text-sm text-foreground mb-1 group-hover:text-army-400 transition-colors">
+                      {review.clientName}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-widest line-clamp-1">
+                      {review.courseTitle}
+                    </div>
                   </div>
-                </div>
-              </SectionReveal>
+                </motion.div>
+              </div>
             ))}
           </div>
+        </div>
+
+        {/* Slider Navigation */}
+        <div className="flex justify-center gap-4 mt-12">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={scrollPrev}
+            className="rounded-none border-border/50 hover:border-army-500/50 bg-background h-10 w-10"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={scrollNext}
+            className="rounded-none border-border/50 hover:border-army-500/50 bg-background h-10 w-10"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
         </div>
       </div>
     </section>
@@ -851,29 +1102,53 @@ function StatsSection() {
 }
 
 export default function PrivateCourses() {
+  const { user, isAuthenticated, refreshUser } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isMentorPanelOpen, setIsMentorPanelOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<ClientReview[]>([]);
+
+  const [isCoinModalOpen, setIsCoinModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [activeCourses, activeMentors] = await Promise.all([
+        const [activeCourses, activeMentors, sessionReviews] = await Promise.all([
           courseService.getActiveCourses(),
-          courseService.getActiveMentors()
+          courseService.getActiveMentors(),
+          courseService.getSessionReviews()
         ]);
+
+        // Calculate dynamic mentor ratings from reviews
+        const mentorsWithRatings = activeMentors.map(mentor => {
+          const mId = String(mentor.id).trim();
+          const mentorReviews = sessionReviews.filter(r =>
+            String(r.mentorId).trim() === mId
+          );
+          const reviewCount = mentorReviews.length;
+          const rating = reviewCount > 0
+            ? mentorReviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+            : 5;
+
+          return {
+            ...mentor,
+            rating: Number(rating.toFixed(1)),
+            reviewCount
+          };
+        });
 
         // Map mentors to their courses
         const coursesWithMentors = activeCourses.map(course => ({
           ...course,
-          mentors: activeMentors.filter(m => m.tags?.includes(course.id))
+          mentors: mentorsWithRatings.filter(m => m.tags?.includes(course.id))
         }));
 
         setCourses(coursesWithMentors);
+        setReviews(sessionReviews);
       } catch (error) {
         console.error('Error in PrivateCourses fetchData:', error);
       } finally {
@@ -897,7 +1172,7 @@ export default function PrivateCourses() {
         try {
           // Add a small delay for webhook processing if needed, 
           // though getOne should be fast enough for confirmation.
-          const booking = await courseService.getBookingById(bookingId);
+          const booking = await bookingService.getBookingById(bookingId);
           setConfirmedBooking(booking);
           setShowSuccessModal(true);
 
@@ -912,7 +1187,15 @@ export default function PrivateCourses() {
       };
       fetchBooking();
     }
-  }, [searchParams, setSearchParams]);
+
+    if (status === 'coin_success') {
+      refreshUser();
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('status');
+      newParams.delete('purchaseId');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams, refreshUser]);
 
   const handleSelectCourse = (course: Course) => {
     setSelectedCourse(course);
@@ -936,17 +1219,27 @@ export default function PrivateCourses() {
     <div className="relative">
       <HeroSection />
 
-      {/* Success Notification Modal */}
+      <div className="relative z-10 bg-background">
+        <CoursesListSection
+          courses={courses}
+          onSelectCourse={handleSelectCourse}
+          user={user}
+          isAuthenticated={isAuthenticated}
+          onBuyCoins={() => setIsCoinModalOpen(true)}
+        />
+        <ReviewSlider reviews={reviews} />
+      </div>
+
+      <CoinPackagesModal
+        isOpen={isCoinModalOpen}
+        onClose={() => setIsCoinModalOpen(false)}
+      />
+
       <BookingSuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
         booking={confirmedBooking}
       />
-      <div className="h-screen" />
-      <div className="relative z-10 bg-background">
-        <CoursesListSection courses={courses} onSelectCourse={handleSelectCourse} />
-        <StatsSection />
-      </div>
 
       {/* Mentor Selection Panel */}
       <MentorPanel

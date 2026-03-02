@@ -11,6 +11,7 @@ export interface User {
   name: string;
   avatar?: string;
   role: 'user' | 'admin';
+  total_coins?: number;
   created: string;
   updated: string;
 }
@@ -67,6 +68,7 @@ export interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 // Menu state types
