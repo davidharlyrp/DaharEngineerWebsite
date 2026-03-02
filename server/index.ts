@@ -213,6 +213,9 @@ app.post('/api/coins/create', async (req, res) => {
         } = req.body;
 
         const adminPb = await getAdminPB();
+        const subtotal = amount;
+        const taxAmount = Math.round(subtotal * 0.12);
+        const finalAmount = subtotal + taxAmount;
 
         // 1. Create initial record in coin_purchases
         const record = await adminPb.collection('coin_purchases').create({
@@ -221,8 +224,11 @@ app.post('/api/coins/create', async (req, res) => {
             user_name: userName,
             package_type: packageType,
             coin_quantity: coinQuantity,
-            original_amount: amount,
-            final_amount: amount,
+            original_amount: subtotal,
+            subtotal: subtotal,
+            tax_percentage: 12,
+            tax_amount: taxAmount,
+            final_amount: finalAmount,
             payment_status: 'pending'
         });
 
@@ -230,7 +236,7 @@ app.post('/api/coins/create', async (req, res) => {
         const invoice = await Invoice.createInvoice({
             data: {
                 externalId: record.id,
-                amount: amount,
+                amount: finalAmount,
                 description: `Coin Purchase: ${packageType} (${coinQuantity} Coins)`,
                 invoiceDuration: 86400,
                 customer: {

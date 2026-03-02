@@ -398,13 +398,19 @@ function CoinPackagesModal({
                   <Badge variant="outline" className="rounded-none border-army-500/30 text-army-400 text-[10px] uppercase">{pkg.discount}</Badge>
                 </div>
                 <div className="text-right">
-                  <div className="text-xl font-bold mb-3">Rp {pkg.price.toLocaleString('id-ID')}</div>
+                  <div className="space-y-0.5 mb-3">
+                    <div className="text-xs text-muted-foreground">Rp {pkg.price.toLocaleString('id-ID')}</div>
+                    <div className="text-[10px] text-muted-foreground/60">+ PPN 12% (Rp {(pkg.price * 0.12).toLocaleString('id-ID')})</div>
+                    <div className="text-lg font-bold text-army-400">
+                      Rp {Math.round(pkg.price * 1.12).toLocaleString('id-ID')}
+                    </div>
+                  </div>
                   <Button
                     onClick={() => handlePurchase(pkg)}
                     disabled={isLoading !== null}
-                    className="rounded-none bg-army-600 hover:bg-army-700 h-9 font-bold px-6"
+                    className="rounded-none bg-army-600 hover:bg-army-700 h-8 font-bold px-6 text-[10px] uppercase tracking-wider"
                   >
-                    {isLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'BUY'}
+                    {isLoading === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'PURCHASE'}
                   </Button>
                 </div>
               </div>
