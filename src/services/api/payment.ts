@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_BACKEND_API_URL || 'https://api.daharengineer.com';
+const API_URL = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:4001'; // Fallback to local for development
 
 export const paymentApi = {
     async createInvoice(data: {

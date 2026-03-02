@@ -25,6 +25,7 @@ export const productsService = {
             // For now, let's try to find a product whose name (slugified) matches.
             const records = await pb.collection('products').getFullList<Product>({
                 filter: 'is_active = true',
+                requestKey: null, // Disable auto-cancellation to prevent "request was aborted" errors
             });
 
             const product = records.find(p => this.createSlug(p.name) === slug);

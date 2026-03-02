@@ -62,7 +62,7 @@ app.post('/api/payment/create', async (req, res) => {
             product_category: productCategory,
             amount: amount,
             final_amount: amount,
-            payment_status: 'PENDING',
+            payment_status: 'pending',
             file_name: fileName,
             file_size: fileSize,
             downloaded: false
@@ -106,12 +106,20 @@ app.post('/api/payment/webhook', async (req, res) => {
             const adminPb = await getAdminPB();
 
             // Update payment_history
-            await adminPb.collection('payment_history').update(external_id, {
-                payment_status: 'PAID',
-                payment_method: payment_method,
-                payment_date: new Date().toISOString(),
-                invoice_id: id // Ensure we have the final ID
-            });
+            try {
+                await adminPb.collection('payment_history').update(external_id, {
+                    payment_status: 'paid',
+                    payment_method: payment_method,
+                    payment_date: new Date().toISOString(),
+                    invoice_id: id // Ensure we have the final ID
+                });
+            } catch (err: any) {
+                if (err.status === 404) {
+                    console.error(`Record ${external_id} not found in payment_history. Webhook ignored.`);
+                    return res.status(200).send('Record not found, ignoring'); // Still return 200 to Xendit
+                }
+                throw err;
+            }
 
             // Increment product stats
             const payment = await adminPb.collection('payment_history').getOne(external_id);
@@ -134,7 +142,7 @@ app.get('/api/payment/check/:productId/:userId', async (req, res) => {
         const adminPb = await getAdminPB();
 
         const records = await adminPb.collection('payment_history').getFullList({
-            filter: `product_id = "${productId}" && user_id = "${userId}" && payment_status = "PAID"`,
+            filter: `product_id = "${productId}" && user_id = "${userId}" && payment_status = "paid"`,
         });
 
         res.json({ purchased: records.length > 0 });
@@ -150,7 +158,7 @@ app.post('/api/payment/download', async (req, res) => {
         const adminPb = await getAdminPB();
 
         const records = await adminPb.collection('payment_history').getFullList({
-            filter: `product_id = "${productId}" && user_id = "${userId}" && payment_status = "PAID"`,
+            filter: `product_id = "${productId}" && user_id = "${userId}" && payment_status = "paid"`,
             sort: '-created',
         });
 

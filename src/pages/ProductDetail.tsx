@@ -52,8 +52,14 @@ export default function ProductDetail() {
 
                         // Check purchase status if authenticated
                         if (isAuthenticated && user?.id) {
-                            const purchased = await paymentApi.checkPurchaseStatus(data.id, user.id);
-                            setIsPurchased(purchased);
+                            try {
+                                const purchased = await paymentApi.checkPurchaseStatus(data.id, user.id);
+                                setIsPurchased(purchased);
+                            } catch (err) {
+                                console.warn('Could not check purchase status (Backend might be down):', err);
+                                // Default to not purchased if API fails
+                                setIsPurchased(false);
+                            }
                         }
                     }
                     setLoading(false);
@@ -422,8 +428,8 @@ export default function ProductDetail() {
                         animate={{ opacity: 1, scale: 1 }}
                         className="bg-card border border-border/50 p-8 rounded-2xl max-w-md w-full text-center space-y-6"
                     >
-                        <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto">
-                            <CheckCircle2 className="w-10 h-10 text-green-500" />
+                        <div className="w-20 h-20 bg-army-500/20 rounded-full flex items-center justify-center mx-auto">
+                            <CheckCircle2 className="w-10 h-10 text-army-500" />
                         </div>
                         <div className="space-y-2">
                             <h3 className="text-2xl font-bold">Purchase Successful!</h3>
