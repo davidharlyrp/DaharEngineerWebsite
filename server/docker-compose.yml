@@ -1,0 +1,16 @@
+services:
+  backend:
+    build: .
+    container_name: dahar-backend
+    image: dahar-backend:latest
+    ports:
+      - "4001:4001"
+    env_file:
+      - .env
+    restart: always
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4001/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

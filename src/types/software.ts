@@ -1,45 +1,20 @@
-// Software types
+export type SoftwareCategory = 'Geotechnical' | 'Structural' | 'Project Management' | 'Productivity';
+
 export interface Software {
   id: string;
-  name: string;
-  slug: string;
-  description: string;
-  fullDescription?: string;
-  category: SoftwareCategory;
-  icon?: string;
-  thumbnail?: string;
-  screenshots?: string[];
-  websiteUrl: string;
-  isNew: boolean;
-  isFeatured: boolean;
-  version?: string;
-  features: string[];
-  pricing?: SoftwarePricing;
-  rating: number;
-  userCount: number;
+  collectionId: string;
+  collectionName: string;
   created: string;
   updated: string;
-}
-
-export type SoftwareCategory = 
-  | 'structural-analysis' 
-  | 'geotechnical' 
-  | 'calculation' 
-  | 'optimization' 
-  | 'estimation' 
-  | 'database';
-
-export interface SoftwarePricing {
-  type: 'free' | 'freemium' | 'paid';
-  price?: number;
-  currency?: string;
-  billingPeriod?: 'monthly' | 'yearly' | 'lifetime';
-}
-
-export interface SoftwareCategoryInfo {
-  id: SoftwareCategory;
   name: string;
+  isMaintain: boolean;
+  logo: string;
+  thumbnail: string;
+  preview: string[];
+  page: string;
   description: string;
-  icon: string;
-  count: number;
+  version: string;
+  add_by: string;
+  category: SoftwareCategory;
+  link: string;
 }

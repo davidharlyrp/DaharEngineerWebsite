@@ -9,9 +9,9 @@ interface TextRevealProps {
   tag?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span';
 }
 
-export function TextReveal({ 
-  text, 
-  className = '', 
+export function TextReveal({
+  text,
+  className = '',
   delay = 0,
   staggerDelay = 0.03,
   tag = 'span'

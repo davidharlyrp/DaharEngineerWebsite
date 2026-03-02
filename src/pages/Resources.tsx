@@ -113,6 +113,7 @@ function HeroSection() {
             to enhance your engineering knowledge.
           </motion.p>
         </div>
+
         {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}

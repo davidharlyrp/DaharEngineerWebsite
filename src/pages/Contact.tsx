@@ -8,7 +8,6 @@ import {
   Instagram,
   Linkedin,
   Youtube,
-  Clock,
   CheckCircle2
 } from 'lucide-react';
 import { TextReveal, LineReveal, SectionReveal } from '@/components/ui-custom';
@@ -37,7 +36,19 @@ function HeroSection() {
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
 
-        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+        <div className="relative z-10 text-center flex flex-col items-center justify-center px-6 w-full mx-auto h-screen">
+          {/* Video background */}
+          <div className="absolute inset-0 -z-10 overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-30"
+            >
+              <source src="/Hero.webm" type="video/webm" />
+            </video>
+          </div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -159,20 +170,6 @@ function ContactFormSection() {
                       <h3 className="font-medium mb-1">Location</h3>
                       <p className="text-muted-foreground">
                         Bandung, West Java, Indonesia
-                      </p>
-                    </div>
-                  </div>
-                </SectionReveal>
-
-                <SectionReveal delay={0.7}>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-army-700/20 flex items-center justify-center flex-shrink-0">
-                      <Clock className="w-5 h-5 text-army-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium mb-1">Working Hours</h3>
-                      <p className="text-muted-foreground">
-                        Monday - Friday: 9:00 AM - 6:00 PM
                       </p>
                     </div>
                   </div>

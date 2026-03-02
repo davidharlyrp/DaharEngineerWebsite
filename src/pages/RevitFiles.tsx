@@ -29,8 +29,6 @@ import { revitService } from '@/services/pb/revit';
 import type { RevitFile } from '@/types/revit';
 import { RevitCategory } from '@/types/revit';
 
-// Category definitions
-
 // Hero Section
 function HeroSection() {
   const ref = useRef(null);

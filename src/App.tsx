@@ -21,6 +21,7 @@ import Dashboard from '@/pages/Dashboard';
 import RevitFiles from '@/pages/RevitFiles';
 import Resources from '@/pages/Resources';
 import Blog from '@/pages/Blog';
+import ProductDetail from '@/pages/ProductDetail';
 
 // Components
 import { ScrollToTop } from '@/components/layout/ScrollToTop';
@@ -58,6 +59,7 @@ function App() {
                     <Route path="community/resources" element={<Resources />} />
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blog/:slug" element={<Blog />} />
+                    <Route path="/store/product/:slug" element={<ProductDetail />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                   </Routes>
                 </MainLayout>

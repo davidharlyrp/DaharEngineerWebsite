@@ -1,33 +1,39 @@
 // Product types for store
 export interface Product {
   id: string;
+  collectionId: string;
+  collectionName: string;
   name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
+  short_description: string;
+  long_description: string;
+  main_price: number;
+  discount_price?: number;
   category: ProductCategory;
-  subcategory?: string;
+  sub_category?: string;
   thumbnail: string;
-  images?: string[];
-  files?: ProductFile[];
-  features: string[];
-  rating: number;
-  reviewCount: number;
-  soldCount: number;
-  isNew?: boolean;
-  isFeatured?: boolean;
-  isBestSeller?: boolean;
-  slug: string;
+  pictures: string[];
+  file: string;
+  file_name?: string;
+  file_size?: number;
+  file_format?: string;
+  version?: string;
+  language?: string;
+  features: string[]; // This will be parsed from JSON
+  is_active: boolean;
+  view_count: number;
+  download_count: number;
+  created_by: string;
+  created_by_name: string;
   created: string;
   updated: string;
 }
 
-export type ProductCategory = 
-  | 'revit-family' 
-  | 'excel-template' 
-  | 'calculation-sheet' 
-  | 'drawing-template' 
-  | 'e-book' 
+export type ProductCategory =
+  | 'revit-family'
+  | 'excel-template'
+  | 'calculation-sheet'
+  | 'drawing-template'
+  | 'e-book'
   | 'course-material';
 
 export interface ProductFile {

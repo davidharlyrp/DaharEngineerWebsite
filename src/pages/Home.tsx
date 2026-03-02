@@ -6,8 +6,8 @@ import {
   Building2,
   Wrench,
   GraduationCap,
-  Calculator,
-  ChevronDown
+  ChevronDown,
+  Code
 } from 'lucide-react';
 import { TextReveal, LineReveal, SectionReveal } from '@/components/ui-custom';
 
@@ -151,14 +151,14 @@ function ServicesSection() {
       link: '/services#building-design'
     },
     {
-      icon: Calculator,
-      title: 'Engineering Tools',
-      description: 'Web-based applications for structural calculations and geotechnical analysis.',
+      icon: Code,
+      title: 'Software',
+      description: 'Web-based software for civil engineering calculations and analysis. Access it from anywhere, anytime.',
       link: '/software'
     },
     {
       icon: GraduationCap,
-      title: 'Courses & Training',
+      title: 'Courses & Consultation',
       description: 'Private and online courses for civil engineering professionals and students.',
       link: '/courses'
     },

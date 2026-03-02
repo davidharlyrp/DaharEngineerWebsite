@@ -5,7 +5,8 @@ import {
   MapPin,
   Instagram,
   Linkedin,
-  Youtube
+  Youtube,
+  Music2,
 } from 'lucide-react';
 
 const footerLinks = {
@@ -16,7 +17,14 @@ const footerLinks = {
     { label: 'Portfolio', href: 'https://www.portfolio.daharengineer.com' },
   ],
   services: [
+    { label: 'Building Design', href: '/building-design' },
+    { label: 'Courses', href: '/courses' },
+    { label: 'Private Courses', href: '/private-courses' },
     { label: 'Store', href: '/store' },
+    { label: 'Software', href: '/software' },
+  ],
+  community: [
+    { label: 'DELinxs', href: 'https://delinxs.com' },
     { label: 'Revit Files', href: '/revit-files' },
     { label: 'Resources', href: '/resources' },
     { label: 'Blog', href: '/blog' },
@@ -117,9 +125,9 @@ export function Footer() {
 
             {/* Learning Links */}
             <div>
-              <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider">Learning</h4>
+              <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider">Community</h4>
               <ul className="space-y-3">
-                {footerLinks.learning.map((link) => (
+                {footerLinks.community.map((link) => (
                   <li key={link.href}>
                     <Link
                       to={link.href}
@@ -163,7 +171,7 @@ export function Footer() {
           {/* Social Links */}
           <div className="flex items-center gap-4">
             <a
-              href="https://instagram.com/dahar.engineer"
+              href="https://www.instagram.com/dahar_engineer/"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
@@ -172,7 +180,7 @@ export function Footer() {
               <Instagram className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
             </a>
             <a
-              href="https://linkedin.com/company/dahar-engineer"
+              href="https://www.linkedin.com/company/dahar-engineer/"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
@@ -181,13 +189,22 @@ export function Footer() {
               <Linkedin className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
             </a>
             <a
-              href="https://youtube.com/@daharengineer"
+              href="https://www.youtube.com/@dahar_engineer"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
                          transition-colors duration-300 group"
             >
               <Youtube className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
+            </a>
+            <a
+              href="https://www.tiktok.com/@dahar_engineer"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
+                         transition-colors duration-300 group"
+            >
+              <Music2 className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
             </a>
           </div>
         </div>

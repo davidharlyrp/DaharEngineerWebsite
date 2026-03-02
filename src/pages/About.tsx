@@ -1,13 +1,13 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import {
-  ArrowRight,
-  Target,
-  Lightbulb,
   Users,
-  Award
+  Loader2,
+  ChevronDown
 } from 'lucide-react';
 import { TextReveal, LineReveal, SectionReveal } from '@/components/ui-custom';
+import { teamsService } from '@/services/pb/teams';
+import type { DaharTeam } from '@/types/teams';
 
 // Hero Section
 function HeroSection() {
@@ -29,7 +29,19 @@ function HeroSection() {
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
 
-        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+        <div className="relative z-10 text-center flex flex-col items-center justify-center px-6 w-full mx-auto h-screen">
+          {/* Video background */}
+          <div className="absolute inset-0 -z-10 overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-30"
+            >
+              <source src="/Hero.webm" type="video/webm" />
+            </video>
+          </div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -38,219 +50,73 @@ function HeroSection() {
                        bg-army-500/10 mb-8"
           >
             <span className="text-sm text-army-400 font-medium tracking-wide">
-              ABOUT US
+              ABOUT DAHAR ENGINEER
             </span>
           </motion.div>
 
           <TextReveal
-            text="Building the Future"
+            text="We deliver reliable civil"
             tag="h1"
-            className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-4"
             delay={0.3}
           />
           <TextReveal
-            text="With Engineering Excellence"
+            text="engineering solutions,"
             tag="h1"
-            className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-tight text-muted-foreground"
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
             delay={0.5}
           />
+          <TextReveal
+            text="combining technical expertise with a clear and educational approach."
+            tag="p"
+            className="text-xl sm:text-2xl font-light tracking-tight text-muted-foreground"
+            delay={0.7}
+          />
         </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.6 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="flex flex-col items-center gap-2 text-muted-foreground"
+          >
+            <span className="text-xs uppercase tracking-widest">Scroll</span>
+            <ChevronDown className="w-5 h-5" />
+          </motion.div>
+        </motion.div>
       </motion.div>
     </div>
   );
 }
 
-// Story Section
-function StorySection() {
-  return (
-    <section className="section-fullscreen relative flex items-center bg-background">
-      <div className="w-full px-6 lg:px-20 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Content */}
-            <div>
-              <SectionReveal>
-                <span className="text-sm text-army-400 font-medium uppercase tracking-wider mb-4 block">
-                  Our Story
-                </span>
-              </SectionReveal>
-              <SectionReveal delay={0.1}>
-                <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-6">
-                  Bridging Theory<br />
-                  <span className="text-muted-foreground">and Practice</span>
-                </h2>
-              </SectionReveal>
-              <LineReveal delay={0.2} className="max-w-md mb-8" />
-
-              <div className="space-y-6 text-muted-foreground">
-                <SectionReveal delay={0.3}>
-                  <p>
-                    Dahar Engineer was founded with a clear mission: to provide reliable
-                    civil engineering solutions that combine technical expertise with a
-                    transparent, educational approach.
-                  </p>
-                </SectionReveal>
-                <SectionReveal delay={0.4}>
-                  <p>
-                    We recognized the need for engineering consultants who not only deliver
-                    accurate designs but also provide well-documented technical justifications
-                    that clients can understand and trust.
-                  </p>
-                </SectionReveal>
-                <SectionReveal delay={0.5}>
-                  <p>
-                    Based in Bandung, Indonesia, we have grown from a small consultancy
-                    into a comprehensive engineering solutions provider, serving clients
-                    across the nation with our unique blend of practical experience and
-                    academic rigor.
-                  </p>
-                </SectionReveal>
-              </div>
-            </div>
-
-            {/* Principles */}
-            <div className="space-y-6">
-              {[
-                {
-                  title: 'Technical Excellence',
-                  desc: 'We deliver accurate, well-documented designs with clear technical justifications.',
-                  icon: Target
-                },
-                {
-                  title: 'Practical Solutions',
-                  desc: 'We bridge academic principles with real-world, implementable solutions.',
-                  icon: Lightbulb
-                },
-                {
-                  title: 'Clear Communication',
-                  desc: 'We communicate complex technical concepts in ways clients can understand.',
-                  icon: Users
-                },
-                {
-                  title: 'Continuous Learning',
-                  desc: 'We are committed to knowledge sharing and professional development.',
-                  icon: Award
-                }
-              ].map((principle, index) => {
-                const Icon = principle.icon;
-                return (
-                  <SectionReveal key={principle.title} delay={0.1 * (index + 1)}>
-                    <div className="flex items-start gap-4 p-6 bg-secondary/30 hover:bg-secondary/50 
-                                    transition-colors duration-300">
-                      <div className="w-10 h-10 bg-army-700/20 flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-5 h-5 text-army-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">{principle.title}</h3>
-                        <p className="text-sm text-muted-foreground">{principle.desc}</p>
-                      </div>
-                    </div>
-                  </SectionReveal>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Founder Section
-function FounderSection() {
-  return (
-    <section className="section-fullscreen relative flex items-center bg-secondary/20">
-      <div className="w-full px-6 lg:px-20 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Image placeholder */}
-            <SectionReveal>
-              <div className="aspect-square bg-gradient-to-br from-army-800/30 to-army-900/30 
-                              flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-32 h-32 mx-auto mb-6 bg-army-700/30 flex items-center justify-center">
-                    <span className="text-4xl font-bold text-army-400">DP</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Founder & Lead Engineer</p>
-                </div>
-              </div>
-            </SectionReveal>
-
-            {/* Content */}
-            <div>
-              <SectionReveal delay={0.1}>
-                <span className="text-sm text-army-400 font-medium uppercase tracking-wider mb-4 block">
-                  Meet the Founder
-                </span>
-              </SectionReveal>
-              <SectionReveal delay={0.2}>
-                <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-                  David Prabudhi
-                </h2>
-              </SectionReveal>
-              <SectionReveal delay={0.3}>
-                <p className="text-lg text-muted-foreground mb-6">
-                  Civil Engineer & Founder
-                </p>
-              </SectionReveal>
-              <LineReveal delay={0.4} className="max-w-md mb-8" />
-
-              <div className="space-y-4 text-muted-foreground">
-                <SectionReveal delay={0.5}>
-                  <p>
-                    With a passion for structural engineering and education, David founded
-                    Dahar Engineer to bridge the gap between academic knowledge and practical
-                    application in the construction industry.
-                  </p>
-                </SectionReveal>
-                <SectionReveal delay={0.6}>
-                  <p>
-                    His expertise spans structural analysis, building design, and geotechnical
-                    engineering, with a particular focus on developing innovative software
-                    solutions that simplify complex engineering calculations.
-                  </p>
-                </SectionReveal>
-              </div>
-
-              <SectionReveal delay={0.7}>
-                <div className="mt-8 flex items-center gap-2 text-army-400">
-                  <a href="https://linkedin.com/in/davidprabudhi" target="_blank" rel="noopener noreferrer"
-                    className="hover:underline">
-                    Connect on LinkedIn
-                  </a>
-                  <ArrowRight className="w-4 h-4" />
-                </div>
-              </SectionReveal>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Values Section
-function ValuesSection() {
-  const values = [
+// Vision Section (Revised StorySection)
+function VisionSection() {
+  const principles = [
     {
-      number: '01',
-      title: 'Accuracy',
-      desc: 'Every calculation, every design, every recommendation is backed by thorough analysis and verification.'
+      id: 1,
+      text: "The need for civil engineering consultants who provide not only accurate designs but also transparent and well-documented technical justifications."
     },
     {
-      number: '02',
-      title: 'Transparency',
-      desc: 'We believe in clear communication and complete documentation of our engineering decisions.'
+      id: 2,
+      text: "A gap in the market for planners who can bridge academic principles with real-world, practical solutions."
     },
     {
-      number: '03',
-      title: 'Innovation',
-      desc: 'We continuously develop new tools and methods to improve engineering workflows.'
+      id: 3,
+      text: "The complexity of regulations, site conditions, and technical standards requires planners who communicate clearly with clients, contractors, and stakeholders."
     },
     {
-      number: '04',
-      title: 'Education',
-      desc: 'We are committed to sharing knowledge and building capacity in the engineering community.'
+      id: 4,
+      text: "A growing demand for continuous learning and knowledge sharing within the civil engineering profession, ensuring better project outcomes."
+    },
+    {
+      id: 5,
+      text: "The importance of human-centered design — functional, safe, and efficient — that addresses Indonesia's evolving infrastructure challenges."
     }
   ];
 
@@ -258,26 +124,159 @@ function ValuesSection() {
     <section className="section-fullscreen relative flex items-center bg-background">
       <div className="w-full px-6 lg:px-20 py-20">
         <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-16 items-start">
+            {/* Content Left */}
+            <div className="sticky top-32">
+              <SectionReveal>
+                <span className="text-sm text-army-400 font-medium uppercase tracking-wider mb-4 block">
+                  Our Foundation
+                </span>
+              </SectionReveal>
+              <SectionReveal delay={0.1}>
+                <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-8">
+                  Core Principles<br />
+                  <span className="text-muted-foreground">and Values</span>
+                </h2>
+              </SectionReveal>
+              <LineReveal delay={0.2} className="max-w-md mb-8" />
+              <SectionReveal delay={0.3}>
+                <p className="text-lg text-muted-foreground">
+                  Dahar Engineer was founded on a set of core principles that guide every project we undertake and every decision we make.
+                </p>
+                <img src="/logo.png" alt="About Hero" className="w-64 h-64 object-cover opacity-50 mt-10 rounded-sm" />
+                {/* <img src="/About2.webp" alt="About Hero" className="w-full h-64 object-cover [object-position:center_80%] opacity-50 mt-10 rounded-sm" /> */}
+              </SectionReveal>
+            </div>
+
+            {/* Principles Right */}
+            <div className="space-y-12">
+              {principles.map((principle, index) => (
+                <SectionReveal key={principle.id} delay={0.1 * index}>
+                  <div className="flex gap-6 group">
+                    <span className="text-2xl font-bold text-army-500/40 group-hover:text-army-500 transition-colors">
+                      {principle.id}.
+                    </span>
+                    <p className="text-lg text-muted-foreground leading-relaxed">
+                      {principle.text}
+                    </p>
+                  </div>
+                </SectionReveal>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Inspiration Section
+function InspirationSection() {
+  return (
+    <section className="section-fullscreen relative flex items-center bg-secondary/10">
+      <div className="w-full px-6 lg:px-20 py-24">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <SectionReveal>
+              <div className="aspect-[16/9] bg-gradient-to-br from-army-800/30 to-army-900/30 overflow-hidden">
+                {/* Image or Pattern */}
+                <img src="/About1.webp" alt="About Hero" className="w-full h-full object-cover opacity-50" />
+                <div className="w-full h-full bg-grid opacity-20" />
+              </div>
+            </SectionReveal>
+            <div className="space-y-8">
+              <SectionReveal delay={0.2}>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight leading-tight">
+                  We're inspired by the <span className="font-bold">growing need for reliable infrastructure</span>,
+                  the demand for accountable engineering practices, and the mission to build
+                  a <span className="text-army-400 underline decoration-army-500/30 underline-offset-8">more informed civil engineering community.</span>
+                </h2>
+              </SectionReveal>
+              <SectionReveal delay={0.4}>
+                <p className="text-muted-foreground text-lg italic">
+                  "Our goal is to simplify complex technical knowledge and empower professionals across the nation."
+                </p>
+              </SectionReveal>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Team Section
+function TeamSection() {
+  const [teams, setTeams] = useState<DaharTeam[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const data = await teamsService.getActiveTeams();
+        setTeams(data);
+      } catch (error) {
+        console.error('Failed to fetch teams:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTeams();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="h-96 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-army-500" />
+      </div>
+    );
+  }
+
+  return (
+    <section className="relative bg-background py-24">
+      <div className="w-full px-6 lg:px-20">
+        <div className="max-w-7xl mx-auto">
           <SectionReveal>
-            <span className="text-sm text-army-400 font-medium uppercase tracking-wider mb-4 block">
-              Our Values
-            </span>
-          </SectionReveal>
-          <SectionReveal delay={0.1}>
-            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-16">
-              What Drives Us
-            </h2>
+            <div className="mb-16">
+              <span className="text-sm text-army-400 font-medium uppercase tracking-wider mb-4 block">
+                The Experts
+              </span>
+              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
+                Meet the Team
+              </h2>
+            </div>
           </SectionReveal>
 
-          <div className="grid md:grid-cols-2 gap-px bg-border/30">
-            {values.map((value, index) => (
-              <SectionReveal key={value.title} delay={0.1 * (index + 1)}>
-                <div className="p-8 lg:p-12 bg-background hover:bg-secondary/30 transition-colors duration-300">
-                  <span className="text-5xl font-bold text-army-700/30 mb-4 block">
-                    {value.number}
-                  </span>
-                  <h3 className="text-2xl font-semibold mb-4">{value.title}</h3>
-                  <p className="text-muted-foreground">{value.desc}</p>
+          <div className="space-y-32">
+            {teams.map((member, index) => (
+              <SectionReveal key={member.id} delay={0.1}>
+                <div className={`grid lg:grid-cols-2 gap-12 items-center ${index % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}>
+                  <div className={index % 2 !== 0 ? 'lg:order-2' : ''}>
+                    <h3 className="text-3xl sm:text-4xl font-bold mb-2 tracking-tight">
+                      {member.name}
+                    </h3>
+                    <p className="text-army-400 font-medium mb-6 uppercase tracking-wider text-sm">
+                      {member.title}
+                    </p>
+                    <LineReveal className="mb-8" />
+                    <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
+                      {member.description}
+                    </p>
+                  </div>
+
+                  <div className={`aspect-square relative group overflow-hidden bg-secondary/20 ${index % 2 !== 0 ? 'lg:order-1' : ''}`}>
+                    {member.image ? (
+                      <img
+                        src={teamsService.getFileUrl(member, member.image)}
+                        alt={member.name}
+                        className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Users className="w-20 h-20 text-muted-foreground/20" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </SectionReveal>
             ))}
@@ -295,9 +294,9 @@ export default function About() {
       <HeroSection />
       <div className="h-screen" />
       <div className="relative z-10 bg-background">
-        <StorySection />
-        <FounderSection />
-        <ValuesSection />
+        <VisionSection />
+        <InspirationSection />
+        <TeamSection />
       </div>
     </div>
   );
