@@ -122,9 +122,30 @@ app.post('/api/booking/create', async (req, res) => {
 
         const adminPb = await getAdminPB();
 
+        // Function to generate unique 16-char ID
+        const generateGroupId = async (): Promise<string> => {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < 16; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+
+            // Check collision
+            const existing = await adminPb.collection('bookings').getList(1, 1, {
+                filter: `booking_group_id = "${result}"`
+            });
+
+            if (existing.totalItems > 0) return generateGroupId();
+            return result;
+        };
+
+        const bookingGroupId = await generateGroupId();
+        const pricePerSession = Math.round(amount / (courseType === 'Consultation' ? parseInt(duration) : 1) / 1.12);
+
         // 1. Create initial record in bookings
         const record = await adminPb.collection('bookings').create({
             user_id: userId,
+            booking_group_id: bookingGroupId,
             full_name: userName,
             email: userEmail,
             whatsapp: whatsapp,
@@ -138,7 +159,9 @@ app.post('/api/booking/create', async (req, res) => {
             session_time: sessionTime,
             topic: topic,
             duration: duration,
-            price_per_session: amount / (courseType === 'Consultation' ? parseInt(duration) : 1) / 1.12, // Approximation
+            session_number: 1,
+            total_sessions: 1,
+            price_per_session: pricePerSession,
             subtotal: subtotal,
             tax_percentage: 12,
             tax_amount: taxAmount,
@@ -209,7 +232,7 @@ app.post('/api/payment/webhook', async (req, res) => {
                             payment_status: 'paid',
                             payment_method: payment_method,
                             payment_date: new Date().toISOString(),
-                            booking_status: 'confirmed'
+                            booking_status: 'pending'
                         });
                         return res.status(200).send('OK (Booking)');
                     } catch (bookErr: any) {

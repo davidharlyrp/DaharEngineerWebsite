@@ -298,7 +298,7 @@ function BookingSuccessModal({
           </div>
 
           <Button
-            onClick={onClose}
+            onClick={() => window.location.href = '/dashboard'}
             className="w-full bg-army-600 hover:bg-army-700 text-white py-6 rounded-none"
           >
             Go to Dashboard
@@ -400,7 +400,7 @@ function BookingModal({
         courseType: course.serviceType === 'Consultation' ? 'Consultation' : 'Course'
       };
 
-      const response = await axios.post('http://localhost:4001/api/booking/create', bookingData);
+      const response = await axios.post('https://api.daharengineer.com/api/booking/create', bookingData);
 
       if (response.data.invoiceUrl) {
         window.location.href = response.data.invoiceUrl;
