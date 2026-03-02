@@ -1,9 +1,9 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  BookOpen, 
-  Search, 
+import {
+  BookOpen,
+  Search,
   Clock,
   Eye,
   Heart
@@ -242,11 +242,11 @@ function HeroSection() {
     <div ref={ref} className="relative h-screen">
       <motion.div
         style={{ opacity, y }}
-        className="fixed inset-0 flex items-center justify-center z-0"
+        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
-        
+
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -273,7 +273,7 @@ function HeroSection() {
             className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-tight text-muted-foreground"
             delay={0.5}
           />
-          
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -292,7 +292,7 @@ function HeroSection() {
 function FeaturedPostCard({ post }: { post: BlogPost }) {
   return (
     <SectionReveal>
-      <Link 
+      <Link
         to={`/blog/${post.slug}`}
         className="group block bg-secondary/30 hover:bg-secondary/50 border border-transparent 
                    hover:border-army-500/30 transition-all duration-300"
@@ -303,7 +303,7 @@ function FeaturedPostCard({ post }: { post: BlogPost }) {
                           flex items-center justify-center">
             <BookOpen className="w-24 h-24 text-army-700/40 group-hover:scale-110 transition-transform" />
           </div>
-          
+
           {/* Content */}
           <div className="p-8 lg:p-12 flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-4">
@@ -313,15 +313,15 @@ function FeaturedPostCard({ post }: { post: BlogPost }) {
                 {post.readTime} min read
               </span>
             </div>
-            
+
             <h2 className="text-2xl lg:text-3xl font-bold mb-4 group-hover:text-army-400 transition-colors">
               {post.title}
             </h2>
-            
+
             <p className="text-muted-foreground mb-6 line-clamp-3">
               {post.excerpt}
             </p>
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-army-700/30 flex items-center justify-center">
@@ -332,15 +332,15 @@ function FeaturedPostCard({ post }: { post: BlogPost }) {
                 <div>
                   <p className="text-sm font-medium">{post.author.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(post.publishedDate).toLocaleDateString('id-ID', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
+                    {new Date(post.publishedDate).toLocaleDateString('id-ID', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
                     })}
                   </p>
                 </div>
               </div>
-              
+
               <span className="text-army-400 group-hover:translate-x-1 transition-transform">
                 Read More →
               </span>
@@ -356,7 +356,7 @@ function FeaturedPostCard({ post }: { post: BlogPost }) {
 function PostCard({ post, index }: { post: BlogPost; index: number }) {
   return (
     <SectionReveal delay={0.05 * (index + 1)}>
-      <Link 
+      <Link
         to={`/blog/${post.slug}`}
         className="group block h-full bg-secondary/30 hover:bg-secondary/50 border border-transparent 
                    hover:border-army-500/30 transition-all duration-300"
@@ -366,7 +366,7 @@ function PostCard({ post, index }: { post: BlogPost; index: number }) {
                         flex items-center justify-center">
           <BookOpen className="w-12 h-12 text-army-700/40 group-hover:scale-110 transition-transform" />
         </div>
-        
+
         {/* Content */}
         <div className="p-5">
           <div className="flex items-center gap-3 mb-3">
@@ -376,20 +376,20 @@ function PostCard({ post, index }: { post: BlogPost; index: number }) {
               {post.readTime} min
             </span>
           </div>
-          
+
           <h3 className="text-lg font-semibold mb-2 group-hover:text-army-400 transition-colors line-clamp-2">
             {post.title}
           </h3>
-          
+
           <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
             {post.excerpt}
           </p>
-          
+
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">
-              {new Date(post.publishedDate).toLocaleDateString('id-ID', { 
-                month: 'short', 
-                day: 'numeric' 
+              {new Date(post.publishedDate).toLocaleDateString('id-ID', {
+                month: 'short',
+                day: 'numeric'
               })}
             </span>
             <div className="flex items-center gap-3 text-muted-foreground">
@@ -425,7 +425,7 @@ function BlogContentSection() {
     // Filter by search
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      posts = posts.filter(p => 
+      posts = posts.filter(p =>
         p.title.toLowerCase().includes(query) ||
         p.excerpt.toLowerCase().includes(query) ||
         p.tags.some(t => t.toLowerCase().includes(query))
@@ -454,7 +454,7 @@ function BlogContentSection() {
                   className="pl-10 bg-background border-border/50"
                 />
               </div>
-              
+
               <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0">
                 <Button
                   variant={selectedCategory === 'all' ? 'default' : 'outline'}

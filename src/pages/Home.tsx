@@ -1,11 +1,11 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
-  Building2, 
-  Wrench, 
-  GraduationCap, 
+import {
+  ArrowRight,
+  Building2,
+  Wrench,
+  GraduationCap,
   Calculator,
   ChevronDown
 } from 'lucide-react';
@@ -27,16 +27,32 @@ function HeroSection() {
     <div ref={ref} className="relative h-screen">
       <motion.div
         style={{ opacity, scale, y }}
-        className="fixed inset-0 flex items-center justify-center z-0"
+        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
       >
-        {/* Background grid */}
-        <div className="absolute inset-0 bg-grid opacity-30" />
-        
+
         {/* Noise overlay */}
         <div className="absolute inset-0 bg-noise" />
 
+        {/* Background grid */}
+        <div className="absolute inset-0 bg-grid opacity-30" />
+
+
+
         {/* Content */}
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+        <div className="relative z-10 text-center flex flex-col items-center justify-center px-6 w-full mx-auto h-screen">
+
+          {/* Video background */}
+          <div className="absolute inset-0 -z-10 overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-30"
+            >
+              <source src="/Hero.webm" type="video/webm" />
+            </video>
+          </div>
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -75,7 +91,7 @@ function HeroSection() {
             transition={{ delay: 0.8, duration: 0.6 }}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Complete construction solutions from planning, building design, 
+            Complete construction solutions from planning, building design,
             courses, to software and resources for developing your engineering career.
           </motion.p>
 
@@ -246,7 +262,7 @@ function SoftwareSection() {
               </SectionReveal>
               <SectionReveal delay={0.2}>
                 <p className="text-lg text-muted-foreground mb-8 max-w-lg">
-                  Powerful web-based tools designed for civil engineers. 
+                  Powerful web-based tools designed for civil engineers.
                   Analyze, calculate, and optimize your projects with precision.
                 </p>
               </SectionReveal>
@@ -343,8 +359,8 @@ function StatsSection() {
               </SectionReveal>
               <SectionReveal delay={0.2}>
                 <p className="text-lg text-muted-foreground mb-8">
-                  From small residential projects to large commercial developments, 
-                  we have helped engineers and contractors deliver successful projects 
+                  From small residential projects to large commercial developments,
+                  we have helped engineers and contractors deliver successful projects
                   with our expertise and innovative tools.
                 </p>
               </SectionReveal>
@@ -381,7 +397,7 @@ function CTASection() {
           </SectionReveal>
           <SectionReveal delay={0.1}>
             <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Whether you need structural design, engineering consultation, or 
+              Whether you need structural design, engineering consultation, or
               want to enhance your skills through our courses, we are here to help.
             </p>
           </SectionReveal>
@@ -416,10 +432,10 @@ export default function Home() {
     <div className="relative">
       {/* Hero with fixed effect */}
       <HeroSection />
-      
+
       {/* Spacer for hero */}
       <div className="h-screen" />
-      
+
       {/* Content sections */}
       <div className="relative z-10 bg-background">
         <ServicesSection />

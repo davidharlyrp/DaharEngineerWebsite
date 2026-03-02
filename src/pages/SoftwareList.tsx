@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { 
-  Code2, 
+import {
+  Code2,
   Star,
   Users,
   Zap,
@@ -202,11 +202,11 @@ function HeroSection() {
     <div ref={ref} className="relative h-screen">
       <motion.div
         style={{ opacity, y }}
-        className="fixed inset-0 flex items-center justify-center z-0"
+        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
-        
+
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -233,14 +233,14 @@ function HeroSection() {
             className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-tight text-muted-foreground"
             delay={0.5}
           />
-          
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.6 }}
             className="text-lg text-muted-foreground mt-8 max-w-2xl mx-auto"
           >
-            Powerful web-based tools designed to simplify complex engineering 
+            Powerful web-based tools designed to simplify complex engineering
             calculations and streamline your workflow.
           </motion.p>
         </div>
@@ -252,7 +252,7 @@ function HeroSection() {
 // Software Card Component - Unique and Bold Design
 function SoftwareCard({ software, index }: { software: Software; index: number }) {
   const Icon = categoryIcons[software.category] || Box;
-  
+
   const handleVisit = () => {
     window.open(software.websiteUrl, '_blank', 'noopener,noreferrer');
   };
@@ -264,11 +264,11 @@ function SoftwareCard({ software, index }: { software: Software; index: number }
         {/* Top accent line */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-army-600 via-army-500 to-army-700 
                         transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-        
+
         {/* Corner accent */}
         <div className="absolute top-0 right-0 w-16 h-16 bg-army-700/10 transform translate-x-8 -translate-y-8 
                         group-hover:translate-x-4 group-hover:-translate-y-4 transition-transform duration-500" />
-        
+
         <div className="p-8 relative">
           {/* Header */}
           <div className="flex items-start justify-between mb-6">
@@ -278,7 +278,7 @@ function SoftwareCard({ software, index }: { software: Software; index: number }
                               group-hover:bg-army-700 transition-colors duration-300">
                 <Icon className="w-8 h-8 text-army-400 group-hover:text-white transition-colors" />
               </div>
-              
+
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-2xl font-bold group-hover:text-army-400 transition-colors">
@@ -310,7 +310,7 @@ function SoftwareCard({ software, index }: { software: Software; index: number }
                 </div>
               </div>
             </div>
-            
+
             {/* Category Badge */}
             <Badge variant="outline" className="text-xs uppercase tracking-wider">
               {categoryNames[software.category]}
@@ -342,7 +342,7 @@ function SoftwareCard({ software, index }: { software: Software; index: number }
                 <span className="text-green-400 font-semibold">Free</span>
               ) : software.pricing?.type === 'freemium' ? (
                 <span className="text-army-400 font-semibold">
-                  Freemium {software.pricing.price && 
+                  Freemium {software.pricing.price &&
                     `(from Rp ${software.pricing.price.toLocaleString('id-ID')})`
                   }
                 </span>
@@ -353,8 +353,8 @@ function SoftwareCard({ software, index }: { software: Software; index: number }
                 </span>
               )}
             </div>
-            
-            <Button 
+
+            <Button
               onClick={handleVisit}
               className="bg-army-700 hover:bg-army-600 group/btn"
             >
@@ -407,8 +407,8 @@ function FeaturedSoftwareSection() {
 function AllSoftwareSection() {
   const [selectedCategory, setSelectedCategory] = useState<SoftwareCategory | 'all'>('all');
 
-  const filteredSoftware = selectedCategory === 'all' 
-    ? mockSoftware 
+  const filteredSoftware = selectedCategory === 'all'
+    ? mockSoftware
     : mockSoftware.filter(s => s.category === selectedCategory);
 
   const categories = Array.from(new Set(mockSoftware.map(s => s.category)));
@@ -544,7 +544,7 @@ function CTASection() {
           </SectionReveal>
           <SectionReveal delay={0.1}>
             <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-              We develop custom engineering software tailored to your specific needs. 
+              We develop custom engineering software tailored to your specific needs.
               Contact us to discuss your requirements.
             </p>
           </SectionReveal>

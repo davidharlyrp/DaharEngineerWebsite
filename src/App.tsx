@@ -9,6 +9,7 @@ import About from '@/pages/About';
 import Services from '@/pages/Services';
 import SoftwareList from '@/pages/SoftwareList';
 import Courses from '@/pages/Courses';
+import PrivateCourses from '@/pages/PrivateCourses';
 import Portfolio from '@/pages/Portfolio';
 import Contact from '@/pages/Contact';
 import Login from '@/pages/Login';
@@ -21,19 +22,22 @@ import RevitFiles from '@/pages/RevitFiles';
 import Resources from '@/pages/Resources';
 import Blog from '@/pages/Blog';
 
+// Components
+import { ScrollToTop } from '@/components/layout/ScrollToTop';
+
 function App() {
   return (
     <AuthProvider>
       <MenuProvider>
         <Router>
+          <ScrollToTop />
           <Routes>
             {/* Auth routes without MainLayout */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
+
             {/* Dashboard route without MainLayout */}
-            <Route path="/dashboard" element={<Dashboard />} />
-            
+
             {/* Main routes with MainLayout */}
             <Route
               path="/*"
@@ -45,14 +49,16 @@ function App() {
                     <Route path="/services" element={<Services />} />
                     <Route path="/software" element={<SoftwareList />} />
                     <Route path="/courses" element={<Courses />} />
+                    <Route path="/private-courses" element={<PrivateCourses />} />
                     <Route path="/portfolio" element={<Portfolio />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/store" element={<Store />} />
                     <Route path="/store/:category" element={<Store />} />
-                    <Route path="/revit-files" element={<RevitFiles />} />
-                    <Route path="/resources" element={<Resources />} />
+                    <Route path="community/revit-files" element={<RevitFiles />} />
+                    <Route path="community/resources" element={<Resources />} />
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blog/:slug" element={<Blog />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
                   </Routes>
                 </MainLayout>
               }

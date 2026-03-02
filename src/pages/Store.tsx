@@ -1,9 +1,9 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ShoppingBag, 
-  Search, 
+import {
+  ShoppingBag,
+  Search,
   Star,
   ArrowRight,
   Grid3X3,
@@ -196,11 +196,11 @@ function HeroSection() {
     <div ref={ref} className="relative h-screen">
       <motion.div
         style={{ opacity, y }}
-        className="fixed inset-0 flex items-center justify-center z-0"
+        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
-        
+
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -227,14 +227,14 @@ function HeroSection() {
             className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-tight text-muted-foreground"
             delay={0.5}
           />
-          
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.6 }}
             className="text-lg text-muted-foreground mt-8 max-w-2xl mx-auto"
           >
-            Premium Revit families, Excel templates, calculation sheets, and more 
+            Premium Revit families, Excel templates, calculation sheets, and more
             to accelerate your engineering workflow.
           </motion.p>
         </div>
@@ -244,17 +244,17 @@ function HeroSection() {
 }
 
 // Product Card Component
-function ProductCard({ 
-  product, 
-  index, 
-  onBuy 
-}: { 
-  product: Product; 
+function ProductCard({
+  product,
+  index,
+  onBuy
+}: {
+  product: Product;
   index: number;
   onBuy: (product: Product) => void;
 }) {
   const { isAuthenticated } = useAuth();
-  
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -279,7 +279,7 @@ function ProductCard({
         <div className="aspect-[4/3] bg-gradient-to-br from-army-800/20 to-army-900/20 
                         flex items-center justify-center relative overflow-hidden">
           <ShoppingBag className="w-16 h-16 text-army-700/40 group-hover:scale-110 transition-transform" />
-          
+
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {product.isNew && (
@@ -307,7 +307,7 @@ function ProductCard({
           <h3 className="text-lg font-semibold mb-2 group-hover:text-army-400 transition-colors line-clamp-2">
             {product.name}
           </h3>
-          
+
           <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
             {product.description}
           </p>
@@ -323,8 +323,8 @@ function ProductCard({
                 {formatPrice(product.price)}
               </span>
             </div>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               onClick={handleBuy}
               className="bg-army-700 hover:bg-army-600"
             >
@@ -360,8 +360,8 @@ function FeaturedProductsSection({ onBuy }: { onBuy: (product: Product) => void 
               </SectionReveal>
             </div>
             <SectionReveal delay={0.2}>
-              <Link 
-                to="/store/all" 
+              <Link
+                to="/store/all"
                 className="group flex items-center gap-2 text-army-400 hover:text-army-300"
               >
                 View All
@@ -389,7 +389,7 @@ function AllProductsSection({ onBuy }: { onBuy: (product: Product) => void }) {
 
   const filteredProducts = mockProducts.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchQuery.toLowerCase());
+      product.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -468,8 +468,8 @@ function AllProductsSection({ onBuy }: { onBuy: (product: Product) => void }) {
           </SectionReveal>
 
           {/* Products Grid */}
-          <div className={`grid gap-6 ${viewMode === 'grid' 
-            ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+          <div className={`grid gap-6 ${viewMode === 'grid'
+            ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
             : 'grid-cols-1'}`}>
             {filteredProducts.map((product, index) => (
               <ProductCard key={product.id} product={product} index={index} onBuy={onBuy} />
@@ -504,7 +504,7 @@ function CategoriesSection() {
             {categories.map((category, index) => {
               const Icon = category.icon;
               const count = mockProducts.filter(p => p.category === category.id).length;
-              
+
               return (
                 <SectionReveal key={category.id} delay={0.1 * (index + 1)}>
                   <Link

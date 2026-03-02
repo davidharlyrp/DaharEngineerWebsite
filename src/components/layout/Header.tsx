@@ -16,8 +16,8 @@ export function Header() {
             transition={{ duration: 0.5 }}
             className="flex items-center gap-3"
           >
-            <div className="w-10 h-10 bg-army-700 flex items-center justify-center">
-              <span className="text-lg font-bold text-white">DE</span>
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img src="logo.png" alt="Dahar Engineer" />
             </div>
             <div className="hidden sm:block">
               <span className="text-lg font-semibold tracking-tight">DAHAR</span>

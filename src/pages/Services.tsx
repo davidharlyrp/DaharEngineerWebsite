@@ -1,11 +1,11 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
-  Building2, 
-  Calculator, 
-  FileText, 
+import {
+  ArrowRight,
+  Building2,
+  Calculator,
+  FileText,
   HardHat,
   GraduationCap,
   Users,
@@ -28,11 +28,11 @@ function HeroSection() {
     <div ref={ref} className="relative h-screen">
       <motion.div
         style={{ opacity, y }}
-        className="fixed inset-0 flex items-center justify-center z-0"
+        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
-        
+
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -100,11 +100,11 @@ function BuildingDesignSection() {
                 </h2>
               </SectionReveal>
               <LineReveal delay={0.3} className="max-w-md mb-8" />
-              
+
               <SectionReveal delay={0.4}>
                 <p className="text-lg text-muted-foreground mb-8">
-                  Comprehensive structural design services for residential, commercial, 
-                  and industrial buildings. We ensure safety, efficiency, and compliance 
+                  Comprehensive structural design services for residential, commercial,
+                  and industrial buildings. We ensure safety, efficiency, and compliance
                   with all relevant codes and standards.
                 </p>
               </SectionReveal>
@@ -169,8 +169,8 @@ function EngineeringToolsSection() {
             <SectionReveal className="order-2 lg:order-1">
               <div className="grid grid-cols-2 gap-px bg-border/30">
                 {tools.map((tool) => (
-                  <div key={tool.name} 
-                       className="p-6 bg-background hover:bg-secondary/50 transition-colors">
+                  <div key={tool.name}
+                    className="p-6 bg-background hover:bg-secondary/50 transition-colors">
                     <Calculator className="w-6 h-6 text-army-400 mb-3" />
                     <h4 className="font-semibold mb-1">{tool.name}</h4>
                     <p className="text-xs text-muted-foreground">{tool.desc}</p>
@@ -197,10 +197,10 @@ function EngineeringToolsSection() {
                 </h2>
               </SectionReveal>
               <LineReveal delay={0.4} className="max-w-md mb-8" />
-              
+
               <SectionReveal delay={0.5}>
                 <p className="text-lg text-muted-foreground mb-8">
-                  Access our suite of web-based engineering applications designed to 
+                  Access our suite of web-based engineering applications designed to
                   streamline your calculations and analysis workflows.
                 </p>
               </SectionReveal>
@@ -257,7 +257,7 @@ function CoursesSection() {
             </SectionReveal>
             <SectionReveal delay={0.2}>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Enhance your engineering skills with our comprehensive courses 
+                Enhance your engineering skills with our comprehensive courses
                 designed for professionals and students.
               </p>
             </SectionReveal>
@@ -329,11 +329,11 @@ function ConsultationSection() {
                 </h2>
               </SectionReveal>
               <LineReveal delay={0.3} className="max-w-md mb-8" color="bg-army-500/50" />
-              
+
               <SectionReveal delay={0.4}>
                 <p className="text-lg text-muted-foreground mb-8">
-                  Get expert advice for your construction projects. Our consultation 
-                  services cover structural review, technical problem-solving, and 
+                  Get expert advice for your construction projects. Our consultation
+                  services cover structural review, technical problem-solving, and
                   project guidance.
                 </p>
               </SectionReveal>
@@ -372,7 +372,7 @@ function ConsultationSection() {
               <div className="p-8 lg:p-12 bg-army-900/50 border border-army-700/30">
                 <h3 className="text-2xl font-semibold mb-4">Ready to discuss your project?</h3>
                 <p className="text-muted-foreground mb-6">
-                  Schedule a consultation session with our engineering team. 
+                  Schedule a consultation session with our engineering team.
                   We offer both online and offline consultation options.
                 </p>
                 <div className="space-y-4">

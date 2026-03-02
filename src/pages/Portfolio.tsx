@@ -1,8 +1,8 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
+import {
+  ArrowRight,
   FolderOpen,
   MapPin,
   Calendar,
@@ -26,11 +26,11 @@ function HeroSection() {
     <div ref={ref} className="relative h-screen">
       <motion.div
         style={{ opacity, y }}
-        className="fixed inset-0 flex items-center justify-center z-0"
+        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
-        
+
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -145,22 +145,22 @@ function ProjectsSection() {
                     <Building2 className="w-16 h-16 text-army-700/40 group-hover:scale-110 
                                           transition-transform duration-500" />
                   </div>
-                  
+
                   <div className="p-6">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="px-2 py-1 text-xs bg-army-700/20 text-army-400">
                         {project.category}
                       </span>
                     </div>
-                    
+
                     <h3 className="text-lg font-semibold mb-2 group-hover:text-army-400 transition-colors">
                       {project.title}
                     </h3>
-                    
+
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                       {project.description}
                     </p>
-                    
+
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3 h-3" />
@@ -212,10 +212,10 @@ function CategoriesSection() {
                 </h2>
               </SectionReveal>
               <LineReveal delay={0.2} className="max-w-md mb-8" />
-              
+
               <SectionReveal delay={0.3}>
                 <p className="text-lg text-muted-foreground mb-8">
-                  From residential buildings to industrial facilities, we have 
+                  From residential buildings to industrial facilities, we have
                   delivered successful projects across various sectors and scales.
                 </p>
               </SectionReveal>
@@ -301,7 +301,7 @@ function CTASection() {
           </SectionReveal>
           <SectionReveal delay={0.1}>
             <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Let us help you bring your vision to life. Contact us to discuss 
+              Let us help you bring your vision to life. Contact us to discuss
               your project requirements and get a customized solution.
             </p>
           </SectionReveal>

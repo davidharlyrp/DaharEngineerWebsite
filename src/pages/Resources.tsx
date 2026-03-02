@@ -1,261 +1,47 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef, useState, useMemo } from 'react';
-import { 
-  BookOpen, 
-  Search, 
+import { useRef, useState, useMemo, useEffect } from 'react';
+import {
+  BookOpen,
+  Search,
   Download,
   FileText,
   GraduationCap,
   Scale,
-  Eye,
   FileDown,
   Lock,
-  Star,
   Calendar,
-  User
+  User,
+  Loader2,
+  ChevronDown
 } from 'lucide-react';
 import { TextReveal, SectionReveal } from '@/components/ui-custom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/context/AuthContext';
-import type { Resource, ResourceCategory } from '@/types';
-
-// Mock resources data
-const mockResources: Resource[] = [
-  {
-    id: '1',
-    title: 'Structural Analysis Fundamentals',
-    description: 'Comprehensive guide to structural analysis methods including statics, mechanics of materials, and structural behavior.',
-    category: 'e-book',
-    fileUrl: '#',
-    fileSize: '15.5 MB',
-    fileFormat: 'PDF',
-    author: 'Dahar Engineer',
-    tags: ['structural', 'analysis', 'fundamentals', 'engineering'],
-    downloadCount: 1234,
-    viewCount: 3456,
-    isPremium: false,
-    requiresLogin: false,
-    created: '2024-01-15',
-    updated: '2024-06-20'
-  },
-  {
-    id: '2',
-    title: 'SNI 1727:2020 - Design Seismic Loads',
-    description: 'Complete regulation document for seismic load design in Indonesia with commentary and examples.',
-    category: 'regulation',
-    fileUrl: '#',
-    fileSize: '8.2 MB',
-    fileFormat: 'PDF',
-    author: 'BSN Indonesia',
-    tags: ['SNI', 'seismic', 'regulation', 'loads'],
-    downloadCount: 2890,
-    viewCount: 5678,
-    isPremium: false,
-    requiresLogin: false,
-    created: '2024-02-10',
-    updated: '2024-07-15'
-  },
-  {
-    id: '3',
-    title: 'Revit Structure Mastery Module',
-    description: 'Step-by-step learning module for mastering structural modeling in Revit with practical exercises.',
-    category: 'module',
-    fileUrl: '#',
-    fileSize: '125 MB',
-    fileFormat: 'PDF',
-    author: 'Dahar Engineer',
-    tags: ['revit', 'bim', 'module', 'tutorial'],
-    downloadCount: 567,
-    viewCount: 1234,
-    isPremium: true,
-    price: 99000,
-    requiresLogin: true,
-    created: '2024-03-05',
-    updated: '2024-08-10'
-  },
-  {
-    id: '4',
-    title: 'Concrete Design Handbook',
-    description: 'Practical handbook for reinforced concrete design following SNI 2847:2019 standards.',
-    category: 'e-book',
-    fileUrl: '#',
-    fileSize: '22.8 MB',
-    fileFormat: 'PDF',
-    author: 'Dahar Engineer',
-    tags: ['concrete', 'design', 'handbook', 'SNI'],
-    downloadCount: 1890,
-    viewCount: 4234,
-    isPremium: false,
-    requiresLogin: false,
-    created: '2024-01-20',
-    updated: '2024-05-15'
-  },
-  {
-    id: '5',
-    title: 'SNI 1726:2019 - Seismic Design Procedures',
-    description: 'Official standard for seismic design procedures for building structures in Indonesia.',
-    category: 'regulation',
-    fileUrl: '#',
-    fileSize: '12.5 MB',
-    fileFormat: 'PDF',
-    author: 'BSN Indonesia',
-    tags: ['SNI', 'seismic', 'design', 'regulation'],
-    downloadCount: 3456,
-    viewCount: 6789,
-    isPremium: false,
-    requiresLogin: false,
-    created: '2024-04-12',
-    updated: '2024-09-01'
-  },
-  {
-    id: '6',
-    title: 'ETABS Advanced Training Module',
-    description: 'Advanced training material for structural analysis and design using ETABS software.',
-    category: 'module',
-    fileUrl: '#',
-    fileSize: '85 MB',
-    fileFormat: 'PDF',
-    author: 'Dahar Engineer',
-    tags: ['etabs', 'analysis', 'module', 'training'],
-    downloadCount: 890,
-    viewCount: 2345,
-    isPremium: true,
-    price: 149000,
-    requiresLogin: true,
-    created: '2024-05-20',
-    updated: '2024-10-15'
-  },
-  {
-    id: '7',
-    title: 'Foundation Engineering Guide',
-    description: 'Complete guide to foundation engineering including soil mechanics and foundation design.',
-    category: 'e-book',
-    fileUrl: '#',
-    fileSize: '18.3 MB',
-    fileFormat: 'PDF',
-    author: 'Dahar Engineer',
-    tags: ['foundation', 'geotechnical', 'design', 'guide'],
-    downloadCount: 1456,
-    viewCount: 3456,
-    isPremium: false,
-    requiresLogin: false,
-    created: '2024-02-28',
-    updated: '2024-07-20'
-  },
-  {
-    id: '8',
-    title: 'SNI 2847:2019 - Concrete Structure Requirements',
-    description: 'Standard requirements for structural concrete buildings and explanations.',
-    category: 'regulation',
-    fileUrl: '#',
-    fileSize: '25.6 MB',
-    fileFormat: 'PDF',
-    author: 'BSN Indonesia',
-    tags: ['SNI', 'concrete', 'regulation', 'requirements'],
-    downloadCount: 4123,
-    viewCount: 7890,
-    isPremium: false,
-    requiresLogin: false,
-    created: '2024-03-15',
-    updated: '2024-08-25'
-  },
-  {
-    id: '9',
-    title: 'Steel Structure Design Module',
-    description: 'Learning module for steel structure design following SNI 1729:2020 standards.',
-    category: 'module',
-    fileUrl: '#',
-    fileSize: '45 MB',
-    fileFormat: 'PDF',
-    author: 'Dahar Engineer',
-    tags: ['steel', 'design', 'module', 'SNI'],
-    downloadCount: 678,
-    viewCount: 1567,
-    isPremium: true,
-    price: 129000,
-    requiresLogin: true,
-    created: '2024-06-01',
-    updated: '2024-11-01'
-  },
-  {
-    id: '10',
-    title: 'Structural Engineering Reference',
-    description: 'Quick reference guide for structural engineers with formulas, tables, and charts.',
-    category: 'e-book',
-    fileUrl: '#',
-    fileSize: '10.2 MB',
-    fileFormat: 'PDF',
-    author: 'Dahar Engineer',
-    tags: ['reference', 'formulas', 'engineering', 'quick-guide'],
-    downloadCount: 2345,
-    viewCount: 4567,
-    isPremium: false,
-    requiresLogin: false,
-    created: '2024-04-20',
-    updated: '2024-09-15'
-  },
-  {
-    id: '11',
-    title: 'SNI 1729:2020 - Steel Structure Specification',
-    description: 'Specification for structural steel buildings with design examples.',
-    category: 'regulation',
-    fileUrl: '#',
-    fileSize: '18.9 MB',
-    fileFormat: 'PDF',
-    author: 'BSN Indonesia',
-    tags: ['SNI', 'steel', 'specification', 'design'],
-    downloadCount: 2789,
-    viewCount: 5678,
-    isPremium: false,
-    requiresLogin: false,
-    created: '2024-07-10',
-    updated: '2024-11-20'
-  },
-  {
-    id: '12',
-    title: 'BIM Implementation Guide',
-    description: 'Comprehensive guide for BIM implementation in structural engineering projects.',
-    category: 'module',
-    fileUrl: '#',
-    fileSize: '32 MB',
-    fileFormat: 'PDF',
-    author: 'Dahar Engineer',
-    tags: ['bim', 'implementation', 'guide', 'workflow'],
-    downloadCount: 456,
-    viewCount: 1234,
-    isPremium: true,
-    price: 79000,
-    requiresLogin: true,
-    created: '2024-08-15',
-    updated: '2024-12-01'
-  }
-];
+import { resourceService } from '@/services/pb/resources';
+import type { Resource } from '@/types/resources';
 
 // Category definitions
-const categories: { id: ResourceCategory; name: string; icon: React.ElementType; description: string; color: string }[] = [
-  { 
-    id: 'e-book', 
-    name: 'E-Books', 
-    icon: BookOpen, 
+const categories = [
+  {
+    id: 'ebooks',
+    name: 'E-Books',
+    icon: BookOpen,
     description: 'Comprehensive books and guides for engineering topics',
-    color: 'bg-blue-600'
   },
-  { 
-    id: 'module', 
-    name: 'Modules', 
-    icon: GraduationCap, 
+  {
+    id: 'modul',
+    name: 'Modules',
+    icon: GraduationCap,
     description: 'Structured learning modules and training materials',
-    color: 'bg-green-600'
   },
-  { 
-    id: 'regulation', 
-    name: 'Regulations', 
-    icon: Scale, 
+  {
+    id: 'regulations',
+    name: 'Regulations',
+    icon: Scale,
     description: 'Official standards and regulatory documents',
-    color: 'bg-amber-600'
-  },
+  }
 ];
 
 // Hero Section
@@ -273,12 +59,24 @@ function HeroSection() {
     <div ref={ref} className="relative h-screen">
       <motion.div
         style={{ opacity, y }}
-        className="fixed inset-0 flex items-center justify-center z-0"
+        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
-        
-        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+
+        <div className="relative z-10 text-center flex flex-col items-center justify-center px-6 w-full mx-auto h-screen">
+          {/* Video background */}
+          <div className="absolute inset-0 -z-10 overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-30"
+            >
+              <source src="/Hero.webm" type="video/webm" />
+            </video>
+          </div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -304,30 +102,45 @@ function HeroSection() {
             className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-tight text-muted-foreground"
             delay={0.5}
           />
-          
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.6 }}
             className="text-lg text-muted-foreground mt-8 max-w-2xl mx-auto"
           >
-            Access our collection of e-books, learning modules, and regulatory documents 
+            Access our collection of e-books, learning modules, and regulatory documents
             to enhance your engineering knowledge.
           </motion.p>
         </div>
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.6 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="flex flex-col items-center gap-2 text-muted-foreground"
+          >
+            <span className="text-xs uppercase tracking-widest">Scroll</span>
+            <ChevronDown className="w-5 h-5" />
+          </motion.div>
+        </motion.div>
       </motion.div>
     </div>
   );
 }
 
 // Resource Card Component
+// Resource Card Component
 function ResourceCard({ resource, index }: { resource: Resource; index: number }) {
   const { isAuthenticated } = useAuth();
-  
-  const canDownload = !resource.requiresLogin || (resource.requiresLogin && isAuthenticated);
 
-  const getCategoryIcon = (category: ResourceCategory) => {
-    switch (category) {
+  const getCategoryIcon = (category: string) => {
+    switch (category?.toLowerCase()) {
       case 'e-book': return BookOpen;
       case 'module': return GraduationCap;
       case 'regulation': return Scale;
@@ -336,223 +149,370 @@ function ResourceCard({ resource, index }: { resource: Resource; index: number }
   };
 
   const Icon = getCategoryIcon(resource.category);
+  const downloadUrl = resourceService.getDownloadUrl(resource);
 
-  const handleDownload = () => {
-    if (resource.requiresLogin && !isAuthenticated) {
-      window.location.href = '/login?redirect=/resources';
-      return;
+  const handleDownload = async () => {
+    try {
+      if (!isAuthenticated) {
+        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
+
+      // Track download in background
+      resourceService.incrementDownload(resource.id, resource.download_count || 0).catch(console.error);
+
+      // Create a temporary link to trigger download (more robust against adblockers than window.open)
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.target = '_blank';
+      link.download = resource.file_name || 'download';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Download failed:', error);
     }
-    if (resource.isPremium && !isAuthenticated) {
-      window.location.href = '/login?redirect=/resources';
-      return;
-    }
-    // Download logic here
-    console.log('Downloading:', resource.id);
+  };
+
+  const formatSize = (bytes: number) => {
+    if (!bytes || bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   return (
     <SectionReveal delay={0.05 * (index + 1)}>
-      <div className="group h-full bg-secondary/30 hover:bg-secondary/50 border border-transparent 
-                      hover:border-army-500/30 transition-all duration-300">
+      <div className="group h-full bg-secondary/5 hover:bg-secondary/15 border border-border/10 
+                      hover:border-army-500/30 transition-all duration-300 rounded-sm overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-5 border-b border-border/30">
+        <div className="p-4 border-b border-border/5">
           <div className="flex items-start justify-between">
-            <div className="w-12 h-12 bg-army-700/20 flex items-center justify-center
-                            group-hover:bg-army-700 transition-colors">
-              <Icon className="w-6 h-6 text-army-400 group-hover:text-white transition-colors" />
+            <div className="w-10 h-10 bg-army-700/10 flex items-center justify-center rounded-sm
+                            group-hover:bg-army-700/20 transition-colors">
+              <Icon className="w-5 h-5 text-army-400" />
             </div>
-            <div className="flex flex-col items-end gap-2">
-              <Badge variant="outline" className="text-xs uppercase">
+            <div className="flex flex-col items-end gap-1 text-right">
+              <Badge variant="outline" className="text-[9px] uppercase h-5 px-1.5 border-border/20 rounded-sm">
                 {resource.category}
               </Badge>
-              {resource.isPremium && (
-                <Badge className="bg-amber-600">
-                  <Star className="w-3 h-3 mr-1 fill-current" />
-                  PREMIUM
-                </Badge>
+              {resource.subcategory && (
+                <span className="text-[9px] text-muted-foreground uppercase opacity-50 tracking-wider">
+                  {resource.subcategory}
+                </span>
               )}
             </div>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-5">
-          <h3 className="text-lg font-semibold mb-2 group-hover:text-army-400 transition-colors line-clamp-2">
+        <div className="p-4 flex flex-col flex-1">
+          <h3 className="text-sm font-semibold mb-1 group-hover:text-army-400 transition-colors line-clamp-1">
             {resource.title}
           </h3>
-          
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+
+          <p className="text-[11px] text-muted-foreground mb-3 line-clamp-2 min-h-[32px] opacity-80 leading-relaxed">
             {resource.description}
           </p>
 
-          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+          <div className="flex flex-wrap gap-3 text-[10px] text-muted-foreground mb-4 opacity-70">
             <span className="flex items-center gap-1">
-              <User className="w-4 h-4" />
-              {resource.author}
+              <User className="w-3 h-3" />
+              {resource.author || resource.uploaded_by_name}
             </span>
-            <span className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              {new Date(resource.created).getFullYear()}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between pt-4 border-t border-border/30">
-            <div className="flex items-center gap-3 text-sm">
+            {resource.year_released && (
               <span className="flex items-center gap-1">
-                <FileDown className="w-4 h-4" />
-                {resource.fileFormat}
+                <Calendar className="w-3 h-3" />
+                {resource.year_released}
               </span>
-              <span className="text-muted-foreground">{resource.fileSize}</span>
+            )}
+          </div>
+
+          <div className="mt-auto">
+            <div className="flex items-center justify-between pt-3 border-t border-border/5 mb-3">
+              <div className="flex items-center gap-2 text-[10px]">
+                <span className="flex items-center gap-1 px-1.5 py-0.5 bg-secondary/20 rounded-sm">
+                  <FileDown className="w-3 h-3" />
+                  {resource.file_type?.split('/').pop()?.toUpperCase() || 'FILE'}
+                </span>
+                <span className="opacity-60">{formatSize(resource.file_size)}</span>
+              </div>
+              <div className="flex items-center gap-1 text-[10px] opacity-60">
+                <Download className="w-3 h-3" />
+                {resource.download_count || 0}
+              </div>
             </div>
-            {resource.isPremium && resource.price && (
-              <span className="font-semibold text-army-400">
-                Rp {resource.price.toLocaleString('id-ID')}
-              </span>
-            )}
-          </div>
 
-          {/* Stats */}
-          <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Eye className="w-4 h-4" />
-              {resource.viewCount}
-            </span>
-            <span className="flex items-center gap-1">
-              <Download className="w-4 h-4" />
-              {resource.downloadCount}
-            </span>
+            <Button
+              onClick={handleDownload}
+              className="w-full bg-army-700 hover:bg-army-600 h-8 text-[11px] rounded-sm transition-all"
+            >
+              {!isAuthenticated ? (
+                <><Lock className="w-3 h-3 mr-2" /> Login to Access</>
+              ) : (
+                <><Download className="w-3 h-3 mr-2" /> Download Document</>
+              )}
+            </Button>
           </div>
-
-          {/* Download Button */}
-          <Button 
-            onClick={handleDownload}
-            disabled={!canDownload}
-            className="w-full mt-4 bg-army-700 hover:bg-army-600"
-          >
-            {resource.requiresLogin && !isAuthenticated ? (
-              <><Lock className="w-4 h-4 mr-2" /> Login to Download</>
-            ) : resource.isPremium && !isAuthenticated ? (
-              <><Star className="w-4 h-4 mr-2" /> Premium Content</>
-            ) : (
-              <><Download className="w-4 h-4 mr-2" /> Download</>
-            )}
-          </Button>
         </div>
       </div>
     </SectionReveal>
   );
 }
 
-// Resources Section with Filter
-function ResourcesSection() {
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+
+const ITEMS_PER_PAGE = 20;
+
+// Resources Listing Section
+function ResourcesListingSection({ resources, isLoading }: { resources: Resource[]; isLoading: boolean }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<ResourceCategory | 'all'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  // Extract unique subcategories from resources based on active category
+  const availableSubcategories = useMemo(() => {
+    const subs = new Set<string>();
+    const sourceResources = selectedCategory === 'all'
+      ? resources
+      : resources.filter(r => r.category?.toLowerCase() === selectedCategory.toLowerCase());
+
+    sourceResources.forEach(r => {
+      if (r.subcategory) subs.add(r.subcategory);
+    });
+    return Array.from(subs).sort();
+  }, [resources, selectedCategory]);
 
   const filteredResources = useMemo(() => {
-    let resources = [...mockResources];
+    let result = [...resources];
 
-    // Filter by category
     if (selectedCategory !== 'all') {
-      resources = resources.filter(r => r.category === selectedCategory);
+      result = result.filter(r => r.category?.toLowerCase() === selectedCategory.toLowerCase());
     }
 
-    // Filter by search
+    if (selectedSubcategory !== 'all') {
+      result = result.filter(r => r.subcategory?.toLowerCase() === selectedSubcategory.toLowerCase());
+    }
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      resources = resources.filter(r => 
-        r.title.toLowerCase().includes(query) ||
-        r.description.toLowerCase().includes(query) ||
-        r.tags.some(t => t.toLowerCase().includes(query)) ||
-        r.author.toLowerCase().includes(query)
+      result = result.filter(r =>
+        r.title?.toLowerCase().includes(query) ||
+        r.description?.toLowerCase().includes(query) ||
+        r.author?.toLowerCase().includes(query) ||
+        r.uploaded_by_name?.toLowerCase().includes(query)
       );
     }
 
-    return resources;
-  }, [searchQuery, selectedCategory]);
+    return result;
+  }, [resources, searchQuery, selectedCategory, selectedSubcategory]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, selectedSubcategory]);
+
+  // Scroll to section when page changes
+  useEffect(() => {
+    if (currentPage > 1) { // Only scroll if not the first page or filter reset
+      sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentPage]);
+
+  const totalPages = Math.ceil(filteredResources.length / ITEMS_PER_PAGE);
+  const paginatedResources = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredResources.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredResources, currentPage]);
+
+  const resetFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('all');
+    setSelectedSubcategory('all');
+  };
 
   return (
-    <section className="section-fullscreen relative flex items-center bg-background">
-      <div className="w-full px-6 lg:px-20 py-20">
+    <section ref={sectionRef} className="relative flex items-center bg-background py-12">
+      <div className="w-full px-6 lg:px-20">
         <div className="max-w-7xl mx-auto">
-          {/* Category Cards */}
+          {/* Category Selection */}
           <SectionReveal>
-            <div className="grid sm:grid-cols-3 gap-6 mb-12">
+            <div className="grid sm:grid-cols-3 gap-3 mb-8">
               {categories.map((category) => {
                 const Icon = category.icon;
-                const count = mockResources.filter(r => r.category === category.id).length;
+                const count = resources.filter(r => r.category?.toLowerCase() === category.id).length;
                 const isSelected = selectedCategory === category.id;
-                
+
                 return (
                   <div
                     key={category.id}
-                    onClick={() => setSelectedCategory(isSelected ? 'all' : category.id)}
-                    className={`cursor-pointer p-6 border transition-all duration-300 ${
-                      isSelected 
-                        ? 'border-army-500 bg-army-700/10' 
-                        : 'border-border/30 bg-secondary/30 hover:bg-secondary/50'
-                    }`}
+                    onClick={() => {
+                      setSelectedCategory(isSelected ? 'all' : category.id);
+                      setSelectedSubcategory('all');
+                    }}
+                    className={`cursor-pointer p-4 border transition-all duration-200 rounded-sm ${isSelected
+                      ? 'border-army-500 bg-army-700/10'
+                      : 'border-border/20 bg-secondary/10 hover:bg-secondary/20'
+                      }`}
                   >
-                    <div className={`w-12 h-12 ${category.color} flex items-center justify-center mb-4`}>
-                      <Icon className="w-6 h-6 text-white" />
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 flex items-center justify-center rounded-sm shrink-0`}>
+                        <Icon className="w-4 h-4 text-army-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-semibold truncate">{category.name}</h3>
+                        <p className="text-[10px] text-muted-foreground truncate opacity-70">{count} Documents</p>
+                      </div>
                     </div>
-                    <h3 className="text-xl font-semibold mb-1">{category.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">{category.description}</p>
-                    <p className="text-sm font-medium">{count} resources</p>
                   </div>
                 );
               })}
             </div>
           </SectionReveal>
 
-          {/* Search */}
-          <SectionReveal delay={0.1}>
-            <div className="relative mb-8">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          {/* Search and Subcategory Selection */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6 items-start md:items-center justify-between">
+            <div className="relative w-full md:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground opacity-50" />
               <Input
-                placeholder="Search resources by title, description, author, or tags..."
+                placeholder="Search resources..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-background border-border/50"
+                className="pl-9 bg-secondary/5 border-border/20 h-9 text-xs rounded-sm"
               />
             </div>
-          </SectionReveal>
 
-          {/* Active Filter */}
-          {selectedCategory !== 'all' && (
-            <SectionReveal delay={0.2}>
-              <div className="flex items-center gap-2 mb-6">
-                <span className="text-sm text-muted-foreground">Showing:</span>
-                <Badge className="bg-army-700">
-                  {categories.find(c => c.id === selectedCategory)?.name}
-                  <button 
-                    onClick={() => setSelectedCategory('all')}
-                    className="ml-2 hover:text-white/70"
-                  >
-                    ×
-                  </button>
+            {availableSubcategories.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground mr-2 font-medium">Sub Category:</span>
+                <Badge
+                  onClick={() => setSelectedSubcategory('all')}
+                  variant={selectedSubcategory === 'all' ? 'default' : 'outline'}
+                  className={`cursor-pointer px-2 py-0.5 text-[9px] rounded-sm transition-colors border-border/30 h-6 ${selectedSubcategory === 'all' ? 'bg-army-700 hover:bg-army-600' : 'hover:bg-army-700/10'
+                    }`}
+                >
+                  ALL
                 </Badge>
+                {availableSubcategories.map(sub => (
+                  <Badge
+                    key={sub}
+                    onClick={() => setSelectedSubcategory(selectedSubcategory === sub ? 'all' : sub)}
+                    variant={selectedSubcategory === sub ? 'default' : 'outline'}
+                    className={`cursor-pointer px-2 py-0.5 text-[9px] rounded-sm transition-colors border-border/30 h-6 ${selectedSubcategory === sub ? 'bg-army-700 hover:bg-army-600' : 'hover:bg-army-700/10'
+                      }`}
+                  >
+                    {sub}
+                  </Badge>
+                ))}
               </div>
-            </SectionReveal>
-          )}
-
-          {/* Results Count */}
-          <SectionReveal delay={0.2}>
-            <p className="text-sm text-muted-foreground mb-6">
-              Showing {filteredResources.length} resource{filteredResources.length !== 1 ? 's' : ''}
-            </p>
-          </SectionReveal>
-
-          {/* Resources Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredResources.map((resource, index) => (
-              <ResourceCard key={resource.id} resource={resource} index={index} />
-            ))}
+            )}
           </div>
 
-          {filteredResources.length === 0 && (
-            <div className="text-center py-20">
-              <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No resources found matching your criteria</p>
+          {/* Active Filter Badge Bar */}
+          {(selectedCategory !== 'all' || selectedSubcategory !== 'all' || searchQuery) && (
+            <div className="flex items-center gap-2 mb-6 animate-in fade-in slide-in-from-top-1">
+              <span className="text-[10px] text-muted-foreground italic">Filtered results for {filteredResources.length} matches:</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={resetFilters}
+                className="h-5 text-[9px] text-army-400 hover:text-army-300 px-1 hover:bg-transparent"
+              >
+                Clear Filters
+              </Button>
+            </div>
+          )}
+
+          {/* Results Grid */}
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-24">
+              <Loader2 className="w-6 h-6 animate-spin text-army-500 mb-4 opacity-50" />
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground opacity-50">Fetching Database Resources...</p>
+            </div>
+          ) : paginatedResources.length > 0 ? (
+            <div className="space-y-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {paginatedResources.map((resource, index) => (
+                  <ResourceCard key={resource.id} resource={resource} index={index} />
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex justify-center pt-8 border-t border-border/5">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (currentPage > 1) setCurrentPage(currentPage - 1);
+                          }}
+                          className={`cursor-pointer text-[10px] rounded-sm h-8 ${currentPage === 1 ? 'pointer-events-none opacity-20' : ''}`}
+                        />
+                      </PaginationItem>
+
+                      {[...Array(totalPages)].map((_, i) => {
+                        const pageNumber = i + 1;
+                        // Basic logic to show limited page numbers
+                        if (
+                          pageNumber === 1 ||
+                          pageNumber === totalPages ||
+                          (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                        ) {
+                          return (
+                            <PaginationItem key={pageNumber}>
+                              <PaginationLink
+                                isActive={currentPage === pageNumber}
+                                onClick={(e) => { e.preventDefault(); setCurrentPage(pageNumber); }}
+                                className={`cursor-pointer text-[10px] rounded-sm w-8 h-8 ${currentPage === pageNumber ? 'bg-army-700 border-army-600' : ''}`}
+                              >
+                                {pageNumber}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        } else if (
+                          (pageNumber === currentPage - 2 && pageNumber > 1) ||
+                          (pageNumber === currentPage + 2 && pageNumber < totalPages)
+                        ) {
+                          return (
+                            <PaginationItem key={pageNumber}>
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                          );
+                        }
+                        return null;
+                      })}
+
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                          }}
+                          className={`cursor-pointer text-[10px] rounded-sm h-8 ${currentPage === totalPages ? 'pointer-events-none opacity-20' : ''}`}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-20 border border-dashed border-border/10 rounded-sm bg-secondary/5">
+              <FileText className="w-8 h-8 text-muted-foreground/10 mx-auto mb-3" />
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">No resources found</p>
             </div>
           )}
         </div>
@@ -561,28 +521,27 @@ function ResourcesSection() {
   );
 }
 
-// Stats Section
-function StatsSection() {
-  const totalDownloads = mockResources.reduce((acc, r) => acc + r.downloadCount, 0);
-  const totalViews = mockResources.reduce((acc, r) => acc + r.viewCount, 0);
+// Stats Preview
+function StatsPreview({ resources }: { resources: Resource[] }) {
+  const totalDownloads = resources.reduce((acc, r) => acc + (r.download_count || 0), 0);
+  const categoriesCount = new Set(resources.map(r => r.category)).size;
 
   return (
-    <section className="section-fullscreen relative flex items-center bg-secondary/20">
-      <div className="w-full px-6 lg:px-20 py-20">
+    <section className="relative bg-secondary/5 py-12">
+      <div className="w-full px-6 lg:px-20">
         <div className="max-w-7xl mx-auto">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border/30">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { value: mockResources.length.toString(), label: 'Total Resources' },
-              { value: totalDownloads.toLocaleString(), label: 'Total Downloads' },
-              { value: totalViews.toLocaleString(), label: 'Total Views' },
-              { value: categories.length.toString(), label: 'Categories' }
+              { value: resources.length.toString(), label: 'RESOURCES' },
+              { value: totalDownloads.toLocaleString(), label: 'DOWNLOADS' },
+              { value: categoriesCount.toString(), label: 'DOMAINS' }
             ].map((stat, index) => (
-              <SectionReveal key={stat.label} delay={0.1 * (index + 1)}>
-                <div className="p-8 lg:p-12 bg-background text-center">
-                  <div className="text-4xl lg:text-5xl font-bold text-army-400 mb-2">
+              <SectionReveal key={stat.label} delay={0.05 * (index + 1)}>
+                <div className="p-6 bg-background/50 border border-border/10 rounded-sm text-center">
+                  <div className="text-2xl font-bold text-army-400 mb-1">
                     {stat.value}
                   </div>
-                  <div className="text-sm text-muted-foreground uppercase tracking-wider">
+                  <div className="text-[9px] text-muted-foreground uppercase tracking-[0.2em] opacity-60">
                     {stat.label}
                   </div>
                 </div>
@@ -597,13 +556,30 @@ function StatsSection() {
 
 // Main Resources Page
 export default function Resources() {
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const data = await resourceService.getResources();
+        setResources(data);
+      } catch (error) {
+        console.error('Failed to fetch resources:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchResources();
+  }, []);
+
   return (
     <div className="relative">
       <HeroSection />
-      <div className="h-screen" />
+      <div className="h-screen pointer-events-none" />
       <div className="relative z-10 bg-background">
-        <ResourcesSection />
-        <StatsSection />
+        <ResourcesListingSection resources={resources} isLoading={isLoading} />
+        <StatsPreview resources={resources} />
       </div>
     </div>
   );

@@ -1,21 +1,22 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMenu } from '@/context/MenuContext';
 import { useAuth } from '@/context/AuthContext';
-import { 
-  Home, 
-  Building2, 
-  Code2, 
-  GraduationCap, 
-  FolderOpen, 
-  Mail, 
-  User, 
+import {
+  Home,
+  Building2,
+  Code2,
+  GraduationCap,
+  FolderOpen,
+  Mail,
+  User,
   LogOut,
   X,
   ShoppingBag,
   Box,
   BookOpen,
   FileText,
-  LayoutDashboard
+  LayoutDashboard,
+  Users
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -25,10 +26,11 @@ const menuItems = [
   { label: 'Services', href: '/services', icon: Building2 },
   { label: 'Software', href: '/software', icon: Code2 },
   { label: 'Store', href: '/store', icon: ShoppingBag },
-  { label: 'Revit Files', href: '/revit-files', icon: Box },
-  { label: 'Resources', href: '/resources', icon: BookOpen },
+  { label: 'Revit Files', href: '/community/revit-files', icon: Box },
+  { label: 'Resources', href: '/community/resources', icon: BookOpen },
   { label: 'Blog', href: '/blog', icon: FileText },
-  { label: 'Courses', href: '/courses', icon: GraduationCap },
+  { label: 'Private Courses', href: '/private-courses', icon: Users },
+  { label: 'Online Courses', href: '/courses', icon: GraduationCap },
   { label: 'Portfolio', href: '/portfolio', icon: FolderOpen },
   { label: 'Contact', href: '/contact', icon: Mail },
 ];
@@ -73,14 +75,14 @@ export function MenuOverlay() {
                 {menuItems.map((item, index) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.href || location.pathname.startsWith(item.href + '/');
-                  
+
                   return (
                     <motion.div
                       key={item.href}
                       initial={{ opacity: 0, x: -50 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -50 }}
-                      transition={{ 
+                      transition={{
                         delay: 0.1 + index * 0.05,
                         duration: 0.4,
                         ease: [0.16, 1, 0.3, 1]
@@ -92,8 +94,8 @@ export function MenuOverlay() {
                         className={`
                           group flex items-center gap-4 py-3 px-4 -mx-4
                           transition-all duration-300
-                          ${isActive 
-                            ? 'text-army-400' 
+                          ${isActive
+                            ? 'text-army-400'
                             : 'text-foreground/60 hover:text-foreground'
                           }
                         `}
@@ -129,7 +131,7 @@ export function MenuOverlay() {
                 <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-6">
                   Account
                 </h3>
-                
+
                 {isAuthenticated ? (
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
@@ -198,25 +200,25 @@ export function MenuOverlay() {
                   Follow Us
                 </h3>
                 <div className="flex gap-4">
-                  <a 
-                    href="https://instagram.com/dahar.engineer" 
-                    target="_blank" 
+                  <a
+                    href="https://instagram.com/dahar.engineer"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-army-400 transition-colors"
                   >
                     Instagram
                   </a>
-                  <a 
-                    href="https://linkedin.com/company/dahar-engineer" 
-                    target="_blank" 
+                  <a
+                    href="https://linkedin.com/company/dahar-engineer"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-army-400 transition-colors"
                   >
                     LinkedIn
                   </a>
-                  <a 
-                    href="https://youtube.com/@daharengineer" 
-                    target="_blank" 
+                  <a
+                    href="https://youtube.com/@daharengineer"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-army-400 transition-colors"
                   >

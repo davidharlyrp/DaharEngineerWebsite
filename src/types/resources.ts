@@ -3,23 +3,23 @@ export interface Resource {
   id: string;
   title: string;
   description: string;
-  category: ResourceCategory;
-  fileUrl: string;
-  fileSize: string;
-  fileFormat: string;
-  thumbnail?: string;
   author: string;
-  tags: string[];
-  downloadCount: number;
-  viewCount: number;
-  isPremium: boolean;
-  price?: number;
-  requiresLogin: boolean;
+  year_released: number;
+  file_name: string;
+  file: string;
+  file_size: number;
+  file_type: string;
+  category: string;
+  subcategory: string;
+  uploaded_by: string;
+  uploaded_by_name: string;
+  is_active: boolean;
+  download_count: number;
   created: string;
   updated: string;
 }
 
-export type ResourceCategory = 'e-book' | 'module' | 'regulation' | 'guide' | 'reference';
+export type ResourceCategory = 'ebooks' | 'modul' | 'regulations' | 'guides' | 'references';
 
 export interface ResourceCategoryInfo {
   id: ResourceCategory;
@@ -51,12 +51,12 @@ export interface BlogPost {
   updated: string;
 }
 
-export type BlogCategory = 
-  | 'tutorial' 
-  | 'news' 
-  | 'tips-tricks' 
-  | 'case-study' 
-  | 'industry-insights' 
+export type BlogCategory =
+  | 'tutorial'
+  | 'news'
+  | 'tips-tricks'
+  | 'case-study'
+  | 'industry-insights'
   | 'software';
 
 export interface Author {

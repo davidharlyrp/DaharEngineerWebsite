@@ -1,8 +1,8 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { 
-  Mail, 
-  Phone, 
+import {
+  Mail,
+  Phone,
   MapPin,
   Send,
   Instagram,
@@ -32,11 +32,11 @@ function HeroSection() {
     <div ref={ref} className="relative h-screen">
       <motion.div
         style={{ opacity, y }}
-        className="fixed inset-0 flex items-center justify-center z-0"
+        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
-        
+
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -111,10 +111,10 @@ function ContactFormSection() {
                 </h2>
               </SectionReveal>
               <LineReveal delay={0.2} className="max-w-md mb-8" />
-              
+
               <SectionReveal delay={0.3}>
                 <p className="text-lg text-muted-foreground mb-10">
-                  Have a project in mind or need engineering consultation? 
+                  Have a project in mind or need engineering consultation?
                   We'd love to hear from you. Reach out and let's discuss how we can help.
                 </p>
               </SectionReveal>
@@ -127,8 +127,8 @@ function ContactFormSection() {
                     </div>
                     <div>
                       <h3 className="font-medium mb-1">Email</h3>
-                      <a href="mailto:daharengineer@gmail.com" 
-                         className="text-muted-foreground hover:text-army-400 transition-colors">
+                      <a href="mailto:daharengineer@gmail.com"
+                        className="text-muted-foreground hover:text-army-400 transition-colors">
                         daharengineer@gmail.com
                       </a>
                     </div>
@@ -142,8 +142,8 @@ function ContactFormSection() {
                     </div>
                     <div>
                       <h3 className="font-medium mb-1">Phone</h3>
-                      <a href="tel:+6282120867946" 
-                         className="text-muted-foreground hover:text-army-400 transition-colors">
+                      <a href="tel:+6282120867946"
+                        className="text-muted-foreground hover:text-army-400 transition-colors">
                         +62 821-2086-7946
                       </a>
                     </div>
@@ -184,7 +184,7 @@ function ContactFormSection() {
                 <div>
                   <h3 className="font-medium mb-4">Follow Us</h3>
                   <div className="flex gap-3">
-                    <a 
+                    <a
                       href="https://instagram.com/dahar.engineer"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -193,7 +193,7 @@ function ContactFormSection() {
                     >
                       <Instagram className="w-5 h-5" />
                     </a>
-                    <a 
+                    <a
                       href="https://linkedin.com/company/dahar-engineer"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -202,7 +202,7 @@ function ContactFormSection() {
                     >
                       <Linkedin className="w-5 h-5" />
                     </a>
-                    <a 
+                    <a
                       href="https://youtube.com/@daharengineer"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -220,7 +220,7 @@ function ContactFormSection() {
             <SectionReveal delay={0.3}>
               <div className="p-8 lg:p-12 bg-secondary/30">
                 <h3 className="text-2xl font-semibold mb-6">Send us a Message</h3>
-                
+
                 {isSubmitted ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <CheckCircle2 className="w-16 h-16 text-army-400 mb-4" />
@@ -258,7 +258,7 @@ function ContactFormSection() {
                         />
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="subject">Subject</Label>
                       <Input
@@ -271,7 +271,7 @@ function ContactFormSection() {
                         className="bg-background border-border/50 focus:border-army-500"
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="message">Message</Label>
                       <Textarea
@@ -285,7 +285,7 @@ function ContactFormSection() {
                         className="bg-background border-border/50 focus:border-army-500 resize-none"
                       />
                     </div>
-                    
+
                     <Button
                       type="submit"
                       className="w-full bg-army-700 hover:bg-army-600 text-white"

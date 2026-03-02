@@ -1,8 +1,8 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
+import {
+  ArrowRight,
   GraduationCap,
   Users,
   Clock,
@@ -28,11 +28,11 @@ function HeroSection() {
     <div ref={ref} className="relative h-screen">
       <motion.div
         style={{ opacity, y }}
-        className="fixed inset-0 flex items-center justify-center z-0"
+        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
-        
+
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -95,10 +95,10 @@ function CourseTypesSection() {
                 </div>
                 <h3 className="text-2xl lg:text-3xl font-semibold mb-4">Online Courses</h3>
                 <p className="text-muted-foreground mb-8">
-                  Self-paced learning with lifetime access. Perfect for busy professionals 
+                  Self-paced learning with lifetime access. Perfect for busy professionals
                   who want to learn at their own schedule.
                 </p>
-                
+
                 <ul className="space-y-3 mb-8">
                   {[
                     'On-demand video lessons',
@@ -134,10 +134,10 @@ function CourseTypesSection() {
                 </div>
                 <h3 className="text-2xl lg:text-3xl font-semibold mb-4">Private Courses</h3>
                 <p className="text-muted-foreground mb-8">
-                  Personalized one-on-one training tailored to your specific needs 
+                  Personalized one-on-one training tailored to your specific needs
                   and learning goals.
                 </p>
-                
+
                 <ul className="space-y-3 mb-8">
                   {[
                     'One-on-one mentoring',
@@ -244,7 +244,7 @@ function FeaturedCoursesSection() {
                                   flex items-center justify-center">
                     <GraduationCap className="w-12 h-12 text-army-700/40" />
                   </div>
-                  
+
                   <div className="p-6">
                     <div className="flex items-center gap-4 mb-3 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
@@ -256,14 +256,14 @@ function FeaturedCoursesSection() {
                         {course.level}
                       </span>
                     </div>
-                    
+
                     <h3 className="text-lg font-semibold mb-2 group-hover:text-army-400 transition-colors">
                       {course.title}
                     </h3>
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                       {course.description}
                     </p>
-                    
+
                     <div className="flex items-center justify-between pt-4 border-t border-border/30">
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1 text-sm">
@@ -375,7 +375,7 @@ function CTASection() {
           </SectionReveal>
           <SectionReveal delay={0.1}>
             <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Join hundreds of engineers who have enhanced their skills through our courses. 
+              Join hundreds of engineers who have enhanced their skills through our courses.
               Your journey to engineering excellence starts here.
             </p>
           </SectionReveal>

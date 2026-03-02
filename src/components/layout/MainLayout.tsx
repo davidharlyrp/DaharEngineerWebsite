@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useMenu } from '@/context/MenuContext';
 import { Header } from './Header';
 import { MenuOverlay } from './MenuOverlay';
+import { Footer } from './Footer';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -42,6 +43,13 @@ export function MainLayout({ children }: MainLayoutProps) {
         <div className="relative">
           {children}
         </div>
+
+        {/* Footer */}
+        {!isOpen && (
+          <div className="relative z-10">
+            <Footer />
+          </div>
+        )}
       </motion.main>
     </div>
   );

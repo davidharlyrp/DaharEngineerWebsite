@@ -1,8 +1,8 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
+import {
+  ArrowRight,
   ArrowUpRight,
   Calculator,
   Database,
@@ -29,11 +29,11 @@ function HeroSection() {
     <div ref={ref} className="relative h-screen">
       <motion.div
         style={{ opacity, y }}
-        className="fixed inset-0 flex items-center justify-center z-0"
+        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
-        
+
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -67,10 +67,10 @@ function HeroSection() {
 }
 
 // Software Card Component
-function SoftwareCard({ 
-  software, 
-  index 
-}: { 
+function SoftwareCard({
+  software,
+  index
+}: {
   software: {
     name: string;
     description: string;
@@ -82,7 +82,7 @@ function SoftwareCard({
   index: number;
 }) {
   const Icon = software.icon;
-  
+
   return (
     <SectionReveal delay={0.1 * (index + 1)}>
       <a
@@ -106,7 +106,7 @@ function SoftwareCard({
                                       group-hover:-translate-y-0.5 transition-all" />
           </div>
         </div>
-        
+
         <span className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
           {software.category}
         </span>
@@ -191,7 +191,7 @@ function AllSoftwareSection() {
             </SectionReveal>
             <SectionReveal delay={0.2}>
               <p className="text-lg text-muted-foreground max-w-2xl">
-                Powerful web-based tools designed to simplify complex engineering 
+                Powerful web-based tools designed to simplify complex engineering
                 calculations and streamline your workflow.
               </p>
             </SectionReveal>
@@ -286,7 +286,7 @@ function CTASection() {
           </SectionReveal>
           <SectionReveal delay={0.1}>
             <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-              We develop custom engineering software tailored to your specific needs. 
+              We develop custom engineering software tailored to your specific needs.
               Contact us to discuss your requirements.
             </p>
           </SectionReveal>

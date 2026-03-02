@@ -1,11 +1,11 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import { 
-  ArrowRight, 
-  Target, 
-  Lightbulb, 
-  Users, 
-  Award 
+import {
+  ArrowRight,
+  Target,
+  Lightbulb,
+  Users,
+  Award
 } from 'lucide-react';
 import { TextReveal, LineReveal, SectionReveal } from '@/components/ui-custom';
 
@@ -24,11 +24,11 @@ function HeroSection() {
     <div ref={ref} className="relative h-screen">
       <motion.div
         style={{ opacity, y }}
-        className="fixed inset-0 flex items-center justify-center z-0"
+        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
-        
+
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -81,27 +81,27 @@ function StorySection() {
                 </h2>
               </SectionReveal>
               <LineReveal delay={0.2} className="max-w-md mb-8" />
-              
+
               <div className="space-y-6 text-muted-foreground">
                 <SectionReveal delay={0.3}>
                   <p>
-                    Dahar Engineer was founded with a clear mission: to provide reliable 
-                    civil engineering solutions that combine technical expertise with a 
+                    Dahar Engineer was founded with a clear mission: to provide reliable
+                    civil engineering solutions that combine technical expertise with a
                     transparent, educational approach.
                   </p>
                 </SectionReveal>
                 <SectionReveal delay={0.4}>
                   <p>
-                    We recognized the need for engineering consultants who not only deliver 
-                    accurate designs but also provide well-documented technical justifications 
+                    We recognized the need for engineering consultants who not only deliver
+                    accurate designs but also provide well-documented technical justifications
                     that clients can understand and trust.
                   </p>
                 </SectionReveal>
                 <SectionReveal delay={0.5}>
                   <p>
-                    Based in Bandung, Indonesia, we have grown from a small consultancy 
-                    into a comprehensive engineering solutions provider, serving clients 
-                    across the nation with our unique blend of practical experience and 
+                    Based in Bandung, Indonesia, we have grown from a small consultancy
+                    into a comprehensive engineering solutions provider, serving clients
+                    across the nation with our unique blend of practical experience and
                     academic rigor.
                   </p>
                 </SectionReveal>
@@ -194,19 +194,19 @@ function FounderSection() {
                 </p>
               </SectionReveal>
               <LineReveal delay={0.4} className="max-w-md mb-8" />
-              
+
               <div className="space-y-4 text-muted-foreground">
                 <SectionReveal delay={0.5}>
                   <p>
-                    With a passion for structural engineering and education, David founded 
-                    Dahar Engineer to bridge the gap between academic knowledge and practical 
+                    With a passion for structural engineering and education, David founded
+                    Dahar Engineer to bridge the gap between academic knowledge and practical
                     application in the construction industry.
                   </p>
                 </SectionReveal>
                 <SectionReveal delay={0.6}>
                   <p>
-                    His expertise spans structural analysis, building design, and geotechnical 
-                    engineering, with a particular focus on developing innovative software 
+                    His expertise spans structural analysis, building design, and geotechnical
+                    engineering, with a particular focus on developing innovative software
                     solutions that simplify complex engineering calculations.
                   </p>
                 </SectionReveal>
@@ -215,7 +215,7 @@ function FounderSection() {
               <SectionReveal delay={0.7}>
                 <div className="mt-8 flex items-center gap-2 text-army-400">
                   <a href="https://linkedin.com/in/davidprabudhi" target="_blank" rel="noopener noreferrer"
-                     className="hover:underline">
+                    className="hover:underline">
                     Connect on LinkedIn
                   </a>
                   <ArrowRight className="w-4 h-4" />
