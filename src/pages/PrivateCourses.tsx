@@ -12,7 +12,8 @@ import {
   ArrowRight,
   X,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  ChevronDown
 } from 'lucide-react';
 import { TextReveal, SectionReveal } from '@/components/ui-custom';
 import { Input } from '@/components/ui/input';
@@ -22,437 +23,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/context/AuthContext';
-import { createInvoice } from '@/lib/xendit/client';
-import type { Course, CourseCategory, Mentor } from '@/types/courses';
+import { useEffect } from 'react';
+import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
+import type { Course, Mentor, Booking } from '@/types/courses';
+import { courseService } from '@/services/pb/courses';
 
 // Mock courses data
-const mockCourses: Course[] = [
-  {
-    id: '1',
-    name: 'Geotechnical Engineering',
-    slug: 'geotechnical-engineering',
-    description: 'Master soil mechanics, foundation design, and geotechnical analysis for various construction projects.',
-    fullDescription: 'This comprehensive course covers all aspects of geotechnical engineering including soil classification, bearing capacity analysis, settlement calculations, slope stability, and foundation design. Perfect for engineers looking to specialize in geotechnical work.',
-    category: 'geotechnical',
-    duration: '20 hours',
-    level: 'intermediate',
-    price: 1500000,
-    currency: 'IDR',
-    mentors: [
-      {
-        id: 'm1',
-        name: 'Dr. Ahmad Rizki',
-        title: 'Senior Geotechnical Engineer',
-        bio: '15+ years experience in geotechnical engineering with expertise in deep foundation and soil improvement.',
-        expertise: ['Soil Mechanics', 'Pile Design', 'Slope Stability', 'Ground Improvement'],
-        experience: '15+ years',
-        rating: 4.9,
-        reviewCount: 127,
-        availability: [
-          { day: 'Monday', times: ['09:00', '14:00', '16:00'] },
-          { day: 'Wednesday', times: ['10:00', '14:00'] },
-          { day: 'Friday', times: ['09:00', '13:00', '15:00'] }
-        ],
-        hourlyRate: 350000,
-        currency: 'IDR',
-        isAvailable: true
-      },
-      {
-        id: 'm2',
-        name: 'Budi Santoso, ST.',
-        title: 'Geotechnical Consultant',
-        bio: 'Specialist in soil investigation and foundation design for high-rise buildings.',
-        expertise: ['Soil Investigation', 'Shallow Foundation', 'Retaining Walls', 'Earthworks'],
-        experience: '10 years',
-        rating: 4.7,
-        reviewCount: 89,
-        availability: [
-          { day: 'Tuesday', times: ['09:00', '11:00', '14:00'] },
-          { day: 'Thursday', times: ['10:00', '13:00', '16:00'] }
-        ],
-        hourlyRate: 280000,
-        currency: 'IDR',
-        isAvailable: true
-      }
-    ],
-    syllabus: [
-      'Soil Classification and Properties',
-      'Soil Compaction and Stabilization',
-      'Bearing Capacity Analysis',
-      'Settlement Calculations',
-      'Deep Foundation Design',
-      'Slope Stability Analysis',
-      'Retaining Wall Design',
-      'Ground Improvement Techniques'
-    ],
-    whatYouWillLearn: [
-      'Analyze soil properties and classify soil types',
-      'Design various types of foundations',
-      'Calculate bearing capacity and settlement',
-      'Perform slope stability analysis',
-      'Select appropriate ground improvement methods'
-    ],
-    isActive: true,
-    created: '2024-01-15',
-    updated: '2024-11-20'
-  },
-  {
-    id: '2',
-    name: 'Structural Analysis & Design',
-    slug: 'structural-analysis-design',
-    description: 'Learn structural analysis methods and design principles for buildings and infrastructure.',
-    fullDescription: 'Comprehensive training in structural engineering covering analysis methods, design codes, and practical applications. Includes hands-on exercises with industry-standard software.',
-    category: 'structural',
-    duration: '30 hours',
-    level: 'advanced',
-    price: 2000000,
-    currency: 'IDR',
-    mentors: [
-      {
-        id: 'm3',
-        name: 'David Prabudhi',
-        title: 'Lead Structural Engineer',
-        bio: 'Founder of Dahar Engineer with expertise in structural analysis and building design.',
-        expertise: ['Structural Analysis', 'ETABS', 'SAP2000', 'Concrete Design', 'Steel Design'],
-        experience: '12 years',
-        rating: 5.0,
-        reviewCount: 234,
-        availability: [
-          { day: 'Monday', times: ['10:00', '14:00'] },
-          { day: 'Tuesday', times: ['09:00', '13:00'] },
-          { day: 'Thursday', times: ['10:00', '14:00', '16:00'] }
-        ],
-        hourlyRate: 450000,
-        currency: 'IDR',
-        isAvailable: true
-      },
-      {
-        id: 'm4',
-        name: 'Sarah Wijaya, ST., MT.',
-        title: 'Structural Design Specialist',
-        bio: 'Expert in seismic design and high-rise building structural systems.',
-        expertise: ['Seismic Design', 'High-Rise Structures', 'Performance-Based Design', 'ETABS'],
-        experience: '8 years',
-        rating: 4.8,
-        reviewCount: 156,
-        availability: [
-          { day: 'Wednesday', times: ['09:00', '11:00', '14:00'] },
-          { day: 'Friday', times: ['10:00', '13:00'] }
-        ],
-        hourlyRate: 380000,
-        currency: 'IDR',
-        isAvailable: true
-      }
-    ],
-    syllabus: [
-      'Structural Analysis Fundamentals',
-      'Load Calculations (Dead, Live, Wind, Seismic)',
-      'Concrete Structure Design',
-      'Steel Structure Design',
-      'Seismic Design Principles',
-      'ETABS Modeling and Analysis',
-      'Foundation Design Integration',
-      'Structural Detailing'
-    ],
-    whatYouWillLearn: [
-      'Perform structural analysis using various methods',
-      'Design reinforced concrete and steel structures',
-      'Apply seismic design principles',
-      'Use ETABS for modeling and analysis',
-      'Create structural drawings and details'
-    ],
-    isActive: true,
-    created: '2024-02-01',
-    updated: '2024-11-15'
-  },
-  {
-    id: '3',
-    name: 'Transportation Engineering',
-    slug: 'transportation-engineering',
-    description: 'Study highway design, traffic engineering, and transportation infrastructure planning.',
-    fullDescription: 'Complete course on transportation engineering covering geometric design, pavement design, traffic analysis, and transportation planning. Essential for infrastructure engineers.',
-    category: 'transportation',
-    duration: '25 hours',
-    level: 'intermediate',
-    price: 1800000,
-    currency: 'IDR',
-    mentors: [
-      {
-        id: 'm5',
-        name: 'Ir. Hendra Kusuma',
-        title: 'Transportation Engineer',
-        bio: 'Expert in highway design and traffic engineering with extensive project experience.',
-        expertise: ['Highway Design', 'Traffic Engineering', 'Pavement Design', 'Transport Planning'],
-        experience: '18 years',
-        rating: 4.8,
-        reviewCount: 98,
-        availability: [
-          { day: 'Monday', times: ['13:00', '15:00'] },
-          { day: 'Wednesday', times: ['09:00', '14:00'] },
-          { day: 'Friday', times: ['10:00', '13:00'] }
-        ],
-        hourlyRate: 320000,
-        currency: 'IDR',
-        isAvailable: true
-      }
-    ],
-    syllabus: [
-      'Highway Geometric Design',
-      'Horizontal and Vertical Alignment',
-      'Intersection Design',
-      'Pavement Design and Materials',
-      'Traffic Engineering Fundamentals',
-      'Transportation Planning',
-      'Road Safety Engineering'
-    ],
-    whatYouWillLearn: [
-      'Design highway geometry and alignments',
-      'Calculate pavement thickness requirements',
-      'Analyze traffic flow and capacity',
-      'Plan transportation infrastructure',
-      'Apply road safety principles'
-    ],
-    isActive: true,
-    created: '2024-03-10',
-    updated: '2024-10-20'
-  },
-  {
-    id: '4',
-    name: 'Project Management',
-    slug: 'project-management',
-    description: 'Learn construction project management from planning to execution and control.',
-    fullDescription: 'Comprehensive project management course tailored for construction professionals. Covers planning, scheduling, cost control, quality management, and risk management.',
-    category: 'project-management',
-    duration: '20 hours',
-    level: 'all-levels',
-    price: 1600000,
-    currency: 'IDR',
-    mentors: [
-      {
-        id: 'm6',
-        name: 'Diana Putri, MBA',
-        title: 'Project Management Professional',
-        bio: 'Certified PMP with extensive experience managing large-scale construction projects.',
-        expertise: ['Project Planning', 'Scheduling', 'Cost Control', 'Risk Management', 'Agile'],
-        experience: '14 years',
-        rating: 4.9,
-        reviewCount: 145,
-        availability: [
-          { day: 'Tuesday', times: ['09:00', '11:00', '14:00'] },
-          { day: 'Thursday', times: ['10:00', '13:00', '15:00'] },
-          { day: 'Saturday', times: ['09:00', '11:00'] }
-        ],
-        hourlyRate: 400000,
-        currency: 'IDR',
-        isAvailable: true
-      }
-    ],
-    syllabus: [
-      'Project Management Fundamentals',
-      'Project Planning and Scheduling',
-      'Cost Estimation and Budgeting',
-      'Resource Management',
-      'Quality Management',
-      'Risk Management',
-      'Contract Management',
-      'Project Monitoring and Control'
-    ],
-    whatYouWillLearn: [
-      'Create comprehensive project plans',
-      'Develop and manage project schedules',
-      'Control project costs and budget',
-      'Manage project risks effectively',
-      'Lead project teams successfully'
-    ],
-    isActive: true,
-    created: '2024-04-05',
-    updated: '2024-09-15'
-  },
-  {
-    id: '5',
-    name: 'SketchUp for Engineers',
-    slug: 'sketchup-for-engineers',
-    description: 'Master SketchUp for 3D modeling, visualization, and presentation of engineering designs.',
-    fullDescription: 'Learn to use SketchUp effectively for engineering visualization. From basic modeling to advanced rendering and presentation techniques.',
-    category: 'sketchup',
-    duration: '15 hours',
-    level: 'beginner',
-    price: 1200000,
-    currency: 'IDR',
-    mentors: [
-      {
-        id: 'm7',
-        name: 'Rudi Hartono',
-        title: '3D Visualization Specialist',
-        bio: 'Expert in SketchUp and 3D visualization for architectural and engineering projects.',
-        expertise: ['SketchUp', '3D Modeling', 'Rendering', 'Visualization', 'V-Ray'],
-        experience: '10 years',
-        rating: 4.8,
-        reviewCount: 112,
-        availability: [
-          { day: 'Monday', times: ['14:00', '16:00'] },
-          { day: 'Wednesday', times: ['10:00', '13:00'] },
-          { day: 'Friday', times: ['09:00', '11:00', '14:00'] }
-        ],
-        hourlyRate: 250000,
-        currency: 'IDR',
-        isAvailable: true
-      }
-    ],
-    syllabus: [
-      'SketchUp Interface and Tools',
-      'Basic 3D Modeling',
-      'Advanced Modeling Techniques',
-      'Components and Dynamic Components',
-      'Materials and Textures',
-      'Lighting and Rendering',
-      'Scene Creation and Animation',
-      'Presentation Techniques'
-    ],
-    whatYouWillLearn: [
-      'Create detailed 3D models',
-      'Apply materials and textures',
-      'Set up lighting for rendering',
-      'Create professional presentations',
-      'Export models for various uses'
-    ],
-    isActive: true,
-    created: '2024-05-20',
-    updated: '2024-08-25'
-  },
-  {
-    id: '6',
-    name: 'Tekla Structures',
-    slug: 'tekla-structures',
-    description: 'Learn Tekla Structures for detailed steel and concrete structural modeling.',
-    fullDescription: 'Comprehensive Tekla Structures training for structural engineers. Covers modeling, detailing, and documentation for steel and concrete structures.',
-    category: 'tekla',
-    duration: '25 hours',
-    level: 'intermediate',
-    price: 2200000,
-    currency: 'IDR',
-    mentors: [
-      {
-        id: 'm8',
-        name: 'Andi Wijaya',
-        title: 'Tekla Specialist',
-        bio: 'Certified Tekla trainer with extensive experience in steel and concrete detailing.',
-        expertise: ['Tekla Structures', 'Steel Detailing', 'Concrete Detailing', 'BIM', 'Clash Detection'],
-        experience: '12 years',
-        rating: 4.9,
-        reviewCount: 167,
-        availability: [
-          { day: 'Tuesday', times: ['09:00', '13:00', '15:00'] },
-          { day: 'Thursday', times: ['10:00', '14:00'] },
-          { day: 'Saturday', times: ['09:00', '11:00'] }
-        ],
-        hourlyRate: 420000,
-        currency: 'IDR',
-        isAvailable: true
-      }
-    ],
-    syllabus: [
-      'Tekla Interface and Setup',
-      'Grid and Level Creation',
-      'Steel Modeling',
-      'Concrete Modeling',
-      'Connection Design',
-      'Drawing Creation',
-      'Report and Schedule',
-      'BIM Collaboration'
-    ],
-    whatYouWillLearn: [
-      'Create accurate 3D structural models',
-      'Generate fabrication drawings',
-      'Create material schedules',
-      'Perform clash detection',
-      'Collaborate using BIM workflows'
-    ],
-    isActive: true,
-    created: '2024-06-15',
-    updated: '2024-07-30'
-  },
-  {
-    id: '7',
-    name: 'Revit Structure',
-    slug: 'revit-structure',
-    description: 'Master Revit for structural modeling, analysis integration, and documentation.',
-    fullDescription: 'Complete Revit Structure course from basics to advanced. Learn to create parametric structural models, integrate with analysis software, and produce construction documents.',
-    category: 'revit',
-    duration: '30 hours',
-    level: 'all-levels',
-    price: 1900000,
-    currency: 'IDR',
-    mentors: [
-      {
-        id: 'm9',
-        name: 'Maya Sari, ST.',
-        title: 'BIM Specialist',
-        bio: 'Revit certified professional with expertise in structural modeling and BIM implementation.',
-        expertise: ['Revit Structure', 'BIM', 'Parametric Modeling', 'Family Creation', 'Dynamo'],
-        experience: '9 years',
-        rating: 4.9,
-        reviewCount: 198,
-        availability: [
-          { day: 'Monday', times: ['09:00', '11:00', '14:00'] },
-          { day: 'Wednesday', times: ['10:00', '13:00', '15:00'] },
-          { day: 'Friday', times: ['09:00', '12:00'] }
-        ],
-        hourlyRate: 380000,
-        currency: 'IDR',
-        isAvailable: true
-      },
-      {
-        id: 'm10',
-        name: 'Fajar Pratama',
-        title: 'Structural BIM Engineer',
-        bio: 'Specialist in Revit Structure with focus on large-scale projects and automation.',
-        expertise: ['Revit Structure', 'Dynamo', 'API', 'Automation', 'BIM Management'],
-        experience: '7 years',
-        rating: 4.7,
-        reviewCount: 134,
-        availability: [
-          { day: 'Tuesday', times: ['10:00', '14:00'] },
-          { day: 'Thursday', times: ['09:00', '11:00', '15:00'] }
-        ],
-        hourlyRate: 320000,
-        currency: 'IDR',
-        isAvailable: true
-      }
-    ],
-    syllabus: [
-      'Revit Interface and Navigation',
-      'Levels, Grids, and Views',
-      'Structural Columns and Beams',
-      'Floors and Foundations',
-      'Reinforcement Modeling',
-      'Family Creation',
-      'Dynamo for Automation',
-      'Analysis Integration',
-      'Documentation and Scheduling'
-    ],
-    whatYouWillLearn: [
-      'Create parametric structural models',
-      'Build custom Revit families',
-      'Use Dynamo for automation',
-      'Integrate with analysis software',
-      'Generate construction documents'
-    ],
-    isActive: true,
-    created: '2024-02-20',
-    updated: '2024-11-10'
-  }
-];
-
-const categoryNames: Record<CourseCategory, string> = {
-  'geotechnical': 'Geotechnical',
-  'structural': 'Structural',
-  'transportation': 'Transportation',
-  'project-management': 'Project Management',
-  'sketchup': 'SketchUp',
-  'tekla': 'Tekla',
-  'revit': 'Revit'
-};
 
 // Hero Section
 function HeroSection() {
@@ -474,7 +51,21 @@ function HeroSection() {
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="absolute inset-0 bg-noise" />
 
-        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+        <div className="relative z-10 text-center flex flex-col items-center justify-center px-6 w-full mx-auto h-screen">
+
+          {/* Video background */}
+          <div className="absolute inset-0 -z-10 overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-30"
+            >
+              <source src="/Hero.webm" type="video/webm" />
+            </video>
+          </div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -511,6 +102,23 @@ function HeroSection() {
             tailored to your learning goals and schedule.
           </motion.p>
         </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.6 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="flex flex-col items-center gap-2 text-muted-foreground"
+          >
+            <span className="text-xs uppercase tracking-widest">Scroll</span>
+            <ChevronDown className="w-5 h-5" />
+          </motion.div>
+        </motion.div>
       </motion.div>
     </div>
   );
@@ -528,17 +136,18 @@ function CourseCard({ course, index, onSelect }: { course: Course; index: number
         {/* Header */}
         <div className="p-6 border-b border-border/30">
           <div className="flex items-start justify-between mb-4">
-            <div className="w-14 h-14 bg-army-700/20 flex items-center justify-center
+            <div className="w-14 h-14 bg-army-700/20 overflow-hidden flex items-center justify-center
                             group-hover:bg-army-700 transition-colors">
-              <GraduationCap className="w-7 h-7 text-army-400 group-hover:text-white transition-colors" />
+              <img
+                src={course.image ? courseService.getFileUrl(course, course.image) : '/placeholder-course.jpg'}
+                alt={course.title}
+                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+              />
             </div>
-            <Badge variant="outline" className="text-xs uppercase">
-              {course.level}
-            </Badge>
           </div>
 
           <h3 className="text-xl font-semibold mb-2 group-hover:text-army-400 transition-colors">
-            {course.name}
+            {course.title}
           </h3>
 
           <p className="text-sm text-muted-foreground line-clamp-2">
@@ -555,7 +164,7 @@ function CourseCard({ course, index, onSelect }: { course: Course; index: number
             </span>
             <span className="flex items-center gap-1">
               <User className="w-4 h-4" />
-              {course.mentors.length} mentor{course.mentors.length > 1 ? 's' : ''}
+              {course.mentors?.length || 0} mentor{(course.mentors?.length || 0) > 1 ? 's' : ''}
             </span>
           </div>
 
@@ -563,8 +172,8 @@ function CourseCard({ course, index, onSelect }: { course: Course; index: number
             <div>
               <span className="text-xs text-muted-foreground">Starting from</span>
               <p className="text-lg font-bold text-army-400">
-                Rp {Math.min(...course.mentors.map(m => m.hourlyRate)).toLocaleString('id-ID')}
-                <span className="text-sm font-normal text-muted-foreground">/hour</span>
+                Rp {course.price.toLocaleString('id-ID')}
+                <span className="text-sm font-normal text-muted-foreground"></span>
               </p>
             </div>
             <span className="text-army-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
@@ -578,60 +187,128 @@ function CourseCard({ course, index, onSelect }: { course: Course; index: number
   );
 }
 
-// Mentor Card Component
-function MentorCard({ mentor, onBook }: { mentor: Mentor; onBook: (mentor: Mentor) => void }) {
+// Mentor List Item Component (Simplified for Panel)
+function MentorListItem({
+  mentor,
+  isSelected,
+  onSelect
+}: {
+  mentor: Mentor;
+  isSelected: boolean;
+  onSelect: (mentor: Mentor) => void
+}) {
   return (
-    <div className="bg-background border border-border/30 p-6 hover:border-army-500/30 transition-all">
-      <div className="flex items-start gap-4 mb-4">
-        <div className="w-16 h-16 bg-army-700/20 flex items-center justify-center flex-shrink-0">
-          <User className="w-8 h-8 text-army-400" />
+    <div
+      onClick={() => onSelect(mentor)}
+      className={`p-4 border transition-all cursor-pointer ${isSelected
+        ? 'bg-army-700/10 border-army-500/50'
+        : 'bg-background border-border/30 hover:border-army-500/20'
+        }`}
+    >
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 bg-army-700/20 flex items-center justify-center flex-shrink-0">
+          <User className="w-6 h-6 text-army-400" />
         </div>
         <div className="flex-1">
-          <h4 className="text-lg font-semibold">{mentor.name}</h4>
-          <p className="text-sm text-muted-foreground">{mentor.title}</p>
-          <div className="flex items-center gap-2 mt-1">
-            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-            <span className="text-sm font-medium">{mentor.rating}</span>
-            <span className="text-sm text-muted-foreground">({mentor.reviewCount} reviews)</span>
+          <h4 className="text-sm font-semibold">{mentor.name}</h4>
+          <p className="text-xs text-muted-foreground">{mentor.specialization}</p>
+        </div>
+        <div className="flex flex-col items-end">
+          <div className="flex items-center gap-1">
+            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+            <span className="text-xs font-medium">{mentor.rating ?? 5}</span>
           </div>
+          <span className="text-[10px] text-muted-foreground">({mentor.reviewCount ?? 0} rev)</span>
         </div>
-      </div>
-
-      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-        {mentor.bio}
-      </p>
-
-      <div className="mb-4">
-        <p className="text-xs text-muted-foreground mb-2">Expertise</p>
-        <div className="flex flex-wrap gap-1">
-          {mentor.expertise.slice(0, 4).map((exp, i) => (
-            <span key={i} className="text-xs px-2 py-1 bg-secondary">
-              {exp}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between pt-4 border-t border-border/30">
-        <div>
-          <span className="text-xs text-muted-foreground">Rate</span>
-          <p className="font-semibold text-army-400">
-            Rp {mentor.hourlyRate.toLocaleString('id-ID')}
-            <span className="text-sm font-normal text-muted-foreground">/hour</span>
-          </p>
-        </div>
-        <Button
-          onClick={() => onBook(mentor)}
-          className="bg-army-700 hover:bg-army-600"
-        >
-          Book Session
-        </Button>
       </div>
     </div>
   );
 }
 
 // Booking Modal Component
+// Booking Success Modal
+function BookingSuccessModal({
+  isOpen,
+  onClose,
+  booking
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  booking: Booking | null;
+}) {
+  if (!isOpen || !booking) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        className="bg-background border border-border w-full max-w-md shadow-2xl relative"
+      >
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 p-2 hover:bg-muted transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
+
+        <div className="p-8 text-center">
+          <div className="w-16 h-16 bg-green-500/10 flex items-center justify-center mx-auto mb-6 rounded-full">
+            <CheckCircle2 className="w-8 h-8 text-green-500" />
+          </div>
+
+          <h2 className="text-2xl font-bold mb-2">Booking Success!</h2>
+          <p className="text-muted-foreground mb-8 text-sm">
+            Your payment has been confirmed. Detailed session information has been sent to your email.
+          </p>
+
+          <div className="bg-muted/30 p-4 space-y-3 text-left mb-8 border border-border/50 text-xs sm:text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Course</span>
+              <span className="font-medium">{booking.course_title}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Mentor</span>
+              <span className="font-medium">{booking.mentor_name}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Date</span>
+              <span className="font-medium">
+                {new Date(booking.session_date).toLocaleDateString('en-GB', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Time</span>
+              <span className="font-medium text-army-400">{booking.session_time}</span>
+            </div>
+            <div className="flex justify-between pt-2 border-t border-border/50">
+              <span className="text-muted-foreground">Total Paid</span>
+              <span className="font-bold">Rp {booking.total_amount.toLocaleString('id-ID')}</span>
+            </div>
+          </div>
+
+          <Button
+            onClick={onClose}
+            className="w-full bg-army-600 hover:bg-army-700 text-white py-6 rounded-none"
+          >
+            Go to Dashboard
+          </Button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function BookingModal({
   course,
   mentor,
@@ -646,16 +323,39 @@ function BookingModal({
   const { user, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
+    full_name: user?.name || '',
+    email: user?.email || '',
+    whatsapp: '',
     preferredDate: '',
     preferredTime: '',
-    duration: '2',
+    duration: '1',
     notes: ''
   });
 
-  const availableTimes = mentor.availability.flatMap(a => a.times);
+  // Generate time slots based on mentor availability
+  const availableTimes = (() => {
+    if (!mentor.startTimeActive || !mentor.endTimeActive) {
+      return ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+    }
+
+    const start = parseInt(mentor.startTimeActive.split(':')[0]);
+    const end = parseInt(mentor.endTimeActive.split(':')[0]);
+    const slots = [];
+    for (let i = start; i < end; i++) {
+      slots.push(`${i.toString().padStart(2, '0')}:00`);
+    }
+    return slots;
+  })();
+
+  // Validate if selected date matches mentor's available days
+  const isDateAvailable = (dateString: string) => {
+    if (!mentor.dayAvail || mentor.dayAvail.length === 0) return true;
+    const date = new Date(dateString);
+    const dayName = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(date);
+    return mentor.dayAvail.includes(dayName);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -668,30 +368,45 @@ function BookingModal({
         return;
       }
 
-      const totalAmount = mentor.hourlyRate * parseInt(formData.duration);
+      if (!isDateAvailable(formData.preferredDate)) {
+        setError(`Mentor is not available on this day. Available days: ${mentor.dayAvail?.join(', ')}`);
+        setIsLoading(false);
+        return;
+      }
 
-      // Create Xendit invoice
-      const invoice = await createInvoice({
-        external_id: `booking-${course.id}-${mentor.id}-${Date.now()}`,
+      const durationValue = course.serviceType === 'Consultation' ? parseInt(formData.duration) : 1;
+      const subtotal = course.price * durationValue;
+      const taxRate = 0.12;
+      const taxAmount = Math.round(subtotal * taxRate);
+      const totalAmount = subtotal + taxAmount;
+
+      const bookingData = {
+        userId: user?.id,
+        userEmail: formData.email,
+        userName: formData.full_name,
         amount: totalAmount,
-        payer_email: user?.email || '',
-        description: `Private Course: ${course.name} with ${mentor.name}`,
-        success_redirect_url: `${window.location.origin}/dashboard`,
-        failure_redirect_url: `${window.location.origin}/private-courses`,
-        customer: {
-          given_names: user?.name || '',
-          email: user?.email || '',
-        }
-      });
+        courseId: course.id,
+        courseTitle: course.title,
+        mentorId: mentor.id,
+        mentorName: mentor.name,
+        mentorEmail: mentor.email,
+        sessionDate: new Date(formData.preferredDate).toISOString(),
+        sessionTime: formData.preferredTime,
+        whatsapp: formData.whatsapp,
+        topic: formData.notes,
+        duration: durationValue.toString(),
+        taxAmount: taxAmount,
+        subtotal: subtotal,
+        courseType: course.serviceType === 'Consultation' ? 'Consultation' : 'Course'
+      };
 
-      // Open payment page
-      window.open(invoice.invoice_url, '_blank');
+      const response = await axios.post('http://localhost:4001/api/booking/create', bookingData);
 
-      setSuccess(true);
-      setTimeout(() => {
-        onClose();
-        setSuccess(false);
-      }, 3000);
+      if (response.data.invoiceUrl) {
+        window.location.href = response.data.invoiceUrl;
+      } else {
+        throw new Error('Failed to get payment link');
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to create booking. Please try again.');
     } finally {
@@ -715,7 +430,7 @@ function BookingModal({
           <div>
             <h2 className="text-xl font-bold">Book Session</h2>
             <p className="text-sm text-muted-foreground">
-              {course.name} with {mentor.name}
+              {course.title} with {mentor.name}
             </p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-secondary rounded-md">
@@ -725,59 +440,87 @@ function BookingModal({
 
         {/* Content */}
         <div className="p-6">
-          {success ? (
-            <div className="text-center py-8">
-              <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Booking Initiated!</h3>
-              <p className="text-muted-foreground">
-                Please complete your payment. You will be redirected to dashboard.
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-              {/* Mentor Info */}
-              <div className="bg-background p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-army-700/20 flex items-center justify-center">
-                    <User className="w-5 h-5 text-army-400" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{mentor.name}</p>
-                    <p className="text-sm text-muted-foreground">{mentor.title}</p>
-                  </div>
+            {/* Mentor Info */}
+            <div className="bg-background p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-army-700/20 flex items-center justify-center">
+                  <User className="w-5 h-5 text-army-400" />
                 </div>
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                    {mentor.rating}
-                  </span>
-                  <span className="text-muted-foreground">
-                    Rp {mentor.hourlyRate.toLocaleString('id-ID')}/hour
-                  </span>
+                <div>
+                  <p className="font-medium">{mentor.name}</p>
+                  <p className="text-sm text-muted-foreground">{mentor.specialization}</p>
                 </div>
               </div>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="text-muted-foreground">
+                  Rp {course.price.toLocaleString('id-ID')} / session
+                </span>
+              </div>
+            </div>
 
+            {/* Personal Data */}
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Full Name</Label>
+                <Input
+                  required
+                  value={formData.full_name}
+                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                  className="bg-background"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="bg-background"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>WhatsApp Number</Label>
+              <Input
+                required
+                placeholder="e.g. 08123456789"
+                value={formData.whatsapp}
+                onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                className="bg-background"
+              />
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
               {/* Date */}
               <div className="space-y-2">
                 <Label>Preferred Date</Label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
                   <Input
                     type="date"
                     required
                     min={new Date().toISOString().split('T')[0]}
                     value={formData.preferredDate}
                     onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
-                    className="pl-10 bg-background"
+                    onClick={(e) => e.currentTarget.showPicker?.()}
+                    className={`pl-10 bg-background cursor-pointer ${formData.preferredDate && !isDateAvailable(formData.preferredDate) ? 'border-red-500' : ''}`}
                   />
                 </div>
+                {mentor.dayAvail && (
+                  <p className="text-[10px] text-muted-foreground">
+                    Mentor days: {mentor.dayAvail.join(', ')}
+                  </p>
+                )}
               </div>
 
               {/* Time */}
@@ -794,12 +537,11 @@ function BookingModal({
                     <option key={time} value={time}>{time}</option>
                   ))}
                 </select>
-                <p className="text-xs text-muted-foreground">
-                  Available times based on mentor's schedule
-                </p>
               </div>
+            </div>
 
-              {/* Duration */}
+            {/* Duration - Only for Consultation */}
+            {course.serviceType === 'Consultation' && (
               <div className="space-y-2">
                 <Label>Session Duration</Label>
                 <select
@@ -813,178 +555,195 @@ function BookingModal({
                   <option value="4">4 hours</option>
                 </select>
               </div>
+            )}
 
-              {/* Notes */}
-              <div className="space-y-2">
-                <Label>Additional Notes (Optional)</Label>
-                <Textarea
-                  placeholder="Tell us about your learning goals or any specific topics you want to cover..."
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="bg-background resize-none"
-                  rows={3}
-                />
-              </div>
+            {/* Notes */}
+            <div className="space-y-2">
+              <Label>Additional Notes (Optional)</Label>
+              <Textarea
+                placeholder="Tell us about your learning goals or any specific topics you want to cover..."
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                className="bg-background resize-none"
+                rows={3}
+              />
+            </div>
 
-              {/* Total */}
-              <div className="bg-army-700/10 p-4 border border-army-500/30">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Total Amount</span>
-                  <span className="text-xl font-bold text-army-400">
-                    Rp {(mentor.hourlyRate * parseInt(formData.duration)).toLocaleString('id-ID')}
-                  </span>
-                </div>
+            {/* Summary & Total */}
+            <div className="bg-army-700/10 p-4 border border-army-500/30 space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">
+                  Subtotal {course.serviceType === 'Consultation' ? `(${formData.duration}h)` : ''}
+                </span>
+                <span>Rp {(course.price * (course.serviceType === 'Consultation' ? parseInt(formData.duration) : 1)).toLocaleString('id-ID')}</span>
               </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Tax (12%)</span>
+                <span>Rp {Math.round(course.price * (course.serviceType === 'Consultation' ? parseInt(formData.duration) : 1) * 0.12).toLocaleString('id-ID')}</span>
+              </div>
+              <div className="pt-2 border-t border-army-500/20 flex items-center justify-between">
+                <span className="font-semibold">Total Amount</span>
+                <span className="text-xl font-bold text-army-400">
+                  Rp {Math.round(course.price * (course.serviceType === 'Consultation' ? parseInt(formData.duration) : 1) * 1.12).toLocaleString('id-ID')}
+                </span>
+              </div>
+            </div>
 
-              {/* Actions */}
-              <div className="flex gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onClose}
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="flex-1 bg-army-700 hover:bg-army-600"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    'Proceed to Payment'
-                  )}
-                </Button>
-              </div>
-            </form>
-          )}
+            {/* Actions */}
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="flex-1 bg-army-700 hover:bg-army-600"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Proceed to Payment'
+                )}
+              </Button>
+            </div>
+          </form>
         </div>
       </motion.div>
     </div>
   );
 }
 
-// Course Detail Section
-function CourseDetailSection({
+// Mentor Panel (Overlay)
+function MentorPanel({
   course,
-  onBack,
+  isOpen,
+  onClose,
   onBook
 }: {
-  course: Course;
-  onBack: () => void;
+  course: Course | null;
+  isOpen: boolean;
+  onClose: () => void;
   onBook: (mentor: Mentor) => void;
 }) {
+  const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
+
+  if (!course) return null;
+
   return (
-    <section className="section-fullscreen relative flex items-center bg-background">
-      <div className="w-full px-6 lg:px-20 py-20">
-        <div className="max-w-7xl mx-auto">
-          {/* Back Button */}
-          <SectionReveal>
-            <button
-              onClick={onBack}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8"
-            >
-              <ArrowRight className="w-4 h-4 rotate-180" />
-              Back to Courses
-            </button>
-          </SectionReveal>
+    <div
+      className={`fixed inset-0 z-50 transition-all duration-500 ${isOpen ? 'visible' : 'invisible'
+        }`}
+    >
+      <div
+        className={`absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+        onClick={onClose}
+      />
 
-          {/* Course Header */}
-          <div className="grid lg:grid-cols-2 gap-12 mb-12">
-            <SectionReveal>
-              <div>
-                <Badge className="mb-4 bg-army-700">{categoryNames[course.category]}</Badge>
-                <h2 className="text-4xl sm:text-5xl font-bold mb-4">{course.name}</h2>
-                <p className="text-lg text-muted-foreground mb-6">{course.fullDescription}</p>
-
-                <div className="flex flex-wrap gap-4 mb-6">
-                  <span className="flex items-center gap-2 text-sm">
-                    <Clock className="w-4 h-4 text-army-400" />
-                    {course.duration}
-                  </span>
-                  <span className="flex items-center gap-2 text-sm">
-                    <GraduationCap className="w-4 h-4 text-army-400" />
-                    {course.level}
-                  </span>
-                  <span className="flex items-center gap-2 text-sm">
-                    <User className="w-4 h-4 text-army-400" />
-                    {course.mentors.length} mentor{course.mentors.length > 1 ? 's' : ''}
-                  </span>
-                </div>
-              </div>
-            </SectionReveal>
-
-            <SectionReveal delay={0.1}>
-              <div className="bg-secondary/30 p-6">
-                <h3 className="text-lg font-semibold mb-4">What You Will Learn</h3>
-                <ul className="space-y-2">
-                  {course.whatYouWillLearn?.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-army-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-muted-foreground">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </SectionReveal>
+      <motion.div
+        initial={{ x: '100%' }}
+        animate={{ x: isOpen ? 0 : '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-secondary shadow-2xl border-l border-border/50 flex flex-col"
+      >
+        {/* Header */}
+        <div className="p-6 border-b border-border/30 flex items-center justify-between bg-background">
+          <div>
+            <Badge className="mb-2 bg-army-700">{course.tag || 'Civil Engineering'}</Badge>
+            <h2 className="text-xl font-bold">{course.title}</h2>
+            <p className="text-xs text-muted-foreground">Available Mentors</p>
           </div>
-
-          {/* Syllabus */}
-          <SectionReveal delay={0.2}>
-            <div className="mb-12">
-              <h3 className="text-2xl font-bold mb-6">Course Syllabus</h3>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {course.syllabus?.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-4 bg-secondary/30">
-                    <span className="w-6 h-6 bg-army-700/20 flex items-center justify-center text-sm font-medium text-army-400 flex-shrink-0">
-                      {i + 1}
-                    </span>
-                    <span className="text-muted-foreground">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </SectionReveal>
-
-          {/* Mentors */}
-          <SectionReveal delay={0.3}>
-            <div>
-              <h3 className="text-2xl font-bold mb-6">Available Mentors</h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                {course.mentors.map((mentor) => (
-                  <MentorCard
-                    key={mentor.id}
-                    mentor={mentor}
-                    onBook={onBook}
-                  />
-                ))}
-              </div>
-            </div>
-          </SectionReveal>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-secondary rounded-full transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
-      </div>
-    </section>
+
+        {/* Mentor List */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <p className="text-sm text-muted-foreground mb-4">
+            Select an expert mentor for your private session. Each session is personalized to your needs.
+          </p>
+
+          {course.mentors && course.mentors.length > 0 ? (
+            course.mentors.map((mentor) => (
+              <MentorListItem
+                key={mentor.id}
+                mentor={mentor}
+                isSelected={selectedMentor?.id === mentor.id}
+                onSelect={setSelectedMentor}
+              />
+            ))
+          ) : (
+            <div className="text-center py-10 opacity-50">
+              <User className="w-10 h-10 mx-auto mb-2" />
+              <p className="text-sm">No mentors available yet</p>
+            </div>
+          )}
+        </div>
+
+        {/* footer */}
+        {selectedMentor && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="p-6 bg-background border-t border-border/30"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <span className="text-xs text-muted-foreground">Selected Mentor</span>
+                <p className="font-semibold">{selectedMentor.name}</p>
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-muted-foreground">Rate</span>
+                <p className="font-bold text-army-400">
+                  Rp {course.price.toLocaleString('id-ID')}
+                </p>
+              </div>
+            </div>
+            <Button
+              className="w-full bg-army-700 hover:bg-army-600"
+              onClick={() => onBook(selectedMentor)}
+            >
+              Book Now
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
   );
 }
 
 // Courses List Section
-function CoursesListSection({ onSelectCourse }: { onSelectCourse: (course: Course) => void }) {
+function CoursesListSection({
+  courses,
+  onSelectCourse
+}: {
+  courses: Course[];
+  onSelectCourse: (course: Course) => void
+}) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<CourseCategory | 'all'>('all');
+  const [selectedTag, setSelectedTag] = useState<string | 'all'>('all');
 
-  const filteredCourses = mockCourses.filter(course => {
-    const matchesSearch = course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredCourses = courses.filter(course => {
+    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesTag = selectedTag === 'all' || course.tag === selectedTag;
+    return matchesSearch && matchesTag;
   });
 
-  const categories = Array.from(new Set(mockCourses.map(c => c.category)));
+  const tags = Array.from(new Set(courses.map(c => c.tag).filter(Boolean))) as string[];
 
   return (
     <section className="section-fullscreen relative flex items-center bg-background">
@@ -1005,22 +764,22 @@ function CoursesListSection({ onSelectCourse }: { onSelectCourse: (course: Cours
 
               <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0">
                 <Button
-                  variant={selectedCategory === 'all' ? 'default' : 'outline'}
+                  variant={selectedTag === 'all' ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setSelectedCategory('all')}
-                  className={selectedCategory === 'all' ? 'bg-army-700' : ''}
+                  onClick={() => setSelectedTag('all')}
+                  className={selectedTag === 'all' ? 'bg-army-700' : ''}
                 >
                   All
                 </Button>
-                {categories.map((cat) => (
+                {tags.map((tag) => (
                   <Button
-                    key={cat}
-                    variant={selectedCategory === cat ? 'default' : 'outline'}
+                    key={tag}
+                    variant={selectedTag === tag ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => setSelectedCategory(cat)}
-                    className={selectedCategory === cat ? 'bg-army-700' : ''}
+                    onClick={() => setSelectedTag(tag)}
+                    className={selectedTag === tag ? 'bg-army-700' : ''}
                   >
-                    {categoryNames[cat]}
+                    {tag}
                   </Button>
                 ))}
               </div>
@@ -1091,19 +850,73 @@ function StatsSection() {
   );
 }
 
-// Main Private Courses Page
 export default function PrivateCourses() {
+  const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isMentorPanelOpen, setIsMentorPanelOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [activeCourses, activeMentors] = await Promise.all([
+          courseService.getActiveCourses(),
+          courseService.getActiveMentors()
+        ]);
+
+        // Map mentors to their courses
+        const coursesWithMentors = activeCourses.map(course => ({
+          ...course,
+          mentors: activeMentors.filter(m => m.tags?.includes(course.id))
+        }));
+
+        setCourses(coursesWithMentors);
+      } catch (error) {
+        console.error('Error in PrivateCourses fetchData:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const status = searchParams.get('status');
+    const bookingId = searchParams.get('bookingId');
+
+    if (status === 'success' && bookingId) {
+      const fetchBooking = async () => {
+        try {
+          // Add a small delay for webhook processing if needed, 
+          // though getOne should be fast enough for confirmation.
+          const booking = await courseService.getBookingById(bookingId);
+          setConfirmedBooking(booking);
+          setShowSuccessModal(true);
+
+          // Clear URL params safely
+          const newParams = new URLSearchParams(searchParams);
+          newParams.delete('status');
+          newParams.delete('bookingId');
+          setSearchParams(newParams, { replace: true });
+        } catch (err) {
+          console.error('Error fetching booking details:', err);
+        }
+      };
+      fetchBooking();
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleSelectCourse = (course: Course) => {
     setSelectedCourse(course);
-    window.scrollTo(0, 0);
-  };
-
-  const handleBack = () => {
-    setSelectedCourse(null);
+    setIsMentorPanelOpen(true);
   };
 
   const handleBook = (mentor: Mentor) => {
@@ -1111,24 +924,37 @@ export default function PrivateCourses() {
     setIsBookingModalOpen(true);
   };
 
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-army-400 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       <HeroSection />
+
+      {/* Success Notification Modal */}
+      <BookingSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        booking={confirmedBooking}
+      />
       <div className="h-screen" />
       <div className="relative z-10 bg-background">
-        {selectedCourse ? (
-          <CourseDetailSection
-            course={selectedCourse}
-            onBack={handleBack}
-            onBook={handleBook}
-          />
-        ) : (
-          <>
-            <CoursesListSection onSelectCourse={handleSelectCourse} />
-            <StatsSection />
-          </>
-        )}
+        <CoursesListSection courses={courses} onSelectCourse={handleSelectCourse} />
+        <StatsSection />
       </div>
+
+      {/* Mentor Selection Panel */}
+      <MentorPanel
+        course={selectedCourse}
+        isOpen={isMentorPanelOpen}
+        onClose={() => setIsMentorPanelOpen(false)}
+        onBook={handleBook}
+      />
 
       {/* Booking Modal */}
       {selectedCourse && selectedMentor && (

@@ -25,9 +25,9 @@ const footerLinks = {
   ],
   community: [
     { label: 'DELinxs', href: 'https://delinxs.com' },
-    { label: 'Revit Files', href: '/revit-files' },
-    { label: 'Resources', href: '/resources' },
-    { label: 'Blog', href: '/blog' },
+    { label: 'Revit Files', href: '/community/revit-files' },
+    { label: 'Resources', href: '/community/resources' },
+    { label: 'Blog', href: '/community/blog' },
   ],
   learning: [
     { label: 'Private Courses', href: '/private-courses' },

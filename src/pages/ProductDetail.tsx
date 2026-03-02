@@ -434,7 +434,7 @@ export default function ProductDetail() {
                         <div className="space-y-2">
                             <h3 className="text-2xl font-bold">Purchase Successful!</h3>
                             <p className="text-muted-foreground">
-                                Thank you for your purchase. You can now download your resource directly from this page.
+                                Thank you for your purchase. You can now download your resource directly from this page or from your dashboard.
                             </p>
                         </div>
                         <Button

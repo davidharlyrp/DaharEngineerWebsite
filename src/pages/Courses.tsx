@@ -154,7 +154,7 @@ function CourseTypesSection() {
                 </ul>
 
                 <Link
-                  to="/courses/private"
+                  to="/courses/private-courses"
                   className="group inline-flex items-center gap-2 text-army-400 
                              hover:text-army-300 font-medium transition-colors"
                 >

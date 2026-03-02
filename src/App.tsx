@@ -50,13 +50,13 @@ function App() {
                     <Route path="/services" element={<Services />} />
                     <Route path="/software" element={<SoftwareList />} />
                     <Route path="/courses" element={<Courses />} />
-                    <Route path="/private-courses" element={<PrivateCourses />} />
+                    <Route path="/courses/private-courses" element={<PrivateCourses />} />
                     <Route path="/portfolio" element={<Portfolio />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/store" element={<Store />} />
                     <Route path="/store/:category" element={<Store />} />
-                    <Route path="community/revit-files" element={<RevitFiles />} />
-                    <Route path="community/resources" element={<Resources />} />
+                    <Route path="/community/revit-files" element={<RevitFiles />} />
+                    <Route path="/community/resources" element={<Resources />} />
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blog/:slug" element={<Blog />} />
                     <Route path="/store/product/:slug" element={<ProductDetail />} />

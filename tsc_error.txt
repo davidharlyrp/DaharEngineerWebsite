@@ -1,0 +1,11 @@
+src/pages/PrivateCourses.tsx(18,43): error TS2307: Cannot find module '@/components/ui-custom' or its corresponding type declarations.
+src/pages/PrivateCourses.tsx(19,23): error TS2307: Cannot find module '@/components/ui/input' or its corresponding type declarations.
+src/pages/PrivateCourses.tsx(20,24): error TS2307: Cannot find module '@/components/ui/button' or its corresponding type declarations.
+src/pages/PrivateCourses.tsx(21,23): error TS2307: Cannot find module '@/components/ui/badge' or its corresponding type declarations.
+src/pages/PrivateCourses.tsx(22,23): error TS2307: Cannot find module '@/components/ui/label' or its corresponding type declarations.
+src/pages/PrivateCourses.tsx(23,26): error TS2307: Cannot find module '@/components/ui/textarea' or its corresponding type declarations.
+src/pages/PrivateCourses.tsx(24,41): error TS2307: Cannot find module '@/components/ui/alert' or its corresponding type declarations.
+src/pages/PrivateCourses.tsx(25,25): error TS2307: Cannot find module '@/context/AuthContext' or its corresponding type declarations.
+src/pages/PrivateCourses.tsx(26,31): error TS2307: Cannot find module '@/lib/xendit/client' or its corresponding type declarations.
+src/pages/PrivateCourses.tsx(27,37): error TS2307: Cannot find module '@/types/courses' or its corresponding type declarations.
+src/pages/PrivateCourses.tsx(28,31): error TS2307: Cannot find module '@/services/pb/courses' or its corresponding type declarations.

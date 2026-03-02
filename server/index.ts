@@ -97,6 +97,86 @@ app.post('/api/payment/create', async (req, res) => {
     }
 });
 
+// Create Booking Invoice
+app.post('/api/booking/create', async (req, res) => {
+    try {
+        const {
+            userId,
+            userEmail,
+            userName,
+            amount,
+            courseId,
+            courseTitle,
+            mentorId,
+            mentorName,
+            mentorEmail,
+            sessionDate,
+            sessionTime,
+            whatsapp,
+            topic,
+            duration,
+            taxAmount,
+            subtotal,
+            courseType
+        } = req.body;
+
+        const adminPb = await getAdminPB();
+
+        // 1. Create initial record in bookings
+        const record = await adminPb.collection('bookings').create({
+            user_id: userId,
+            full_name: userName,
+            email: userEmail,
+            whatsapp: whatsapp,
+            course_id: courseId,
+            course_title: courseTitle,
+            course_type: courseType,
+            mentor_id: mentorId,
+            mentor_name: mentorName,
+            mentor_email: mentorEmail,
+            session_date: sessionDate,
+            session_time: sessionTime,
+            topic: topic,
+            duration: duration,
+            price_per_session: amount / (courseType === 'Consultation' ? parseInt(duration) : 1) / 1.12, // Approximation
+            subtotal: subtotal,
+            tax_percentage: 12,
+            tax_amount: taxAmount,
+            total_amount: amount,
+            payment_status: 'pending',
+            booking_status: 'pending'
+        });
+
+        // 2. Create Xendit Invoice
+        const invoice = await Invoice.createInvoice({
+            data: {
+                externalId: record.id,
+                amount: amount,
+                description: `Booking: ${courseTitle} with ${mentorName}`,
+                invoiceDuration: 86400,
+                customer: {
+                    givenNames: userName,
+                    email: userEmail,
+                    mobileNumber: whatsapp
+                },
+                currency: 'IDR',
+                successRedirectUrl: `${process.env.FRONTEND_URL}/courses/private-courses?status=success&bookingId=${record.id}`,
+                failureRedirectUrl: `${process.env.FRONTEND_URL}/courses/private-courses?status=failed`,
+            }
+        });
+
+        // 3. Update record with Invoice ID
+        await adminPb.collection('bookings').update(record.id, {
+            invoice_id: invoice.id
+        });
+
+        res.json({ invoiceUrl: invoice.invoiceUrl });
+    } catch (error: any) {
+        console.error('Booking Creation Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Xendit Webhook
 app.post('/api/payment/webhook', async (req, res) => {
     try {
@@ -105,27 +185,43 @@ app.post('/api/payment/webhook', async (req, res) => {
         if (status === 'PAID' || status === 'SETTLED') {
             const adminPb = await getAdminPB();
 
-            // Update payment_history
+            // Try updating payment_history first (Products)
             try {
                 await adminPb.collection('payment_history').update(external_id, {
                     payment_status: 'paid',
                     payment_method: payment_method,
                     payment_date: new Date().toISOString(),
-                    invoice_id: id // Ensure we have the final ID
+                    invoice_id: id
                 });
+
+                // Increment product stats
+                const payment = await adminPb.collection('payment_history').getOne(external_id);
+                await adminPb.collection('products').update(payment.product_id, {
+                    'download_count+': 1
+                });
+
+                return res.status(200).send('OK (Product)');
             } catch (err: any) {
+                // If not found in payment_history, try bookings
                 if (err.status === 404) {
-                    console.error(`Record ${external_id} not found in payment_history. Webhook ignored.`);
-                    return res.status(200).send('Record not found, ignoring'); // Still return 200 to Xendit
+                    try {
+                        await adminPb.collection('bookings').update(external_id, {
+                            payment_status: 'paid',
+                            payment_method: payment_method,
+                            payment_date: new Date().toISOString(),
+                            booking_status: 'confirmed'
+                        });
+                        return res.status(200).send('OK (Booking)');
+                    } catch (bookErr: any) {
+                        if (bookErr.status === 404) {
+                            console.error(`Record ${external_id} not found in any collection. Webhook ignored.`);
+                            return res.status(200).send('Record not found, ignoring');
+                        }
+                        throw bookErr;
+                    }
                 }
                 throw err;
             }
-
-            // Increment product stats
-            const payment = await adminPb.collection('payment_history').getOne(external_id);
-            await adminPb.collection('products').update(payment.product_id, {
-                'download_count+': 1 // Actually purchase count, but per user request
-            });
         }
 
         res.status(200).send('OK');

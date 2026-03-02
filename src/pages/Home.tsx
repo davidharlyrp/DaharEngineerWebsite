@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 import {
   ArrowRight,
   Building2,
-  Wrench,
   GraduationCap,
   ChevronDown,
-  Code
+  Code,
+  Store
 } from 'lucide-react';
 import { TextReveal, LineReveal, SectionReveal } from '@/components/ui-custom';
 
@@ -53,6 +53,7 @@ function HeroSection() {
               <source src="/Hero.webm" type="video/webm" />
             </video>
           </div>
+
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -163,10 +164,10 @@ function ServicesSection() {
       link: '/courses'
     },
     {
-      icon: Wrench,
-      title: 'Consultation',
-      description: 'Expert consultation for your construction projects and technical challenges.',
-      link: '/services#consultation'
+      icon: Store,
+      title: 'Digital Product',
+      description: 'Various digital products for civil engineering, such as spreadsheets, templates, and more.',
+      link: '/store'
     }
   ];
 
