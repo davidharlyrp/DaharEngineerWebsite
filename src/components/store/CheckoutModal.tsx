@@ -28,7 +28,7 @@ export function CheckoutModal({ product, isOpen, onClose, onSuccess }: CheckoutM
     try {
       const invoice = await createInvoice({
         external_id: `order-${product.id}-${Date.now()}`,
-        amount: product.price,
+        amount: product?.discount_price || product?.main_price,
         payer_email: user?.email || '',
         description: `Purchase: ${product.name}`,
         success_redirect_url: `${window.location.origin}/store/success`,
@@ -41,7 +41,7 @@ export function CheckoutModal({ product, isOpen, onClose, onSuccess }: CheckoutM
           {
             name: product.name,
             quantity: 1,
-            price: product.price,
+            price: product?.discount_price || product?.main_price,
             category: product.category,
           },
         ],
@@ -49,7 +49,7 @@ export function CheckoutModal({ product, isOpen, onClose, onSuccess }: CheckoutM
 
       // Open payment page in new tab
       window.open(invoice.invoice_url, '_blank');
-      
+
       onSuccess();
     } catch (err: any) {
       setError(err.message || 'Failed to create payment. Please try again.');
@@ -70,7 +70,7 @@ export function CheckoutModal({ product, isOpen, onClose, onSuccess }: CheckoutM
             onClick={onClose}
             className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
           />
-          
+
           {/* Modal */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -102,10 +102,10 @@ export function CheckoutModal({ product, isOpen, onClose, onSuccess }: CheckoutM
               <div className="bg-background p-4 mb-6">
                 <h3 className="font-semibold mb-1">{product.name}</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  {product.description}
+                  {product.short_description}
                 </p>
                 <p className="text-xl font-bold text-army-400">
-                  Rp {product.price.toLocaleString('id-ID')}
+                  Rp {(product?.discount_price || product?.main_price).toLocaleString('id-ID')}
                 </p>
               </div>
 

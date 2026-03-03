@@ -4,16 +4,13 @@ import {
   Mail,
   Send,
   CheckCircle2,
-  Star,
-  Info,
-  ExternalLink
 } from 'lucide-react';
 import { TextReveal, LineReveal, SectionReveal } from '@/components/ui-custom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { CONTACT_INFO, CONTACT_CHANNELS, SOCIAL_LINKS } from '@/constants/contact';
+import { CONTACT_CHANNELS, SOCIAL_LINKS } from '@/constants/contact';
 
 // Hero Section
 function HeroSection() {
