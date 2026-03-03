@@ -11,6 +11,7 @@ import {
   ChevronDown,
   Upload,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Pagination,
   PaginationContent,
@@ -125,6 +126,8 @@ function HeroSection() {
 // File Card Component
 function FileCard({ file, index, viewMode }: { file: RevitFile; index: number; viewMode: 'grid' | 'list' }) {
   const { isAuthenticated } = useAuth();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
 
   const handleDownload = async () => {
     try {
@@ -133,23 +136,60 @@ function FileCard({ file, index, viewMode }: { file: RevitFile; index: number; v
         return;
       }
 
+      setIsDownloading(true);
+      setDownloadProgress(0);
+
+      // Increment count asynchronously
       revitService.incrementDownload(file.id, file.download_count || 0).catch(console.error);
 
       const downloadUrl = revitService.getDownloadUrl(file);
       const response = await fetch(downloadUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      if (!response.ok) throw new Error('Network response was not ok');
 
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = file.file_name || file.display_name || 'revit-file';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      const reader = response.body?.getReader();
+      const contentLength = +(response.headers.get('Content-Length') ?? 0);
+
+      if (!reader) {
+        const blob = await response.blob();
+        triggerDownload(blob, file.file_name || file.display_name || 'revit-file');
+        return;
+      }
+
+      let receivedLength = 0;
+      const chunks = [];
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        receivedLength += value.length;
+        if (contentLength) {
+          setDownloadProgress(Math.round((receivedLength / contentLength) * 100));
+        }
+      }
+
+      const blob = new Blob(chunks, { type: response.headers.get('Content-Type') || undefined });
+      triggerDownload(blob, file.file_name || file.display_name || 'revit-file');
+
+      toast.success(`Download complete: ${file.display_name}`);
+
     } catch (error) {
       console.error('Download failed:', error);
+      toast.error('Download failed');
+    } finally {
+      setIsDownloading(false);
+      setDownloadProgress(0);
     }
+  };
+
+  const triggerDownload = (blob: Blob, filename: string) => {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   };
 
   const formatSize = (bytes: number) => {
@@ -224,10 +264,23 @@ function FileCard({ file, index, viewMode }: { file: RevitFile; index: number; v
               <Button
                 onClick={handleDownload}
                 size="sm"
-                className="bg-army-700 hover:bg-army-600 h-8 text-[11px] rounded-sm"
+                disabled={isDownloading}
+                className="bg-army-700 hover:bg-army-600 h-8 text-[11px] rounded-sm min-w-[100px]"
               >
                 {!isAuthenticated ? (
                   <><Download className="w-3 h-3 mr-2" /> Login to Download</>
+                ) : isDownloading ? (
+                  <div className="flex flex-col items-center justify-center -mt-1">
+                    <div className="flex items-center">
+                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                      {downloadProgress > 0 && (
+                        <span className="text-[8px] font-bold text-army-300 leading-none mr-1">
+                          {downloadProgress}%
+                        </span>
+                      )}
+                      <span className="text-[10px]">Downloading...</span>
+                    </div>
+                  </div>
                 ) : (
                   <><Download className="w-3 h-3 mr-2" /> Download</>
                 )}
@@ -348,18 +401,22 @@ function FilesSection({
               {RevitCategory.map((cat) => {
                 const count = files.filter(f => f.category?.toLowerCase() === cat.id).length;
                 return (
-                  <Button
-                    key={cat.id}
-                    variant={selectedCategory === cat.id ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`text-[10px] h-8 rounded-sm transition-all ${selectedCategory === cat.id ? 'bg-army-700 hover:bg-army-600' : 'hover:bg-army-700/10'}`}
-                  >
-                    {cat.name}
-                    <Badge variant="secondary" className="ml-2 h-4 text-[9px] px-1 bg-secondary/50 rounded-sm">
-                      {count}
-                    </Badge>
-                  </Button>
+                  <>
+                    {count > 0 && (
+                      <Button
+                        key={cat.id}
+                        variant={selectedCategory === cat.id ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setSelectedCategory(cat.id)}
+                        className={`text-[10px] h-8 rounded-sm transition-all ${selectedCategory === cat.id ? 'bg-army-700 hover:bg-army-600' : 'hover:bg-army-700/10'}`}
+                      >
+                        {cat.name}
+                        <Badge variant="secondary" className="ml-2 h-4 text-[9px] px-1 bg-secondary/50 rounded-sm">
+                          {count}
+                        </Badge>
+                      </Button>
+                    )}
+                  </>
                 );
               })}
             </div>
@@ -545,7 +602,7 @@ function StatsBar({ files }: { files: RevitFile[] }) {
             {[
               { value: files.length.toString(), label: 'ASSETS' },
               { value: totalDownloads.toLocaleString(), label: 'DOWNLOADS' },
-              { value: categoriesCount.toString(), label: 'DOMAINS' }
+              { value: categoriesCount.toString(), label: 'CATEGORIES' }
             ].map((stat, index) => (
               <SectionReveal key={stat.label} delay={0.05 * (index + 1)}>
                 <div className="p-6 bg-background/50 border border-border/10 rounded-sm text-center">
@@ -587,25 +644,29 @@ function CategoriesDetailSection({ files, onCategorySelect }: { files: RevitFile
               const count = files.filter(f => f.category?.toLowerCase() === category.id).length;
 
               return (
-                <SectionReveal key={category.id} delay={0.1 * (index + 1)}>
-                  <div
-                    onClick={() => onCategorySelect(category.id)}
-                    className="group p-6 bg-secondary/5 border border-border/10 
+                <>
+                  {count > 0 && (
+                    <SectionReveal key={category.id} delay={0.1 * (index + 1)}>
+                      <div
+                        onClick={() => onCategorySelect(category.id)}
+                        className="group p-6 bg-secondary/5 border border-border/10 
                                   hover:border-army-500/30 transition-all duration-300 rounded-sm cursor-pointer"
-                  >
-                    <h3 className="text-sm font-semibold mb-2 group-hover:text-army-400 transition-colors">
-                      {category.name}
-                    </h3>
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className="text-[10px] text-muted-foreground font-medium opacity-60">
-                        {count} assets
-                      </span>
-                      <span className="text-[10px] text-army-400 group-hover:translate-x-1 transition-transform font-bold">
-                        EXPLORE →
-                      </span>
-                    </div>
-                  </div>
-                </SectionReveal>
+                      >
+                        <h3 className="text-sm font-semibold mb-2 group-hover:text-army-400 transition-colors">
+                          {category.name}
+                        </h3>
+                        <div className="flex items-center justify-between mt-auto">
+                          <span className="text-[10px] text-muted-foreground font-medium opacity-60">
+                            {count} assets
+                          </span>
+                          <span className="text-[10px] text-army-400 group-hover:translate-x-1 transition-transform font-bold">
+                            EXPLORE →
+                          </span>
+                        </div>
+                      </div>
+                    </SectionReveal>
+                  )}
+                </>
               );
             })}
           </div>

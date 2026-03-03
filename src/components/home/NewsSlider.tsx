@@ -49,9 +49,6 @@ export function NewsSlider() {
     return (
         <div className="relative overflow-hidden bg-background/20 backdrop-blur-md border border-border/5 rounded-sm p-4 min-w-[360px] max-w-[420px]">
             <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 bg-army-700/20 flex items-center justify-center rounded-sm">
-                    <Newspaper className="w-3 h-3 text-army-400" />
-                </div>
                 <span className="text-[10px] font-bold uppercase tracking-tight text-army-500">Latest Updates</span>
                 <div className="flex-1" />
                 <span className="text-[8px] font-bold text-muted-foreground opacity-30">
@@ -110,7 +107,7 @@ export function NewsSlider() {
                         rel="noopener noreferrer"
                         className="text-[9px] font-bold text-army-400 flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tight"
                     >
-                        READ FULL NEWS <ArrowUpRight className="w-3 h-3" />
+                        SEE DETAIL <ArrowUpRight className="w-3 h-3" />
                     </a>
                 ) : (
                     <span className="text-[9px] font-bold text-muted-foreground opacity-20 uppercase tracking-tight">DE Community</span>

@@ -9,6 +9,7 @@ import About from '@/pages/About';
 import Services from '@/pages/Services';
 import SoftwareList from '@/pages/SoftwareList';
 import PrivateCourses from '@/pages/PrivateCourses';
+import OnlineCourses from '@/pages/OnlineCourses';
 import Contact from '@/pages/Contact';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -68,6 +69,7 @@ function App() {
                     <Route path="/services" element={<Services />} />
                     <Route path="/building-design" element={<BuildingDesign />} />
                     <Route path="/software" element={<SoftwareList />} />
+                    <Route path="/courses/online-courses" element={<OnlineCourses />} />
                     <Route path="/courses/private-courses" element={<PrivateCourses />} />
                     <Route path="/store" element={<Store />} />
                     <Route path="/store/:category" element={<Store />} />

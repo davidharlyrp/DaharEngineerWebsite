@@ -201,15 +201,6 @@ export default function FAQPage() {
                                                 </AccordionTrigger>
                                                 <AccordionContent className="text-muted-foreground leading-relaxed text-xs pb-6 opacity-80 border-t border-border/5 pt-4">
                                                     <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(faq.answer.replace(/\n/g, '<br />')) }} />
-                                                    {faq.keyword && (
-                                                        <div className="mt-4 flex flex-wrap gap-2">
-                                                            {faq.keyword.split(',').map(tag => (
-                                                                <span key={tag} className="text-[9px] uppercase tracking-wider bg-army-700/10 text-army-400 px-2 py-0.5 border border-army-500/20">
-                                                                    {tag.trim()}
-                                                                </span>
-                                                            ))}
-                                                        </div>
-                                                    )}
                                                 </AccordionContent>
                                             </AccordionItem>
                                         </SectionReveal>

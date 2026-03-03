@@ -160,7 +160,7 @@ function ExploreSection() {
       title: 'CORE ECOSYSTEM',
       items: [
         { label: 'Building Design', desc: 'Structural & Architectural Design', href: '/services', icon: Building2 },
-        { label: 'Software Suite', desc: 'Engineering Calculation Tools', href: '/software', icon: Code },
+        { label: 'Software Suite', desc: 'Civil Engineering Software', href: '/software', icon: Code },
         { label: 'Digital Store', desc: 'Spreadsheets & Templates', href: '/store', icon: ShoppingBag },
         { label: 'Private Courses', desc: '1-on-1 Personalized Training', href: '/courses/private-courses', icon: GraduationCap },
       ]
