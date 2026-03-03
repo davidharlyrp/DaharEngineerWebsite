@@ -1,17 +1,26 @@
+import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { portfolioService } from '@/services/pb/portfolio';
+import { bookingService } from '@/services/pb/booking';
 import {
   ArrowRight,
   Building2,
   GraduationCap,
   ChevronDown,
   Code,
-  Store
+  FileText,
+  Users,
+  FolderOpen,
+  MessageSquare,
+  Search,
+  BookOpen,
+  ShoppingBag
 } from 'lucide-react';
-import { TextReveal, LineReveal, SectionReveal } from '@/components/ui-custom';
+import { TextReveal, SectionReveal } from '@/components/ui-custom';
+import { NewsSlider } from '@/components/home/NewsSlider';
 
-// Hero Section dengan fixed effect
+// Hero Section with News Slider
 function HeroSection() {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -24,116 +33,117 @@ function HeroSection() {
   const y = useTransform(scrollYProgress, [0, 1], [0, 150]);
 
   return (
-    <div ref={ref} className="relative h-screen">
+    <div ref={ref} className="relative h-screen overflow-hidden">
       <motion.div
         style={{ opacity, scale, y }}
-        className="fixed inset-0 flex items-center justify-center z-0 pointer-events-none"
+        className="fixed inset-0 flex items-center justify-center z-0"
       >
-
         {/* Noise overlay */}
-        <div className="absolute inset-0 bg-noise" />
+        <div className="absolute inset-0 bg-noise pointer-events-none" />
 
         {/* Background grid */}
-        <div className="absolute inset-0 bg-grid opacity-30" />
+        <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
 
-
+        {/* Video background */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-20"
+          >
+            <source src="/Hero.webm" type="video/webm" />
+          </video>
+        </div>
 
         {/* Content */}
-        <div className="relative z-10 text-center flex flex-col items-center justify-center px-6 w-full mx-auto h-screen">
-
-          {/* Video background */}
-          <div className="absolute inset-0 -z-10 overflow-hidden">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover opacity-30"
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-20 flex flex-col justify-center h-full">
+          <div className="max-w-3xl">
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 border border-army-500/30 
+                         bg-army-500/5 mb-8"
             >
-              <source src="/Hero.webm" type="video/webm" />
-            </video>
+              <span className="w-1.5 h-1.5 bg-army-500 animate-pulse" />
+              <span className="text-[10px] text-army-400 font-bold uppercase tracking-widest">
+                CIVIL ENGINEERING CONSULTANT
+              </span>
+            </motion.div>
+
+            {/* Main title */}
+            <div className="mb-8">
+              <TextReveal
+                text="DAHAR"
+                tag="h1"
+                className="text-7xl sm:text-8xl lg:text-9xl font-bold tracking-tighter leading-[0.8]"
+                delay={0.3}
+              />
+              <TextReveal
+                text="ENGINEER"
+                tag="h1"
+                className="text-7xl sm:text-8xl lg:text-9xl font-light tracking-tighter leading-[0.8] 
+                           text-muted-foreground mt-2"
+                delay={0.5}
+              />
+            </div>
+
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+              className="text-sm sm:text-base text-muted-foreground/60 max-w-lg mb-10 leading-relaxed"
+            >
+              Complete construction solutions from planning, building design,
+              courses, to software and resources for developing your engineering career.
+            </motion.p>
+
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1, duration: 0.6 }}
+              className="flex items-center gap-4"
+            >
+              <Link
+                to="/services"
+                className="group flex items-center gap-2 px-8 py-4 bg-army-700 hover:bg-army-600 
+                           text-white text-[11px] font-bold uppercase tracking-tight transition-all duration-300"
+              >
+                Explore Services
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </motion.div>
           </div>
-
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-army-500/30 
-                       bg-army-500/10 mb-8"
-          >
-            <span className="w-2 h-2 bg-army-500 animate-pulse" />
-            <span className="text-sm text-army-400 font-medium tracking-wide">
-              CIVIL ENGINEERING CONSULTANT
-            </span>
-          </motion.div>
-
-          {/* Main title */}
-          <div className="mb-6">
-            <TextReveal
-              text="DAHAR"
-              tag="h1"
-              className="text-7xl sm:text-8xl lg:text-9xl font-bold tracking-tighter leading-none"
-              delay={0.3}
-            />
-            <TextReveal
-              text="ENGINEER"
-              tag="h1"
-              className="text-7xl sm:text-8xl lg:text-9xl font-light tracking-tighter leading-none 
-                         text-muted-foreground"
-              delay={0.5}
-            />
-          </div>
-
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
-            className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
-          >
-            Complete construction solutions from planning, building design,
-            courses, to software and resources for developing your engineering career.
-          </motion.p>
-
-          {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <Link
-              to="/services"
-              className="group flex items-center gap-2 px-8 py-4 bg-army-700 hover:bg-army-600 
-                         text-white font-medium transition-all duration-300"
-            >
-              Explore Services
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-            <Link
-              to="/contact"
-              className="px-8 py-4 border border-border/50 hover:border-army-500 
-                         font-medium transition-all duration-300"
-            >
-              Get in Touch
-            </Link>
-          </motion.div>
         </div>
+
+        {/* News Slider - Right Bottom */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2, duration: 0.8 }}
+          className="absolute bottom-10 right-10 z-20 hidden lg:block"
+        >
+          <NewsSlider />
+        </motion.div>
 
         {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 0.6 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+          className="absolute w-full bottom-10 left-10 lg:left-20"
         >
           <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="flex flex-col items-center gap-2 text-muted-foreground"
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="flex flex-col items-center gap-2 text-muted-foreground/30"
           >
-            <span className="text-xs uppercase tracking-widest">Scroll</span>
+            <p className="text-xs text-muted-foreground/60">Scroll Down</p>
             <ChevronDown className="w-5 h-5" />
           </motion.div>
         </motion.div>
@@ -142,285 +152,151 @@ function HeroSection() {
   );
 }
 
-// Services Section
-function ServicesSection() {
-  const services = [
+// Explore Section (Quicklinks)
+function ExploreSection() {
+  const groups = [
     {
-      icon: Building2,
-      title: 'Building Design',
-      description: 'Structural analysis and design for residential, commercial, and industrial buildings.',
-      link: '/services#building-design'
+      title: 'CORE ECOSYSTEM',
+      items: [
+        { label: 'Building Design', desc: 'Structural & Architectural Design', href: '/services', icon: Building2 },
+        { label: 'Software Suite', desc: 'Engineering Calculation Tools', href: '/software', icon: Code },
+        { label: 'Digital Store', desc: 'Spreadsheets & Templates', href: '/store', icon: ShoppingBag },
+        { label: 'Private Courses', desc: '1-on-1 Personalized Training', href: '/courses/private-courses', icon: GraduationCap },
+      ]
     },
     {
-      icon: Code,
-      title: 'Software',
-      description: 'Web-based software for civil engineering calculations and analysis. Access it from anywhere, anytime.',
-      link: '/software'
+      title: 'COMMUNITY HUB',
+      items: [
+        { label: 'Engineering Blog', desc: 'Articles & Tutorials', href: '/blog', icon: FileText },
+        { label: 'Revit Files', desc: 'Family & Project Library', href: '/community/revit-files', icon: FolderOpen },
+        { label: 'Resources', desc: 'Free Engineering Library', href: '/community/resources', icon: BookOpen },
+        { label: 'Help & FAQ', desc: 'Common Questions', href: '/faq', icon: MessageSquare },
+      ]
     },
     {
-      icon: GraduationCap,
-      title: 'Courses & Consultation',
-      description: 'Private and online courses for civil engineering professionals and students.',
-      link: '/courses'
-    },
-    {
-      icon: Store,
-      title: 'Digital Product',
-      description: 'Various digital products for civil engineering, such as spreadsheets, templates, and more.',
-      link: '/store'
+      title: 'CLIENT SERVICES',
+      items: [
+        { label: 'About Dahar', desc: 'Our Vision & Expertise', href: '/about', icon: Users },
+        { label: 'Project Portfolio', desc: 'Showcase of Our Work', href: 'https://portfolio.daharengineer.com', icon: Search },
+        { label: 'Contact Us', desc: 'Get Professional Advice', href: '/contact', icon: MessageSquare },
+        { label: 'Online Learning', desc: 'Video-based Courses', href: '/courses/online-courses', icon: GraduationCap },
+      ]
     }
   ];
 
   return (
-    <section className="section-fullscreen relative flex items-center bg-background">
-      <div className="w-full px-6 lg:px-20 py-20">
-        {/* Section header */}
-        <div className="max-w-7xl mx-auto mb-16">
-          <SectionReveal>
-            <span className="text-sm text-army-400 font-medium uppercase tracking-wider mb-4 block">
-              What We Offer
-            </span>
-          </SectionReveal>
-          <SectionReveal delay={0.1}>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-              Our Services
+    <section className="py-24 bg-background">
+      <div className="max-w-7xl mx-auto px-6 lg:px-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+          {groups.map((group, gIndex) => (
+            <div key={group.title} className="space-y-6">
+              <SectionReveal delay={gIndex * 0.1}>
+                <h3 className="text-[10px] font-bold text-army-500 uppercase tracking-[0.2em] mb-8 border-l border-army-500/30 pl-3">
+                  {group.title}
+                </h3>
+              </SectionReveal>
+
+              <div className="space-y-px bg-border/5">
+                {group.items.map((item, iIndex) => {
+                  const Icon = item.icon;
+                  const isExternal = item.href.startsWith('http');
+                  const LinkComponent = isExternal ? 'a' : Link;
+                  const linkProps = isExternal ? { href: item.href, target: "_blank", rel: "noopener noreferrer" } : { to: item.href };
+
+                  return (
+                    <SectionReveal key={item.label} delay={(gIndex * 0.1) + (iIndex * 0.05)}>
+                      <LinkComponent
+                        {...(linkProps as any)}
+                        className="group flex items-start gap-4 p-5 hover:bg-secondary/30 transition-all rounded-sm border border-transparent hover:border-border/5"
+                      >
+                        <div className="w-8 h-8 rounded-sm bg-army-700/10 flex items-center justify-center shrink-0 group-hover:bg-army-700 transition-colors duration-500">
+                          <Icon className="w-3.5 h-3.5 text-army-400 group-hover:text-white transition-colors" />
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="text-[11px] font-bold tracking-tight group-hover:text-army-400 transition-colors uppercase">
+                            {item.label}
+                          </h4>
+                          <p className="text-[10px] text-muted-foreground opacity-60 leading-tight">
+                            {item.desc}
+                          </p>
+                        </div>
+                        <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                          <ArrowRight className="w-3 h-3 text-army-400" />
+                        </div>
+                      </LinkComponent>
+                    </SectionReveal>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Stats & CTA (Compact)
+function BottomInfo() {
+  const [stats, setStats] = useState([
+    { value: '0+', label: 'Projects' },
+    { value: '0+', label: 'Students' },
+    { value: '3+', label: 'Years' },
+  ]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [projectsCount, studentsCount] = await Promise.all([
+          portfolioService.getTotalProjects(),
+          bookingService.getTotalPaidBookings()
+        ]);
+
+        // Round down to nearest 5 for projects
+        const roundedProjects = Math.floor(projectsCount / 5) * 5;
+
+        // Round down to nearest 10 for students
+        const roundedStudents = Math.floor(studentsCount / 10) * 10;
+
+        setStats([
+          { value: `${roundedProjects}+`, label: 'Projects' },
+          { value: `${roundedStudents}+`, label: 'Students' },
+          { value: '3+', label: 'Years' },
+        ]);
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  return (
+    <section className="pb-24 bg-background">
+      <div className="max-w-7xl mx-auto px-6 lg:px-20">
+        <div className="bg-secondary/10 border border-border/5 rounded-sm p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-12">
+          <div className="grid grid-cols-3 gap-8 lg:gap-16 shrink-0">
+            {stats.map((stat) => (
+              <div key={stat.label} className="text-center lg:text-left">
+                <div className="text-2xl font-bold tracking-tighter text-army-400">{stat.value}</div>
+                <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="max-w-md text-center lg:text-right">
+            <h2 className="text-2xl font-bold tracking-tight mb-4 leading-tight">
+              READY TO START YOUR <span className="text-army-500">NEXT PROJECT?</span>
             </h2>
-          </SectionReveal>
-          <LineReveal delay={0.2} className="max-w-md" />
-        </div>
-
-        {/* Services grid */}
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border/30">
-            {services.map((service, index) => {
-              const Icon = service.icon;
-              return (
-                <SectionReveal key={service.title} delay={0.1 * (index + 1)}>
-                  <Link
-                    to={service.link}
-                    className="group block p-8 lg:p-12 bg-background hover:bg-secondary/50 
-                               transition-colors duration-500"
-                  >
-                    <div className="flex items-start gap-6">
-                      <div className="w-12 h-12 bg-army-700/20 flex items-center justify-center
-                                      group-hover:bg-army-700 transition-colors duration-500">
-                        <Icon className="w-6 h-6 text-army-400 group-hover:text-white transition-colors" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl lg:text-2xl font-semibold mb-3 
-                                       group-hover:text-army-400 transition-colors">
-                          {service.title}
-                        </h3>
-                        <p className="text-muted-foreground mb-4 line-clamp-2">
-                          {service.description}
-                        </p>
-                        <span className="inline-flex items-center gap-2 text-sm font-medium
-                                         group-hover:gap-3 transition-all">
-                          Learn more
-                          <ArrowRight className="w-4 h-4" />
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                </SectionReveal>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Software Section
-function SoftwareSection() {
-  const software = [
-    { name: 'DEColumn', desc: 'Column Interaction P-M Diagram', isNew: true },
-    { name: 'TerraPile', desc: 'Pile Bearing Capacity Analysis', isNew: false },
-    { name: 'TerraShallow', desc: 'Shallow Foundation Analysis', isNew: false },
-    { name: 'CutPro', desc: 'Cutting List Optimization', isNew: true },
-    { name: 'BrickCost', desc: 'Project Cost Estimation', isNew: false },
-    { name: 'TerraID', desc: 'Indonesia Soil Database', isNew: false },
-  ];
-
-  return (
-    <section className="section-fullscreen relative flex items-center bg-secondary/20">
-      <div className="w-full px-6 lg:px-20 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left content */}
-            <div>
-              <SectionReveal>
-                <span className="text-sm text-army-400 font-medium uppercase tracking-wider mb-4 block">
-                  Web Applications
-                </span>
-              </SectionReveal>
-              <SectionReveal delay={0.1}>
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-                  Engineering<br />
-                  <span className="text-muted-foreground">Software</span>
-                </h2>
-              </SectionReveal>
-              <SectionReveal delay={0.2}>
-                <p className="text-lg text-muted-foreground mb-8 max-w-lg">
-                  Powerful web-based tools designed for civil engineers.
-                  Analyze, calculate, and optimize your projects with precision.
-                </p>
-              </SectionReveal>
-              <SectionReveal delay={0.3}>
-                <Link
-                  to="/software"
-                  className="group inline-flex items-center gap-2 px-8 py-4 bg-army-700 
-                             hover:bg-army-600 text-white font-medium transition-all duration-300"
-                >
-                  Explore All Apps
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </SectionReveal>
-            </div>
-
-            {/* Right - Software list */}
-            <div className="space-y-px bg-border/30">
-              {software.map((app, index) => (
-                <SectionReveal key={app.name} delay={0.1 * (index + 1)}>
-                  <Link
-                    to={`/software/${app.name.toLowerCase()}`}
-                    className="group flex items-center justify-between p-6 bg-background 
-                               hover:bg-secondary/50 transition-colors duration-300"
-                  >
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <h3 className="text-lg font-semibold group-hover:text-army-400 transition-colors">
-                          {app.name}
-                        </h3>
-                        {app.isNew && (
-                          <span className="px-2 py-0.5 text-xs bg-army-700 text-white">
-                            NEW
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{app.desc}</p>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-muted-foreground 
-                                           group-hover:text-army-400 group-hover:translate-x-1 
-                                           transition-all" />
-                  </Link>
-                </SectionReveal>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Stats Section
-function StatsSection() {
-  const stats = [
-    { value: '50+', label: 'Projects Completed' },
-    { value: '1000+', label: 'Students Trained' },
-    { value: '6', label: 'Software Tools' },
-    { value: '3+', label: 'Years Experience' },
-  ];
-
-  return (
-    <section className="section-fullscreen relative flex items-center bg-background">
-      <div className="w-full px-6 lg:px-20 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Stats grid */}
-            <div className="grid grid-cols-2 gap-px bg-border/30 order-2 lg:order-1">
-              {stats.map((stat, index) => (
-                <SectionReveal key={stat.label} delay={0.1 * (index + 1)}>
-                  <div className="p-8 lg:p-12 bg-background">
-                    <div className="text-4xl lg:text-5xl font-bold text-army-400 mb-2">
-                      {stat.value}
-                    </div>
-                    <div className="text-sm text-muted-foreground uppercase tracking-wider">
-                      {stat.label}
-                    </div>
-                  </div>
-                </SectionReveal>
-              ))}
-            </div>
-
-            {/* Content */}
-            <div className="order-1 lg:order-2">
-              <SectionReveal>
-                <span className="text-sm text-army-400 font-medium uppercase tracking-wider mb-4 block">
-                  Our Impact
-                </span>
-              </SectionReveal>
-              <SectionReveal delay={0.1}>
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-                  Trusted by Engineers<br />
-                  <span className="text-muted-foreground">Across Indonesia</span>
-                </h2>
-              </SectionReveal>
-              <SectionReveal delay={0.2}>
-                <p className="text-lg text-muted-foreground mb-8">
-                  From small residential projects to large commercial developments,
-                  we have helped engineers and contractors deliver successful projects
-                  with our expertise and innovative tools.
-                </p>
-              </SectionReveal>
-              <SectionReveal delay={0.3}>
-                <Link
-                  to="/portfolio"
-                  className="inline-flex items-center gap-2 text-army-400 hover:text-army-300 
-                             font-medium transition-colors"
-                >
-                  View Our Portfolio
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </SectionReveal>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// CTA Section
-function CTASection() {
-  return (
-    <section className="section-fullscreen relative flex items-center bg-army-950">
-      <div className="absolute inset-0 bg-grid opacity-20" />
-      <div className="w-full px-6 lg:px-20 py-20 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <SectionReveal>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-              Ready to Start Your<br />
-              <span className="text-army-400">Next Project?</span>
-            </h2>
-          </SectionReveal>
-          <SectionReveal delay={0.1}>
-            <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Whether you need structural design, engineering consultation, or
-              want to enhance your skills through our courses, we are here to help.
-            </p>
-          </SectionReveal>
-          <SectionReveal delay={0.2}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                to="/contact"
-                className="group flex items-center gap-2 px-8 py-4 bg-army-700 hover:bg-army-600 
-                           text-white font-medium transition-all duration-300"
-              >
-                Contact Us
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            <div className="flex flex-wrap justify-center lg:justify-end gap-3">
+              <Link to="/contact" className="px-6 py-3 bg-army-700 hover:bg-army-600 text-white text-[10px] font-bold uppercase tracking-tight transition-all">
+                Get Professional Advice
               </Link>
-              <Link
-                to="/about"
-                className="px-8 py-4 border border-army-700/50 hover:border-army-500 
-                           font-medium transition-all duration-300"
-              >
-                Learn More About Us
+              <Link to="/about" className="px-6 py-3 bg-transparent border border-border/20 hover:border-army-500 text-[10px] font-bold uppercase tracking-tight transition-all">
+                Learn More
               </Link>
             </div>
-          </SectionReveal>
+          </div>
         </div>
       </div>
     </section>
@@ -431,18 +307,16 @@ function CTASection() {
 export default function Home() {
   return (
     <div className="relative">
-      {/* Hero with fixed effect */}
+      {/* Hero with Fixed Effect */}
       <HeroSection />
 
-      {/* Spacer for hero */}
+      {/* Spacer for Fixed Hero */}
       <div className="h-screen" />
 
-      {/* Content sections */}
+      {/* Content Sections */}
       <div className="relative z-10 bg-background">
-        <ServicesSection />
-        <SoftwareSection />
-        <StatsSection />
-        <CTASection />
+        <ExploreSection />
+        <BottomInfo />
       </div>
     </div>
   );

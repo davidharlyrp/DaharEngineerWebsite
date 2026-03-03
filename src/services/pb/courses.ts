@@ -1,7 +1,5 @@
-import PocketBase from 'pocketbase';
+import { pb } from '@/lib/pocketbase/client';
 import type { Course, Mentor, Booking, SessionReview, ClientReview } from '@/types/courses';
-
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
 
 export const courseService = {
     async getActiveCourses(): Promise<Course[]> {

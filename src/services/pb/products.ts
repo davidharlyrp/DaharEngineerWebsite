@@ -1,7 +1,5 @@
-import PocketBase from 'pocketbase';
+import { pb, getFileUrl } from '@/lib/pocketbase/client';
 import type { Product } from '@/types/store';
-
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
 
 export const productsService = {
     async getProducts(): Promise<Product[]> {
@@ -36,6 +34,15 @@ export const productsService = {
         }
     },
 
+    async getProductById(id: string): Promise<Product | null> {
+        try {
+            return await pb.collection('products').getOne<Product>(id);
+        } catch (error) {
+            console.error('Error fetching product by id:', error);
+            return null;
+        }
+    },
+
     createSlug(name: string): string {
         return name
             .toLowerCase()
@@ -44,6 +51,6 @@ export const productsService = {
     },
 
     getFileUrl(record: Product, fileName: string): string {
-        return `${import.meta.env.VITE_POCKETBASE_URL}/api/files/${record.collectionId}/${record.id}/${fileName}`;
+        return getFileUrl('products', record.id, fileName, { download: true });
     }
 };

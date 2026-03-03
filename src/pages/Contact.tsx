@@ -2,19 +2,18 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
 import {
   Mail,
-  Phone,
-  MapPin,
   Send,
-  Instagram,
-  Linkedin,
-  Youtube,
-  CheckCircle2
+  CheckCircle2,
+  Star,
+  Info,
+  ExternalLink
 } from 'lucide-react';
 import { TextReveal, LineReveal, SectionReveal } from '@/components/ui-custom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { CONTACT_INFO, CONTACT_CHANNELS, SOCIAL_LINKS } from '@/constants/contact';
 
 // Hero Section
 function HeroSection() {
@@ -86,15 +85,38 @@ function ContactFormSection() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    whatsapp: '',
     subject: '',
     message: ''
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
+
+    // Create WhatsApp message
+    const message = encodeURIComponent(
+      `Halo, saya ${formData.name} ingin menghubungi Dahar Engineer:\n\n` +
+      `*WhatsApp:* ${formData.whatsapp}\n` +
+      `*Email:* ${formData.email}\n` +
+      `*Pesan:*\n${formData.message}\n\n` +
+      `Saya tunggu balasannya. Terima kasih!`
+    );
+
+    // Redirect to WhatsApp using the centralized number
+    const whatsappUrl = `https://wa.me/6285536533330?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+
     setIsSubmitted(true);
-    setTimeout(() => setIsSubmitted(false), 3000);
+    setTimeout(() => {
+      setIsSubmitted(false);
+      setFormData({
+        name: '',
+        email: '',
+        whatsapp: '',
+        subject: '',
+        message: ''
+      });
+    }, 3000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -131,49 +153,22 @@ function ContactFormSection() {
               </SectionReveal>
 
               <div className="space-y-6 mb-10">
-                <SectionReveal delay={0.4}>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-army-700/20 flex items-center justify-center flex-shrink-0">
-                      <Mail className="w-5 h-5 text-army-400" />
+                {CONTACT_CHANNELS.map((channel, index) => (
+                  <SectionReveal key={channel.name} delay={0.4 + (index * 0.1)}>
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-army-700/10 flex items-center justify-center flex-shrink-0">
+                        <channel.icon className="w-5 h-5 text-army-400" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium mb-1">{channel.name}</h3>
+                        <a href={channel.href} target="_blank" rel="noopener noreferrer"
+                          className="text-muted-foreground hover:text-army-400 transition-colors">
+                          {channel.label}
+                        </a>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-medium mb-1">Email</h3>
-                      <a href="mailto:daharengineer@gmail.com"
-                        className="text-muted-foreground hover:text-army-400 transition-colors">
-                        daharengineer@gmail.com
-                      </a>
-                    </div>
-                  </div>
-                </SectionReveal>
-
-                <SectionReveal delay={0.5}>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-army-700/20 flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-5 h-5 text-army-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium mb-1">Phone</h3>
-                      <a href="tel:+6282120867946"
-                        className="text-muted-foreground hover:text-army-400 transition-colors">
-                        +62 821-2086-7946
-                      </a>
-                    </div>
-                  </div>
-                </SectionReveal>
-
-                <SectionReveal delay={0.6}>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-army-700/20 flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-5 h-5 text-army-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium mb-1">Location</h3>
-                      <p className="text-muted-foreground">
-                        Bandung, West Java, Indonesia
-                      </p>
-                    </div>
-                  </div>
-                </SectionReveal>
+                  </SectionReveal>
+                ))}
               </div>
 
               {/* Social Links */}
@@ -181,33 +176,18 @@ function ContactFormSection() {
                 <div>
                   <h3 className="font-medium mb-4">Follow Us</h3>
                   <div className="flex gap-3">
-                    <a
-                      href="https://instagram.com/dahar.engineer"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
-                                 transition-colors duration-300"
-                    >
-                      <Instagram className="w-5 h-5" />
-                    </a>
-                    <a
-                      href="https://linkedin.com/company/dahar-engineer"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
-                                 transition-colors duration-300"
-                    >
-                      <Linkedin className="w-5 h-5" />
-                    </a>
-                    <a
-                      href="https://youtube.com/@daharengineer"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
-                                 transition-colors duration-300"
-                    >
-                      <Youtube className="w-5 h-5" />
-                    </a>
+                    {SOCIAL_LINKS.map((social) => (
+                      <a
+                        key={social.name}
+                        href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
+                                   transition-colors duration-300 group"
+                      >
+                        <social.icon className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
+                      </a>
+                    ))}
                   </div>
                 </div>
               </SectionReveal>
@@ -242,6 +222,22 @@ function ContactFormSection() {
                         />
                       </div>
                       <div className="space-y-2">
+                        <Label htmlFor="whatsapp">WhatsApp Number</Label>
+                        <Input
+                          id="whatsapp"
+                          name="whatsapp"
+                          type="tel"
+                          value={formData.whatsapp}
+                          onChange={handleChange}
+                          placeholder="0812..."
+                          required
+                          className="bg-background border-border/50 focus:border-army-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-6">
+                      <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
                         <Input
                           id="email"
@@ -254,19 +250,18 @@ function ContactFormSection() {
                           className="bg-background border-border/50 focus:border-army-500"
                         />
                       </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="subject">Subject</Label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        placeholder="How can we help?"
-                        required
-                        className="bg-background border-border/50 focus:border-army-500"
-                      />
+                      <div className="space-y-2">
+                        <Label htmlFor="subject">Subject</Label>
+                        <Input
+                          id="subject"
+                          name="subject"
+                          value={formData.subject}
+                          onChange={handleChange}
+                          placeholder="How can we help?"
+                          required
+                          className="bg-background border-border/50 focus:border-army-500"
+                        />
+                      </div>
                     </div>
 
                     <div className="space-y-2">
@@ -301,77 +296,23 @@ function ContactFormSection() {
   );
 }
 
-// Map Section (Placeholder)
+// Map Section
 function MapSection() {
   return (
-    <section className="section-fullscreen relative flex items-center bg-secondary/20">
-      <div className="w-full px-6 lg:px-20 py-20">
-        <div className="max-w-7xl mx-auto">
-          <SectionReveal>
-            <div className="aspect-[21/9] bg-gradient-to-br from-army-800/20 to-army-900/20 
-                            flex items-center justify-center border border-border/30">
-              <div className="text-center">
-                <MapPin className="w-12 h-12 text-army-700/40 mx-auto mb-4" />
-                <p className="text-muted-foreground">Bandung, West Java, Indonesia</p>
-              </div>
-            </div>
-          </SectionReveal>
-        </div>
+    <section className="h-[600px] relative bg-secondary/20 overflow-hidden">
+      <div className="absolute flex items-center justify-center inset-0 mx-auto h-full w-[80dvw] z-0">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.0802851928574!2d107.59680829999999!3d-6.9998273!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e9228c3ed1fd%3A0xc9baa165d4a3cad8!2sDahar%20Engineer!5e0!3m2!1sid!2sid!4v1749789553737!5m2!1sid!2sid"
+          width="100%"
+          height="100%"
+          style={{ border: 0, filter: 'invert(1) grayscale(1) brightness(0.9) contrast(0.9)' }}
+          allowFullScreen={true}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Dahar Engineer Location"
+        />
       </div>
-    </section>
-  );
-}
 
-// FAQ Section
-function FAQSection() {
-  const faqs = [
-    {
-      question: 'What services do you offer?',
-      answer: 'We offer building design, structural analysis, engineering consultation, online courses, and custom software development for civil engineering applications.'
-    },
-    {
-      question: 'How can I book a consultation?',
-      answer: 'You can book a consultation by filling out the contact form above, emailing us directly, or calling our office. We offer both online and offline consultation options.'
-    },
-    {
-      question: 'Do you offer online courses?',
-      answer: 'Yes, we offer a variety of online courses on structural engineering, Revit, ETABS, and more. Visit our Courses page to see the full list.'
-    },
-    {
-      question: 'What is your typical project timeline?',
-      answer: 'Project timelines vary depending on scope and complexity. We will provide a detailed timeline during our initial consultation after understanding your requirements.'
-    }
-  ];
-
-  return (
-    <section className="section-fullscreen relative flex items-center bg-background">
-      <div className="w-full px-6 lg:px-20 py-20">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <SectionReveal>
-              <span className="text-sm text-army-400 font-medium uppercase tracking-wider mb-4 block">
-                FAQ
-              </span>
-            </SectionReveal>
-            <SectionReveal delay={0.1}>
-              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
-                Frequently Asked Questions
-              </h2>
-            </SectionReveal>
-          </div>
-
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <SectionReveal key={index} delay={0.1 * (index + 1)}>
-                <div className="p-6 bg-secondary/30">
-                  <h3 className="text-lg font-semibold mb-2">{faq.question}</h3>
-                  <p className="text-muted-foreground">{faq.answer}</p>
-                </div>
-              </SectionReveal>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   );
 }
@@ -385,7 +326,6 @@ export default function Contact() {
       <div className="relative z-10 bg-background">
         <ContactFormSection />
         <MapSection />
-        <FAQSection />
       </div>
     </div>
   );

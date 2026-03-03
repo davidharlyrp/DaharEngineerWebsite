@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
   ArrowRight,
   Chrome,
-  AlertCircle
+  AlertCircle,
+  XCircle
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,14 @@ export default function Login() {
     email: '',
     password: ''
   });
+
+  // Forgot Password Modal State
+  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [isSendingReset, setIsSendingReset] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [forgotError, setForgotError] = useState('');
+  const { resetPassword } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -55,11 +64,26 @@ export default function Login() {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotError('');
+    setIsSendingReset(true);
+
+    try {
+      await resetPassword(forgotEmail);
+      setResetSent(true);
+    } catch (err: any) {
+      setForgotError(err.message || 'Failed to send reset email. Please try again.');
+    } finally {
+      setIsSendingReset(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="absolute inset-0 bg-grid opacity-20" />
       <div className="absolute inset-0 bg-noise" />
-      
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -141,9 +165,16 @@ export default function Login() {
                 <input type="checkbox" className="rounded border-border/50" />
                 <span className="text-muted-foreground">Remember me</span>
               </label>
-              <Link to="/forgot-password" className="text-army-400 hover:text-army-300 transition-colors">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsForgotModalOpen(true);
+                  setForgotEmail(formData.email);
+                }}
+                className="text-army-400 hover:text-army-300 transition-colors"
+              >
                 Forgot password?
-              </Link>
+              </button>
             </div>
 
             <Button
@@ -194,13 +225,101 @@ export default function Login() {
         </p>
 
         {/* Back to Home */}
-        <Link 
+        <Link
           to="/"
           className="block text-center mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           ← Back to home
         </Link>
       </motion.div>
+
+      {/* Forgot Password Modal */}
+      {isForgotModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-sm bg-secondary border border-border/50 rounded-lg shadow-xl overflow-hidden"
+          >
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold">Reset Password</h3>
+                <button onClick={() => setIsForgotModalOpen(false)} className="text-muted-foreground hover:text-foreground">
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
+
+              {resetSent ? (
+                <div className="text-center py-4">
+                  <div className="w-12 h-12 bg-army-500/10 text-army-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Mail className="w-6 h-6" />
+                  </div>
+                  <h4 className="font-bold mb-2">Check your email</h4>
+                  <p className="text-xs text-muted-foreground mb-6">
+                    We've sent a password reset link to <span className="text-foreground font-medium">{forgotEmail}</span>.
+                  </p>
+                  <Button
+                    onClick={() => {
+                      setIsForgotModalOpen(false);
+                      setResetSent(false);
+                    }}
+                    className="w-full bg-army-700 hover:bg-army-600"
+                  >
+                    Got it
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Enter your email address and we'll send you a link to reset your password.
+                  </p>
+
+                  {forgotError && (
+                    <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] rounded flex items-center gap-2">
+                      <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                      {forgotError}
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="forgotEmail" className="text-xs">Email Address</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="forgotEmail"
+                        type="email"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        required
+                        className="pl-9 h-10 bg-background text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsForgotModalOpen(false)}
+                      className="flex-1 h-10 text-xs border-border/50"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={isSendingReset}
+                      className="flex-1 h-10 text-xs bg-army-700 hover:bg-army-600"
+                    >
+                      {isSendingReset ? 'Sending...' : 'Send Link'}
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

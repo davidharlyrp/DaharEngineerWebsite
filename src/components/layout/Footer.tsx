@@ -1,25 +1,19 @@
 import { Link } from 'react-router-dom';
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Instagram,
-  Linkedin,
-  Youtube,
-  Music2,
-} from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
+import { CONTACT_INFO, SOCIAL_LINKS } from '@/constants/contact';
 
 const footerLinks = {
   company: [
     { label: 'About Us', href: '/about' },
     { label: 'Contact', href: '/contact' },
     { label: 'Services', href: '/services' },
-    { label: 'Portfolio', href: 'https://www.portfolio.daharengineer.com' },
+    { label: 'Portfolio', href: 'https://portfolio.daharengineer.com' },
+    { label: 'FAQ', href: '/faq' },
   ],
   services: [
     { label: 'Building Design', href: '/building-design' },
-    { label: 'Courses', href: '/courses' },
-    { label: 'Private Courses', href: '/private-courses' },
+    { label: 'Online Courses', href: '/courses/online-courses' },
+    { label: 'Private Courses', href: '/courses/private-courses' },
     { label: 'Store', href: '/store' },
     { label: 'Software', href: '/software' },
   ],
@@ -27,17 +21,13 @@ const footerLinks = {
     { label: 'DELinxs', href: 'https://delinxs.com' },
     { label: 'Revit Files', href: '/community/revit-files' },
     { label: 'Resources', href: '/community/resources' },
-    { label: 'Blog', href: '/community/blog' },
-  ],
-  learning: [
-    { label: 'Private Courses', href: '/private-courses' },
-    { label: 'Online Courses', href: '/courses' },
-    { label: 'Software', href: '/software' },
+    { label: 'Blog', href: '/blog' },
   ],
   legal: [
     { label: 'Terms of Service', href: '/terms' },
     { label: 'Privacy Policy', href: '/privacy' },
     { label: 'Refund Policy', href: '/refund' },
+    { label: 'Community Policy', href: '/community-policy' },
   ],
 };
 
@@ -69,23 +59,30 @@ export function Footer() {
               {/* Contact Info */}
               <div className="space-y-3 text-sm">
                 <a
-                  href="mailto:admin@daharengineer.com"
+                  href={`mailto:${CONTACT_INFO.email}`}
                   className="flex items-center gap-2 text-muted-foreground hover:text-army-400 transition-colors"
                 >
-                  <Mail className="w-4 h-4" />
-                  admin@daharengineer.com
+                  <Mail className="w-4 h-4 text-muted-foreground/50" />
+                  {CONTACT_INFO.email}
                 </a>
                 <a
-                  href="https://wa.me/6285536533330"
+                  href={CONTACT_INFO.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-2 text-muted-foreground hover:text-army-400 transition-colors"
                 >
-                  <Phone className="w-4 h-4" />
-                  +62 855-3653-3330
+                  <Phone className="w-4 h-4 text-muted-foreground/50" />
+                  {CONTACT_INFO.phone}
                 </a>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  Bandung, Indonesia
-                </div>
+                <a
+                  href={CONTACT_INFO.mapsLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-army-400 transition-colors"
+                >
+                  <MapPin className="w-4 h-4 text-muted-foreground/50" />
+                  {CONTACT_INFO.location}
+                </a>
               </div>
             </div>
 
@@ -165,47 +162,26 @@ export function Footer() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Copyright */}
           <p className="text-sm text-muted-foreground">
-            2024 Dahar Engineer. All rights reserved.
+            {new Date().getFullYear()} Dahar Engineer. All rights reserved.
           </p>
 
           {/* Social Links */}
           <div className="flex items-center gap-4">
-            <a
-              href="https://www.instagram.com/dahar_engineer/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
-                         transition-colors duration-300 group"
-            >
-              <Instagram className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
-            </a>
-            <a
-              href="https://www.linkedin.com/company/dahar-engineer/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
-                         transition-colors duration-300 group"
-            >
-              <Linkedin className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
-            </a>
-            <a
-              href="https://www.youtube.com/@dahar_engineer"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
-                         transition-colors duration-300 group"
-            >
-              <Youtube className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
-            </a>
-            <a
-              href="https://www.tiktok.com/@dahar_engineer"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
-                         transition-colors duration-300 group"
-            >
-              <Music2 className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
-            </a>
+            {SOCIAL_LINKS.map((social) => {
+              const Icon = social.icon;
+              return (
+                <a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-secondary/50 hover:bg-army-700 flex items-center justify-center
+                             transition-colors duration-300 group"
+                >
+                  <Icon className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>

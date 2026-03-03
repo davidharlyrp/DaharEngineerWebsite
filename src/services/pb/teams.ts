@@ -1,7 +1,5 @@
-import PocketBase from 'pocketbase';
+import { pb } from '@/lib/pocketbase/client';
 import type { DaharTeam } from '@/types/teams';
-
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
 
 export const teamsService = {
     async getActiveTeams(): Promise<DaharTeam[]> {

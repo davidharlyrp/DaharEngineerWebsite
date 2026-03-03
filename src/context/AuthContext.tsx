@@ -1,17 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { pb, authStore } from '@/lib/pocketbase/client';
-import type { AuthContextType } from '@/types';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-  role: 'user' | 'admin';
-  total_coins?: number;
-  created: string;
-  updated: string;
-}
+import type { AuthContextType, User } from '@/types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -23,13 +12,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // Check if user is already authenticated
-        if (authStore.isValid) {
-          const authUser = authStore.model as unknown as User;
-          setUser(authUser);
+        // Check if user is already authenticated and refresh the model
+        if (pb.authStore.isValid) {
+          const authData = await pb.collection('users').authRefresh();
+          setUser(authData.record as unknown as User);
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
+        // Fallback to local model if refresh fails but store is still valid
+        if (pb.authStore.isValid) {
+          setUser(pb.authStore.model as unknown as User);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -72,7 +65,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const authData = await pb.collection('users').authWithOAuth2({
         provider: 'google',
       });
-      setUser(authData.record as unknown as User);
+
+      // Update user details for Google Login (emailVisibility and newsletter to true)
+      if (authData.record) {
+        await pb.collection('users').update(authData.record.id, {
+          emailVisibility: true,
+          newsletter: true,
+        });
+
+        // Refresh local user model
+        const updatedRecord = await pb.collection('users').getOne(authData.record.id);
+        setUser(updatedRecord as unknown as User);
+      } else {
+        setUser(authData.record as unknown as User);
+      }
     } catch (error) {
       console.error('Google login error:', error);
       throw error;
@@ -82,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Register new user
-  const register = useCallback(async (email: string, password: string, name: string) => {
+  const register = useCallback(async (email: string, password: string, name: string, institution?: string, newsletter?: boolean, phone_number?: string) => {
     try {
       setIsLoading(true);
       const data = {
@@ -90,6 +96,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
         passwordConfirm: password,
         name,
+        institution: institution || '',
+        newsletter: !!newsletter,
+        phone_number: phone_number || '',
+        emailVisibility: true,
       };
 
       await pb.collection('users').create(data);
@@ -128,6 +138,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Confirm password reset
+  const confirmPasswordReset = useCallback(async (token: string, password: string) => {
+    try {
+      await pb.collection('users').confirmPasswordReset(token, password, password);
+    } catch (error) {
+      console.error('Confirm password reset error:', error);
+      throw error;
+    }
+  }, []);
+
+  // Change password for logged in user
+  const changePassword = useCallback(async (oldPassword: string, newPassword: string) => {
+    try {
+      if (!user) throw new Error('User not authenticated');
+      await pb.collection('users').update(user.id, {
+        oldPassword,
+        password: newPassword,
+        passwordConfirm: newPassword,
+      });
+    } catch (error) {
+      console.error('Change password error:', error);
+      throw error;
+    }
+  }, [user]);
+
   const refreshUser = useCallback(async () => {
     try {
       if (pb.authStore.isValid && pb.authStore.model) {
@@ -136,6 +171,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('Refresh user error:', error);
+    }
+  }, []);
+
+  const requestVerification = useCallback(async (email: string) => {
+    try {
+      await pb.collection('users').requestVerification(email);
+      return { success: true };
+    } catch (error) {
+      console.error('Request verification error:', error);
+      return { success: false };
     }
   }, []);
 
@@ -148,7 +193,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     register,
     logout,
     resetPassword,
+    confirmPasswordReset,
+    changePassword,
     refreshUser,
+    requestVerification,
   };
 
   return (

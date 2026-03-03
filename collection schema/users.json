@@ -1,0 +1,463 @@
+{
+    "id": "_pb_users_auth_",
+    "listRule": "",
+    "viewRule": "",
+    "createRule": "",
+    "updateRule": "",
+    "deleteRule": "@request.auth.isAdmin = true || id = @request.auth.id",
+    "name": "users",
+    "type": "auth",
+    "fields": [
+        {
+            "autogeneratePattern": "[a-z0-9]{15}",
+            "hidden": false,
+            "id": "text3208210256",
+            "max": 15,
+            "min": 15,
+            "name": "id",
+            "pattern": "^[a-z0-9]+$",
+            "presentable": false,
+            "primaryKey": true,
+            "required": true,
+            "system": true,
+            "type": "text"
+        },
+        {
+            "cost": 0,
+            "hidden": true,
+            "id": "password901924565",
+            "max": 0,
+            "min": 8,
+            "name": "password",
+            "pattern": "",
+            "presentable": false,
+            "required": true,
+            "system": true,
+            "type": "password"
+        },
+        {
+            "autogeneratePattern": "[a-zA-Z0-9]{50}",
+            "hidden": true,
+            "id": "text2504183744",
+            "max": 60,
+            "min": 30,
+            "name": "tokenKey",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": true,
+            "system": true,
+            "type": "text"
+        },
+        {
+            "exceptDomains": [
+                "passinbox.com"
+            ],
+            "hidden": false,
+            "id": "email3885137012",
+            "name": "email",
+            "onlyDomains": null,
+            "presentable": false,
+            "required": true,
+            "system": true,
+            "type": "email"
+        },
+        {
+            "hidden": false,
+            "id": "bool1547992806",
+            "name": "emailVisibility",
+            "presentable": false,
+            "required": false,
+            "system": true,
+            "type": "bool"
+        },
+        {
+            "hidden": false,
+            "id": "bool256245529",
+            "name": "verified",
+            "presentable": false,
+            "required": false,
+            "system": true,
+            "type": "bool"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text1579384326",
+            "max": 255,
+            "min": 0,
+            "name": "name",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "hidden": false,
+            "id": "file376926767",
+            "maxSelect": 1,
+            "maxSize": 0,
+            "mimeTypes": [
+                "image/jpeg",
+                "image/png",
+                "image/svg+xml",
+                "image/gif",
+                "image/webp"
+            ],
+            "name": "avatar",
+            "presentable": false,
+            "protected": false,
+            "required": false,
+            "system": false,
+            "thumbs": null,
+            "type": "file"
+        },
+        {
+            "hidden": false,
+            "id": "bool2122679752",
+            "name": "newsletter",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "bool"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text3578368839",
+            "max": 0,
+            "min": 0,
+            "name": "display_name",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text983537893",
+            "max": 0,
+            "min": 0,
+            "name": "institution",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "hidden": false,
+            "id": "number3455262183",
+            "max": null,
+            "min": 0,
+            "name": "total_coins",
+            "onlyInt": true,
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "number"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text1795275867",
+            "max": 0,
+            "min": 0,
+            "name": "phone_number",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "hidden": false,
+            "id": "number1712216094",
+            "max": null,
+            "min": null,
+            "name": "desys_running_count",
+            "onlyInt": false,
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "number"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text4166911607",
+            "max": 0,
+            "min": 0,
+            "name": "username",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "hidden": false,
+            "id": "bool3304254982",
+            "name": "isAdmin",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "bool"
+        },
+        {
+            "hidden": false,
+            "id": "bool1579833956",
+            "name": "brickcost_access",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "bool"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text272992928",
+            "max": 0,
+            "min": 0,
+            "name": "brickcost_payment_status",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "hidden": false,
+            "id": "date2698765831",
+            "max": "",
+            "min": "",
+            "name": "brickcost_payment_date",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "date"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text3983100938",
+            "max": 0,
+            "min": 0,
+            "name": "brickcost_external_id",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "hidden": false,
+            "id": "date1626564523",
+            "max": "",
+            "min": "",
+            "name": "brickcost_expiry",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "date"
+        },
+        {
+            "hidden": false,
+            "id": "bool4235264087",
+            "name": "terrashallow_access",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "bool"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text4027341829",
+            "max": 0,
+            "min": 0,
+            "name": "terrashallow_payment_status",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "hidden": false,
+            "id": "date2523284931",
+            "max": "",
+            "min": "",
+            "name": "terrashallow_payment_date",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "date"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text1400929952",
+            "max": 0,
+            "min": 0,
+            "name": "terrashallow_external_id",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "hidden": false,
+            "id": "date3265805720",
+            "max": "",
+            "min": "",
+            "name": "terrashallow_expiry",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "date"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text2481550892",
+            "max": 0,
+            "min": 0,
+            "name": "pushToken",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "hidden": false,
+            "id": "date2314311557",
+            "max": "",
+            "min": "",
+            "name": "last_notification_read",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "date"
+        },
+        {
+            "hidden": false,
+            "id": "autodate2990389176",
+            "name": "created",
+            "onCreate": true,
+            "onUpdate": false,
+            "presentable": false,
+            "system": false,
+            "type": "autodate"
+        },
+        {
+            "hidden": false,
+            "id": "autodate3332085495",
+            "name": "updated",
+            "onCreate": true,
+            "onUpdate": true,
+            "presentable": false,
+            "system": false,
+            "type": "autodate"
+        }
+    ],
+    "indexes": [
+        "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
+    ],
+    "created": "2026-01-23 18:27:01.118Z",
+    "updated": "2026-02-26 05:51:58.334Z",
+    "system": false,
+    "authRule": "",
+    "manageRule": null,
+    "authAlert": {
+        "enabled": true,
+        "emailTemplate": {
+            "subject": "Login from a new location",
+            "body": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Login Alert</title>\n</head>\n\n<body\n    style=\"margin:0; padding:0; background-color:#f4f4f7; font-family:'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\">\n\n    <table align=\"center\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n        style=\"background-color:#f4f4f7; padding:40px 20px;\">\n        <tr>\n            <td align=\"center\">\n                <!-- Inner Container -->\n                <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n                    style=\"width:100%; max-width:600px; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.08);\">\n\n                    <!-- Logo & Brand Header -->\n                    <tr>\n                        <td style=\"background:#000000; padding:32px 48px;\">\n                            <table role=\"presentation\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n                                <tr>\n                                    <td width=\"60%\" style=\"text-align:left; vertical-align:middle;\">\n                                        <img src=\"https://daharengineer.com/Logo.png\" alt=\"Dahar Engineer\" width=\"40\"\n                                            height=\"40\"\n                                            style=\"height:40px; width:40px; vertical-align:middle; margin-right:12px; display:inline-block;\" />\n                                        <span\n                                            style=\"font-size:22px; font-weight:800; color:#ffffff; vertical-align:middle; letter-spacing:-0.5px;\">{APP_NAME}</span>\n                                    </td>\n                                    <td width=\"40%\" style=\"text-align:right; vertical-align:middle;\">\n                                        <span\n                                            style=\"font-size:14px; color:rgba(255,255,255,0.7); font-weight:600; letter-spacing:0.5px; text-transform:uppercase;\">Security\n                                            Alert</span>\n                                    </td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n\n                    <!-- Main Content -->\n                    <tr>\n                        <td style=\"padding:48px 48px 40px;\">\n                            <h1\n                                style=\"margin:0 0 20px; font-size:32px; font-weight:800; color:#111827; letter-spacing:-1px; line-height:1.2;\">\n                                New Login Detected</h1>\n                            <p style=\"margin:0 0 32px; font-size:17px; line-height:1.8; color:#4b5563;\">\n                                Hello, we noticed a login to your <strong>{APP_NAME}</strong> account from a new\n                                location or device.\n                            </p>\n\n                            <!-- Login Info Box -->\n                            <table role=\"presentation\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n                                style=\"background:#fff7ed; border-radius:12px; border:1px solid #ffedd5; margin-bottom:36px;\">\n                                <tr>\n                                    <td style=\"padding:24px 28px;\">\n                                        <p\n                                            style=\"margin:0 0 8px; font-size:14px; font-weight:700; color:#9a3412; text-transform:uppercase; letter-spacing:1.5px;\">\n                                            Login Details</p>\n                                        <p\n                                            style=\"margin:0; font-size:15px; color:#c2410c; line-height:1.7; font-family:monospace;\">\n                                            {ALERT_INFO}</p>\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <p style=\"margin:0 0 32px; font-size:16px; line-height:1.8; color:#4b5563;\">\n                                <strong>If this wasn't you</strong>, please change your password immediately to secure\n                                your account and log out other sessions.\n                            </p>\n\n                            <!-- CTA Button -->\n                            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n                                <tr>\n                                    <td style=\"background:#dc2626; border-radius:10px;\">\n                                        <a href=\"{APP_URL}/dashboard\"\n                                            style=\"display:inline-block; padding:18px 40px; font-size:16px; font-weight:700; color:#ffffff; text-decoration:none; letter-spacing:0.3px;\">Secure\n                                            Your Account &rarr;</a>\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <p style=\"margin:40px 0 0; font-size:14px; color:#9ca3af; line-height:1.8;\">\n                                If this was you, you can safely disregard this email.\n                            </p>\n                        </td>\n                    </tr>\n\n                    <!-- Divider -->\n                    <tr>\n                        <td style=\"padding:0 48px;\">\n                            <div style=\"border-top:1px solid #f3f4f6;\"></div>\n                        </td>\n                    </tr>\n\n                    <!-- Bottom note -->\n                    <tr>\n                        <td style=\"padding:32px 48px 48px;\">\n                            <p style=\"margin:0; font-size:13px; color:#9ca3af; text-align:center; line-height:1.7;\">Your\n                                security is our top priority. Thank you for protecting your account.</p>\n                        </td>\n                    </tr>\n                </table>\n\n                <!-- Footer -->\n                <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n                    style=\"width:100%; max-width:600px;\">\n                    <tr>\n                        <td style=\"padding:32px 40px; text-align:center;\">\n                            <p style=\"margin:0 0 10px; font-size:13px; color:#9ca3af; font-weight:500;\">© {APP_NAME}.\n                                All rights reserved.</p>\n                            <p style=\"margin:0; font-size:12px; color:#d1d5db;\">Dahar Engineer &bull; daharengineer.com\n                            </p>\n                        </td>\n                    </tr>\n                </table>\n            </td>\n        </tr>\n    </table>\n</body>\n\n</html>"
+        }
+    },
+    "oauth2": {
+        "providers": [
+            {
+                "pkce": null,
+                "name": "google",
+                "clientId": "911937250806-si4k1j7br9jnh1r184r4e16j8hmou6dc.apps.googleusercontent.com",
+                "authURL": "",
+                "tokenURL": "",
+                "userInfoURL": "",
+                "displayName": "",
+                "extra": null
+            }
+        ],
+        "mappedFields": {
+            "id": "",
+            "name": "name",
+            "username": "",
+            "avatarURL": "avatar"
+        },
+        "enabled": true
+    },
+    "passwordAuth": {
+        "enabled": true,
+        "identityFields": [
+            "email"
+        ]
+    },
+    "mfa": {
+        "enabled": false,
+        "duration": 1800,
+        "rule": ""
+    },
+    "otp": {
+        "enabled": false,
+        "duration": 180,
+        "length": 8,
+        "emailTemplate": {
+            "subject": "OTP for {APP_NAME}",
+            "body": "<p>Hello,</p>\n<p>Your one-time password is: <strong>{OTP}</strong></p>\n<p><i>If you didn't ask for the one-time password, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+        }
+    },
+    "authToken": {
+        "duration": 604800
+    },
+    "passwordResetToken": {
+        "duration": 1800
+    },
+    "emailChangeToken": {
+        "duration": 1800
+    },
+    "verificationToken": {
+        "duration": 259200
+    },
+    "fileToken": {
+        "duration": 180
+    },
+    "verificationTemplate": {
+        "subject": "Verify your {APP_NAME} email",
+        "body": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Email Verification</title>\n</head>\n\n<body\n    style=\"margin:0; padding:0; background-color:#f4f4f7; font-family:'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\">\n\n    <table align=\"center\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n        style=\"background-color:#f4f4f7; padding:40px 20px;\">\n        <tr>\n            <td align=\"center\">\n                <!-- Inner Container -->\n                <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n                    style=\"width:100%; max-width:600px; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.08);\">\n\n                    <!-- Logo & Brand Header -->\n                    <tr>\n                        <td style=\"background:#000000; padding:32px 48px;\">\n                            <table role=\"presentation\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n                                <tr>\n                                    <td width=\"60%\" style=\"text-align:left; vertical-align:middle;\">\n                                        <img src=\"https://daharengineer.com/Logo.png\" alt=\"Dahar Engineer\" width=\"40\"\n                                            height=\"40\"\n                                            style=\"height:40px; width:40px; vertical-align:middle; margin-right:12px; display:inline-block;\" />\n                                        <span\n                                            style=\"font-size:22px; font-weight:800; color:#ffffff; vertical-align:middle; letter-spacing:-0.5px;\">{APP_NAME}</span>\n                                    </td>\n                                    <td width=\"40%\" style=\"text-align:right; vertical-align:middle;\">\n                                        <span\n                                            style=\"font-size:14px; color:rgba(255,255,255,0.7); font-weight:600; letter-spacing:0.5px; text-transform:uppercase;\">Verify</span>\n                                    </td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n\n                    <!-- Main Content -->\n                    <tr>\n                        <td style=\"padding:48px 48px 40px;\">\n                            <h1\n                                style=\"margin:0 0 20px; font-size:32px; font-weight:800; color:#111827; letter-spacing:-1px; line-height:1.2;\">\n                                Welcome aboard!</h1>\n                            <p style=\"margin:0 0 32px; font-size:17px; line-height:1.8; color:#4b5563;\">\n                                Thank you for registering with <strong>{APP_NAME}</strong>.\n                                To activate your account and start using the platform, please verify your email address.\n                            </p>\n\n                            <!-- Highlight Box -->\n                            <table role=\"presentation\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n                                style=\"background:#f0fdf4; border-radius:12px; border:1px solid #bbf7d0; margin-bottom:36px;\">\n                                <tr>\n                                    <td style=\"padding:24px 28px;\">\n                                        <p\n                                            style=\"margin:0 0 8px; font-size:14px; font-weight:700; color:#15803d; text-transform:uppercase; letter-spacing:1.5px;\">\n                                            Security Note</p>\n                                        <p style=\"margin:0; font-size:15px; color:#166534; line-height:1.7;\">By\n                                            verifying your email, you ensure that you can safely recover your account\n                                            and receive important updates.</p>\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <!-- CTA Button -->\n                            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n                                <tr>\n                                    <td style=\"background:#000000; border-radius:10px;\">\n                                        <a href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\"\n                                            style=\"display:inline-block; padding:18px 40px; font-size:16px; font-weight:700; color:#ffffff; text-decoration:none; letter-spacing:0.3px;\">Verify\n                                            Email Now &rarr;</a>\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <p style=\"margin:40px 0 0; font-size:14px; color:#9ca3af; line-height:1.8;\">\n                                If the button above doesn't work, copy and paste this link into your browser:\n                                <br />\n                                <span\n                                    style=\"display:inline-block; margin-top:8px; color:#3b82f6; font-family:monospace; font-size:13px; word-break:break-all;\">{APP_URL}/_/#/auth/confirm-verification/{TOKEN}</span>\n                            </p>\n                        </td>\n                    </tr>\n\n                    <!-- Divider -->\n                    <tr>\n                        <td style=\"padding:0 48px;\">\n                            <div style=\"border-top:1px solid #f3f4f6;\"></div>\n                        </td>\n                    </tr>\n\n                    <!-- Bottom note -->\n                    <tr>\n                        <td style=\"padding:32px 48px 48px;\">\n                            <p style=\"margin:0; font-size:13px; color:#9ca3af; text-align:center; line-height:1.7;\">If\n                                you did not create an account, you can safely ignore this email.</p>\n                        </td>\n                    </tr>\n                </table>\n\n                <!-- Footer -->\n                <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n                    style=\"width:100%; max-width:600px;\">\n                    <tr>\n                        <td style=\"padding:32px 40px; text-align:center;\">\n                            <p style=\"margin:0 0 10px; font-size:13px; color:#9ca3af; font-weight:500;\">© {APP_NAME}.\n                                All rights reserved.</p>\n                            <p style=\"margin:0; font-size:12px; color:#d1d5db;\">Dahar Engineer &bull;\n                                daharengineer.com</p>\n                        </td>\n                    </tr>\n                </table>\n            </td>\n        </tr>\n    </table>\n</body>\n\n</html>"
+    },
+    "resetPasswordTemplate": {
+        "subject": "Reset your {APP_NAME} password",
+        "body": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Password Reset</title>\n</head>\n\n<body\n    style=\"margin:0; padding:0; background-color:#f4f4f7; font-family:'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\">\n\n    <table align=\"center\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n        style=\"background-color:#f4f4f7; padding:40px 20px;\">\n        <tr>\n            <td align=\"center\">\n                <!-- Inner Container -->\n                <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n                    style=\"width:100%; max-width:600px; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.08);\">\n\n                    <!-- Logo & Brand Header -->\n                    <tr>\n                        <td style=\"background:#000000; padding:32px 48px;\">\n                            <table role=\"presentation\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n                                <tr>\n                                    <td width=\"60%\" style=\"text-align:left; vertical-align:middle;\">\n                                        <img src=\"https://daharengineer.com/Logo.png\" alt=\"Dahar Engineer\" width=\"40\"\n                                            height=\"40\"\n                                            style=\"height:40px; width:40px; vertical-align:middle; margin-right:12px; display:inline-block;\" />\n                                        <span\n                                            style=\"font-size:22px; font-weight:800; color:#ffffff; vertical-align:middle; letter-spacing:-0.5px;\">{APP_NAME}</span>\n                                    </td>\n                                    <td width=\"40%\" style=\"text-align:right; vertical-align:middle;\">\n                                        <span\n                                            style=\"font-size:14px; color:rgba(255,255,255,0.7); font-weight:600; letter-spacing:0.5px; text-transform:uppercase;\">Security</span>\n                                    </td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n\n                    <!-- Main Content -->\n                    <tr>\n                        <td style=\"padding:48px 48px 40px;\">\n                            <h1\n                                style=\"margin:0 0 20px; font-size:32px; font-weight:800; color:#111827; letter-spacing:-1px; line-height:1.2;\">\n                                Reset Password</h1>\n                            <p style=\"margin:0 0 32px; font-size:17px; line-height:1.8; color:#4b5563;\">\n                                We received a request to reset your password for your <strong>{APP_NAME}</strong>\n                                account.\n                                Click the button below to choose a new password.\n                            </p>\n\n                            <!-- Highlight Box -->\n                            <table role=\"presentation\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n                                style=\"background:#fef2f2; border-radius:12px; border:1px solid #fecaca; margin-bottom:36px;\">\n                                <tr>\n                                    <td style=\"padding:24px 28px;\">\n                                        <p\n                                            style=\"margin:0 0 8px; font-size:14px; font-weight:700; color:#b91c1c; text-transform:uppercase; letter-spacing:1.5px;\">\n                                            Safety Notice</p>\n                                        <p style=\"margin:0; font-size:15px; color:#991b1b; line-height:1.7;\">If you did\n                                            not request this change, you can safely ignore this email. Your password\n                                            will remain unchanged.</p>\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <!-- CTA Button -->\n                            <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n                                <tr>\n                                    <td style=\"background:#000000; border-radius:10px;\">\n                                        <a href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\"\n                                            style=\"display:inline-block; padding:18px 40px; font-size:16px; font-weight:700; color:#ffffff; text-decoration:none; letter-spacing:0.3px;\">Set\n                                            New Password &rarr;</a>\n                                    </td>\n                                </tr>\n                            </table>\n\n                            <p style=\"margin:40px 0 0; font-size:14px; color:#9ca3af; line-height:1.8;\">\n                                If the button above doesn't work, copy and paste this link into your browser:\n                                <br />\n                                <span\n                                    style=\"display:inline-block; margin-top:8px; color:#3b82f6; font-family:monospace; font-size:13px; word-break:break-all;\">{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}</span>\n                            </p>\n                        </td>\n                    </tr>\n\n                    <!-- Divider -->\n                    <tr>\n                        <td style=\"padding:0 48px;\">\n                            <div style=\"border-top:1px solid #f3f4f6;\"></div>\n                        </td>\n                    </tr>\n\n                    <!-- Bottom note -->\n                    <tr>\n                        <td style=\"padding:32px 48px 48px;\">\n                            <p style=\"margin:0; font-size:13px; color:#9ca3af; text-align:center; line-height:1.7;\">Your\n                                security is our top priority. Thank you for being a part of Dahar Engineer.</p>\n                        </td>\n                    </tr>\n                </table>\n\n                <!-- Footer -->\n                <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"\n                    style=\"width:100%; max-width:600px;\">\n                    <tr>\n                        <td style=\"padding:32px 40px; text-align:center;\">\n                            <p style=\"margin:0 0 10px; font-size:13px; color:#9ca3af; font-weight:500;\">© {APP_NAME}.\n                                All rights reserved.</p>\n                            <p style=\"margin:0; font-size:12px; color:#d1d5db;\">Dahar Engineer &bull; daharengineer.com\n                            </p>\n                        </td>\n                    </tr>\n                </table>\n            </td>\n        </tr>\n    </table>\n</body>\n\n</html>"
+    },
+    "confirmEmailChangeTemplate": {
+        "subject": "Confirm your {APP_NAME} new email address",
+        "body": "<p>Hello,</p>\n<p>Click on the button below to confirm your new email address.</p>\n<p>\n  <a class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\">Confirm new email</a>\n</p>\n<p><i>If you didn't ask to change your email address, you can ignore this email.</i></p>\n<p>\n  Thanks,<br/>\n  {APP_NAME} team\n</p>"
+    }
+}

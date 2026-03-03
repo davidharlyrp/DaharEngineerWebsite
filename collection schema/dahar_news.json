@@ -1,0 +1,123 @@
+{
+    "id": "pbc_1625237448",
+    "listRule": "",
+    "viewRule": "",
+    "createRule": "true = @request.auth.isAdmin",
+    "updateRule": "true = @request.auth.isAdmin",
+    "deleteRule": "true = @request.auth.isAdmin",
+    "name": "dahar_news",
+    "type": "base",
+    "fields": [
+        {
+            "autogeneratePattern": "[a-z0-9]{15}",
+            "hidden": false,
+            "id": "text3208210256",
+            "max": 15,
+            "min": 15,
+            "name": "id",
+            "pattern": "^[a-z0-9]+$",
+            "presentable": false,
+            "primaryKey": true,
+            "required": true,
+            "system": true,
+            "type": "text"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text724990059",
+            "max": 0,
+            "min": 0,
+            "name": "title",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "autogeneratePattern": "",
+            "hidden": false,
+            "id": "text2615518641",
+            "max": 0,
+            "min": 0,
+            "name": "short_description",
+            "pattern": "",
+            "presentable": false,
+            "primaryKey": false,
+            "required": false,
+            "system": false,
+            "type": "text"
+        },
+        {
+            "exceptDomains": null,
+            "hidden": false,
+            "id": "url917281265",
+            "name": "link",
+            "onlyDomains": null,
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "url"
+        },
+        {
+            "hidden": false,
+            "id": "file3277268710",
+            "maxSelect": 1,
+            "maxSize": 0,
+            "mimeTypes": [],
+            "name": "thumbnail",
+            "presentable": false,
+            "protected": false,
+            "required": false,
+            "system": false,
+            "thumbs": [],
+            "type": "file"
+        },
+        {
+            "hidden": false,
+            "id": "bool458715613",
+            "name": "is_active",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "bool"
+        },
+        {
+            "hidden": false,
+            "id": "date2135146993",
+            "max": "",
+            "min": "",
+            "name": "news_date",
+            "presentable": false,
+            "required": false,
+            "system": false,
+            "type": "date"
+        },
+        {
+            "hidden": false,
+            "id": "autodate2990389176",
+            "name": "created",
+            "onCreate": true,
+            "onUpdate": false,
+            "presentable": false,
+            "system": false,
+            "type": "autodate"
+        },
+        {
+            "hidden": false,
+            "id": "autodate3332085495",
+            "name": "updated",
+            "onCreate": true,
+            "onUpdate": true,
+            "presentable": false,
+            "system": false,
+            "type": "autodate"
+        }
+    ],
+    "indexes": [],
+    "created": "2026-03-03 05:20:49.408Z",
+    "updated": "2026-03-03 05:21:59.729Z",
+    "system": false
+}

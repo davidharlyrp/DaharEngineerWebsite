@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { SectionReveal, TextReveal } from '@/components/ui-custom';
+import { SectionReveal } from '@/components/ui-custom';
 import { productsService } from '@/services/pb/products';
 import { paymentApi } from '@/services/api/payment';
 import { CheckoutModal } from '@/components/store/CheckoutModal';
@@ -35,6 +35,8 @@ export default function ProductDetail() {
     const [isPurchased, setIsPurchased] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+    const [downloadProgress, setDownloadProgress] = useState<number>(0);
+    const [isDownloading, setIsDownloading] = useState(false);
     const { isAuthenticated, user } = useAuth();
 
     useEffect(() => {
@@ -134,28 +136,66 @@ export default function ProductDetail() {
         if (!product || !user) return;
 
         try {
+            setIsDownloading(true);
+            setDownloadProgress(0);
+
             // Log download to backend
             await paymentApi.logDownload(product.id, user.id);
 
-            // Trigger browser download
+            // Trigger browser download (Blob with progress for filename & UX)
             const fileUrl = productsService.getFileUrl(product, product.file);
-            const link = document.createElement('a');
-            link.href = fileUrl;
-            link.download = product.file_name || product.name;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const response = await fetch(fileUrl);
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const reader = response.body?.getReader();
+            const contentLength = +(response.headers.get('Content-Length') ?? 0);
+
+            if (!reader) {
+                const blob = await response.blob();
+                triggerDownload(blob, product.file_name || product.name);
+                return;
+            }
+
+            let receivedLength = 0;
+            const chunks = [];
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                receivedLength += value.length;
+                if (contentLength) {
+                    setDownloadProgress(Math.round((receivedLength / contentLength) * 100));
+                }
+            }
+
+            const blob = new Blob(chunks, { type: response.headers.get('Content-Type') || undefined });
+            triggerDownload(blob, product.file_name || product.name);
+
         } catch (error) {
             console.error('Download failed:', error);
             alert('Download failed. Please try again.');
+        } finally {
+            setIsDownloading(false);
+            setDownloadProgress(0);
         }
+    };
+
+    const triggerDownload = (blob: Blob, filename: string) => {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = filename || 'download';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
     };
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+            <div className="min-h-dvh flex flex-col items-center justify-center gap-4">
                 <Loader2 className="w-12 h-12 animate-spin text-army-500" />
-                <p className="uppercase tracking-[0.3em] text-xs text-muted-foreground">Retrieving Product Details</p>
+                <p className="tracking-widest text-xs text-muted-foreground">Retrieving Product Details</p>
             </div>
         );
     }
@@ -196,42 +236,43 @@ export default function ProductDetail() {
     }
 
     return (
-        <div className="pt-24 pb-32">
-            <div className="max-w-7xl mx-auto px-6 lg:px-20">
+        <div className="pt-24 pb-16 lg:pb-32">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
                 {/* Breadcrumbs */}
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-12 overflow-x-auto whitespace-nowrap pb-2">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4 lg:mb-12 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
                     <Link to="/store" className="hover:text-army-400 transition-colors">Store</Link>
-                    <ChevronRight className="w-4 h-4" />
-                    <span className="capitalize">{product.category.replace(/-/g, ' ')}</span>
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-3.5 h-3.5 opacity-50" />
+                    <span className="capitalize hidden sm:inline">{product.category.replace(/-/g, ' ')}</span>
+                    <span className="capitalize sm:hidden">...</span>
+                    <ChevronRight className="w-3.5 h-3.5 opacity-50" />
                     <span className="text-foreground font-medium">{product.name}</span>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-16 items-start">
+                <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-start">
                     {/* Left: Images */}
-                    <div className="space-y-6">
+                    <div className="space-y-3 lg:space-y-6 w-full overflow-hidden">
                         <SectionReveal>
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.5 }}
-                                className="aspect-[4/3] bg-secondary/30 rounded-lg overflow-hidden border border-border/50 group relative"
+                                className="aspect-[4/3] sm:aspect-video lg:aspect-[4/3] bg-secondary/20 rounded-lg overflow-hidden border border-border/50 group relative flex items-center justify-center p-1"
                             >
                                 {activeImage ? (
                                     <img
                                         src={activeImage}
                                         alt={product.name}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                        className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-700 mx-auto"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <Code2 className="w-20 h-20 text-muted-foreground/20" />
+                                    <div className="flex items-center justify-center">
+                                        <Code2 className="w-12 lg:w-20 h-12 lg:h-20 text-muted-foreground/10" />
                                     </div>
                                 )}
 
                                 {product.discount_price && product.main_price > product.discount_price && (
-                                    <div className="absolute top-4 left-4">
-                                        <Badge className="bg-red-600 text-white border-none px-3 py-1 text-sm font-bold">
+                                    <div className="absolute top-2 left-2 lg:top-4 lg:left-4 z-10">
+                                        <Badge className="bg-red-600 text-white border-none px-2 py-0.5 lg:px-3 lg:py-1 text-[10px] lg:text-sm font-bold shadow-lg">
                                             {Math.round((1 - (product.discount_price / product.main_price)) * 100)}% OFF
                                         </Badge>
                                     </div>
@@ -240,15 +281,15 @@ export default function ProductDetail() {
                         </SectionReveal>
 
                         {images.length > 1 && (
-                            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                            <div className="flex gap-2 lg:gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-1 px-1">
                                 {images.map((img, i) => (
                                     <button
                                         key={i}
                                         onClick={() => setActiveImage(img)}
-                                        className={`relative w-24 h-24 flex-shrink-0 rounded-md overflow-hidden border-2 transition-all
+                                        className={`relative w-14 lg:w-24 h-14 lg:h-24 flex-shrink-0 rounded overflow-hidden border-2 transition-all p-0.5 bg-secondary/10
                       ${activeImage === img ? 'border-army-500 scale-95' : 'border-transparent opacity-60 hover:opacity-100'}`}
                                     >
-                                        <img src={img} alt={`${product.name} ${i}`} className="w-full h-full object-cover" />
+                                        <img src={img} alt={`${product.name} ${i}`} className="w-full h-full object-contain" />
                                     </button>
                                 ))}
                             </div>
@@ -256,19 +297,17 @@ export default function ProductDetail() {
                     </div>
 
                     {/* Right: Info */}
-                    <div className="space-y-8">
+                    <div className="space-y-4 lg:space-y-8">
                         <div>
                             <SectionReveal>
-                                <Badge variant="outline" className="mb-4 uppercase tracking-widest text-army-400 border-army-400/30">
+                                <Badge variant="outline" className="mb-2 lg:mb-4 text-[10px] lg:text-xs tracking-tight text-army-400 border-army-400/30">
                                     {product.category.replace(/-/g, ' ')}
                                 </Badge>
                             </SectionReveal>
-                            <TextReveal
-                                text={product.name}
-                                tag="h1"
-                                className="text-4xl sm:text-5xl font-bold tracking-tight mb-4"
-                            />
-                            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                            <h1 className="text-xl sm:text-2xl lg:text-4xl font-bold tracking-tight mb-2 lg:mb-4 text-balance">
+                                {product.name}
+                            </h1>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
                                 <div className="flex items-center gap-1.5 text-muted-foreground">
                                     <Eye className="w-4 h-4" />
                                     <span className="text-muted-foreground">{product.view_count}</span>
@@ -286,70 +325,78 @@ export default function ProductDetail() {
                             </p>
                         </SectionReveal>
 
-                        <div className="p-8 bg-secondary/30 rounded-xl border border-border/50 space-y-6">
-                            <div className="flex items-end gap-4">
-                                <div className="space-y-1">
+                        <div className="p-4 lg:p-8 bg-secondary/30 rounded-xl border border-border/50 space-y-4 lg:space-y-6">
+                            <div className="flex items-end gap-3 lg:gap-4">
+                                <div className="space-y-0.5 lg:space-y-1">
                                     {product.discount_price && (
-                                        <span className="text-lg text-muted-foreground line-through block">
+                                        <span className="text-sm lg:text-lg text-muted-foreground line-through block">
                                             {formatPrice(product.main_price)}
                                         </span>
                                     )}
-                                    <span className="text-4xl font-black text-army-400 tracking-tighter italic">
+                                    <span className="text-2xl lg:text-4xl font-bold text-army-400 tracking-tight">
                                         {formatPrice(product.discount_price || product.main_price)}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="grid sm:grid-cols-2 gap-4 pt-4 border-t border-border/30">
-                                <div className="flex items-center gap-3 text-sm">
-                                    <Globe className="w-4 h-4 text-army-400" />
-                                    <span className="text-muted-foreground">Language:</span>
-                                    <span className="font-medium">{product.language || 'English/Indonesia'}</span>
+                            <div className="grid grid-cols-2 gap-2 lg:gap-4 pt-4 border-t border-border/30">
+                                <div className="flex items-center gap-2 text-[10px] lg:text-sm">
+                                    <Globe className="w-3.5 h-3.5 text-army-400" />
+                                    <span className="text-muted-foreground hidden sm:inline">Language:</span>
+                                    <span className="font-medium truncate">{product.language || 'EN/ID'}</span>
                                 </div>
-                                <div className="flex items-center gap-3 text-sm">
-                                    <Tag className="w-4 h-4 text-army-400" />
-                                    <span className="text-muted-foreground">Version:</span>
+                                <div className="flex items-center gap-2 text-[10px] lg:text-sm">
+                                    <Tag className="w-3.5 h-3.5 text-army-400" />
+                                    <span className="text-muted-foreground hidden sm:inline">Version:</span>
                                     <span className="font-medium">{product.version || '1.0.0'}</span>
                                 </div>
-                                <div className="flex items-center gap-3 text-sm">
-                                    <Clock className="w-4 h-4 text-army-400" />
-                                    <span className="text-muted-foreground">Updates:</span>
+                                <div className="flex items-center gap-2 text-[10px] lg:text-sm">
+                                    <Clock className="w-3.5 h-3.5 text-army-400" />
+                                    <span className="text-muted-foreground hidden sm:inline">Updates:</span>
                                     <span className="font-medium">Lifetime</span>
                                 </div>
-                                <div className="flex items-center gap-3 text-sm">
-                                    <ShieldCheck className="w-4 h-4 text-army-400" />
-                                    <span className="text-muted-foreground">Access:</span>
+                                <div className="flex items-center gap-2 text-[10px] lg:text-sm">
+                                    <ShieldCheck className="w-3.5 h-3.5 text-army-400" />
+                                    <span className="text-muted-foreground hidden sm:inline">Access:</span>
                                     <span className="font-medium">Instant</span>
                                 </div>
                             </div>
 
                             <Button
                                 onClick={handleBuy}
-                                className="w-full h-14 bg-army-700 hover:bg-army-600 text-lg font-bold group"
+                                disabled={isDownloading}
+                                className="w-full h-11 lg:h-14 bg-army-700 hover:bg-army-600 text-sm lg:text-lg font-bold group"
                             >
-                                {isPurchased ? (
+                                {isDownloading ? (
+                                    <div className="flex items-center gap-2">
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <span>Downloading {downloadProgress}%</span>
+                                    </div>
+                                ) : isPurchased ? (
                                     <>
-                                        <Download className="w-5 h-5 mr-2" />
-                                        DOWNLOAD NOW
+                                        <Download className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
+                                        Download Now
                                     </>
                                 ) : (
                                     <>
-                                        <ShoppingCart className="w-5 h-5 mr-2" />
-                                        BUY NOW
+                                        <ShoppingCart className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
+                                        Buy Now
                                     </>
                                 )}
-                                <ArrowLeft className="w-5 h-5 ml-2 rotate-180 group-hover:translate-x-1 transition-transform" />
+                                {!isDownloading && (
+                                    <ArrowLeft className="w-4 h-4 lg:w-5 lg:h-5 ml-2 rotate-180 group-hover:translate-x-1 transition-transform" />
+                                )}
                             </Button>
                         </div>
                     </div>
                 </div>
 
                 {/* Extended Details */}
-                <div className="mt-32 grid lg:grid-cols-3 gap-16">
+                <div className="mt-10 lg:mt-32 grid lg:grid-cols-3 gap-8 lg:gap-16">
                     <div className="lg:col-span-2 space-y-12">
                         <SectionReveal>
-                            <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-                                <Info className="w-6 h-6 text-army-400" />
+                            <h2 className="text-xl lg:text-3xl font-bold mb-4 lg:mb-6 flex items-center gap-2 lg:gap-3">
+                                <Info className="w-5 h-5 lg:w-6 lg:h-6 text-army-400" />
                                 Product Description
                             </h2>
                             <div
@@ -360,17 +407,17 @@ export default function ProductDetail() {
 
                         {features && features.length > 0 && (
                             <SectionReveal delay={0.1}>
-                                <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                                    <CheckCircle2 className="w-6 h-6 text-army-400" />
+                                <h2 className="text-xl lg:text-3xl font-bold mb-4 lg:mb-8 flex items-center gap-2 lg:gap-3">
+                                    <CheckCircle2 className="w-5 h-5 lg:w-6 lg:h-6 text-army-400" />
                                     Key Features
                                 </h2>
-                                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-6">
+                                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4 lg:gap-y-6">
                                     {features.map((feature: string, i: number) => (
-                                        <div key={i} className="flex gap-4 p-4 bg-secondary/20 rounded-lg group hover:bg-secondary/40 transition-colors">
-                                            <div className="w-6 h-6 rounded-full bg-army-400/10 flex items-center justify-center flex-shrink-0">
-                                                <CheckCircle2 className="w-4 h-4 text-army-400" />
+                                        <div key={i} className="flex gap-4 p-3 lg:p-4 bg-secondary/20 rounded-lg group hover:bg-secondary/40 transition-colors">
+                                            <div className="w-5 h-5 lg:w-6 lg:h-6 rounded-full bg-army-400/10 flex items-center justify-center flex-shrink-0">
+                                                <CheckCircle2 className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-army-400" />
                                             </div>
-                                            <span className="text-base text-muted-foreground group-hover:text-foreground transition-colors">{feature}</span>
+                                            <span className="text-sm lg:text-base text-muted-foreground group-hover:text-foreground transition-colors">{feature}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -378,9 +425,9 @@ export default function ProductDetail() {
                         )}
                     </div>
 
-                    <aside className="space-y-8">
-                        <div className="p-8 bg-secondary/10 border border-border/50 rounded-lg sticky top-32">
-                            <h3 className="font-bold text-xl mb-6">File Information</h3>
+                    <aside className="space-y-6 lg:space-y-8">
+                        <div className="p-4 lg:p-8 bg-secondary/10 border border-border/50 rounded-lg sticky top-32">
+                            <h3 className="font-bold text-lg lg:text-xl mb-4 lg:mb-6">File Information</h3>
                             <div className="space-y-4">
                                 <div className="flex justify-between text-sm py-2 border-b border-border/30">
                                     <span className="text-muted-foreground">File Format</span>
@@ -394,9 +441,9 @@ export default function ProductDetail() {
                                     <span className="text-muted-foreground">File Size</span>
                                     <span className="font-medium">{product.file_size ? `${(product.file_size / 1024 / 1024).toFixed(2)} MB` : 'Dynamic'}</span>
                                 </div>
-                                <div className="flex justify-between text-sm py-2">
+                                <div className="flex justify-between text-[11px] lg:text-sm py-2">
                                     <span className="text-muted-foreground">Author</span>
-                                    <span className="font-medium italic">{product.created_by_name || 'DHAR TEAM'}</span>
+                                    <span className="font-medium italic truncate ml-2">{product.created_by_name || 'DHAR TEAM'}</span>
                                 </div>
                             </div>
 

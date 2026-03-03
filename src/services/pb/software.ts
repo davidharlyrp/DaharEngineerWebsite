@@ -1,7 +1,5 @@
-import PocketBase from 'pocketbase';
+import { pb } from '@/lib/pocketbase/client';
 import type { Software } from '@/types/software';
-
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
 
 export const softwareService = {
     async getSoftwares(): Promise<Software[]> {

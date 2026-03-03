@@ -33,8 +33,6 @@ export interface Mentor {
   // UI derived fields
   availability?: AvailabilitySlot[];
   experience?: string;
-  rating?: number;
-  reviewCount?: number;
 }
 
 export interface Booking {

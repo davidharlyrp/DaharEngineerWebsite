@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { easeInOut, motion } from 'framer-motion';
 import { useMenu } from '@/context/MenuContext';
 import { Header } from './Header';
 import { MenuOverlay } from './MenuOverlay';
@@ -22,17 +22,18 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Main content with scale effect */}
       <motion.main
         animate={{
-          scale: isOpen ? 0.85 : 1,
+          scaleX: isOpen ? 1 : 1,
+          scaleY: isOpen ? 1 : 1,
           borderRadius: isOpen ? '24px' : '0px',
           opacity: isOpen ? 0.5 : 1,
         }}
         transition={{
           duration: 0.7,
-          ease: [0.16, 1, 0.3, 1],
+          ease: easeInOut,
         }}
         className={`
           relative min-h-screen bg-background overflow-hidden
-          transition-layout origin-center
+          transition-all origin-center
           ${isOpen ? 'pointer-events-none' : ''}
         `}
         style={{

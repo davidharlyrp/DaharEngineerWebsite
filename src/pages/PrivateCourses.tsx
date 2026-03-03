@@ -255,8 +255,8 @@ function BookingSuccessModal({
         </button>
 
         <div className="p-8 text-center">
-          <div className="w-16 h-16 bg-green-500/10 flex items-center justify-center mx-auto mb-6 rounded-full">
-            <CheckCircle2 className="w-8 h-8 text-green-500" />
+          <div className="w-16 h-16 bg-army-500/10 flex items-center justify-center mx-auto mb-6 rounded-full">
+            <CheckCircle2 className="w-8 h-8 text-army-500" />
           </div>
 
           <h2 className="text-2xl font-bold mb-2">Booking Success!</h2>
@@ -294,6 +294,9 @@ function BookingSuccessModal({
             </div>
           </div>
 
+          <p className="text-muted-foreground mb-8 text-sm">
+            Please be patient, the mentor will contact you soon to confirm your session.
+          </p>
           <Button
             onClick={() => window.location.href = '/dashboard'}
             className="w-full bg-army-600 hover:bg-army-700 text-white py-6 rounded-none"
@@ -451,7 +454,7 @@ function BookingModal({
   // Generate time slots based on mentor availability
   const availableTimes = (() => {
     if (!mentor.startTimeActive || !mentor.endTimeActive) {
-      return ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+      return ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'];
     }
 
     const start = parseInt(mentor.startTimeActive.split(':')[0]);
@@ -544,7 +547,7 @@ function BookingModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative bg-secondary/50 border border-border/50 w-full max-w-lg max-h-[90vh] overflow-auto m-4"
+        className="relative bg-secondary/50 border border-border/50 w-full max-w-lg max-h-[90dvh] overflow-auto m-4"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border/30">
@@ -599,7 +602,7 @@ function BookingModal({
             <div className="bg-background/40 border border-border/50 p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-army-700/20 flex items-center justify-center">
-                  <User className="w-5 h-5 text-army-400" />
+                  <img src={mentor.image ? courseService.getFileUrl(mentor, mentor.image) : '/placeholder-course.jpg'} alt={mentor.name} className="w-full h-full object-cover" />
                 </div>
                 <div>
                   <p className="text-sm font-bold">{mentor.name}</p>
@@ -690,7 +693,7 @@ function BookingModal({
               )}
 
               <div className="space-y-2">
-                <Label className="text-xs">Additional Notes</Label>
+                <Label className="text-xs">Topic {course.serviceType === 'Consultation' ? 'of Consultation' : 'of Course'}</Label>
                 <Textarea
                   placeholder="Learning goals or topics..."
                   value={formData.notes}
@@ -772,6 +775,11 @@ function MentorPanel({
 }) {
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
 
+  // Reset selection when course changes or panel toggles
+  useEffect(() => {
+    setSelectedMentor(null);
+  }, [course?.id, isOpen]);
+
   if (!course) return null;
 
   return (
@@ -809,7 +817,7 @@ function MentorPanel({
         {/* Mentor List */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           <p className="text-sm text-muted-foreground mb-4">
-            Select an expert mentor for your private session. Each session is personalized to your needs.
+            Select a mentor for your private session. Each session is personalized to your needs by your request.
           </p>
 
           {course.mentors && course.mentors.length > 0 ? (

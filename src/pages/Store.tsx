@@ -6,7 +6,6 @@ import {
   Search,
   Grid3X3,
   List,
-  ShoppingCart,
   Tag,
   TrendingUp,
   Sparkles,
@@ -19,7 +18,6 @@ import { TextReveal, SectionReveal } from '@/components/ui-custom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/context/AuthContext';
 import { CheckoutModal } from '@/components/store/CheckoutModal';
 import { productsService } from '@/services/pb/products';
 import type { Product } from '@/types/store';
@@ -132,14 +130,11 @@ function HeroSection() {
 // Product Card Component
 function ProductCard({
   product,
-  index,
-  onBuy
+  index
 }: {
   product: Product;
   index: number;
-  onBuy: (product: Product) => void;
 }) {
-  const { isAuthenticated } = useAuth();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -149,13 +144,7 @@ function ProductCard({
     }).format(price);
   };
 
-  const handleBuy = () => {
-    if (!isAuthenticated) {
-      window.location.href = '/login?redirect=/store';
-      return;
-    }
-    onBuy(product);
-  };
+  // handleBuy logic removed - now links to details
 
   const thumb = product.thumbnail ? productsService.getFileUrl(product, product.thumbnail) : null;
   const slug = productsService.createSlug(product.name);
@@ -163,11 +152,11 @@ function ProductCard({
   return (
     <SectionReveal delay={0.05 * (index + 1)}>
       <div className="group h-full bg-secondary/30 hover:bg-secondary/50 border border-transparent 
-                      hover:border-army-500/30 transition-all duration-300">
-        <Link to={`/store/product/${slug}`} className="block">
-          {/* Image */}
+                      hover:border-army-500/30 transition-all duration-300 flex flex-col">
+        {/* Image - Clickable */}
+        <Link to={`/store/product/${slug}`} className="block overflow-hidden">
           <div className="aspect-[4/3] bg-gradient-to-br from-army-800/20 to-army-900/20 
-                          flex items-center justify-center relative overflow-hidden">
+                          flex items-center justify-center relative">
             {thumb ? (
               <img src={thumb} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
             ) : (
@@ -177,58 +166,58 @@ function ProductCard({
             {/* Badges */}
             <div className="absolute top-3 left-3 flex flex-col gap-2">
               {product.discount_price && product.main_price > product.discount_price && (
-                <Badge className="bg-red-600 text-white">
+                <Badge className="bg-red-600 text-white border-none rounded-sm px-2 py-0.5 text-[10px] font-bold">
                   {Math.round((1 - product.discount_price / product.main_price) * 100)}% OFF
                 </Badge>
               )}
             </div>
           </div>
+        </Link>
 
-          {/* Content */}
-          <div className="p-5">
-
-            <h3 className="text-lg font-semibold mb-2 group-hover:text-army-400 transition-colors line-clamp-2">
+        {/* Content */}
+        <div className="p-5 flex flex-col flex-1">
+          <Link to={`/store/product/${slug}`} className="block mb-2 group-hover:text-army-400 transition-colors">
+            <h3 className="text-lg font-semibold line-clamp-2">
               {product.name}
             </h3>
+          </Link>
 
-            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-              {product.short_description}
-            </p>
+          <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+            {product.short_description}
+          </p>
 
-            <div className="flex items-center gap-1 mb-4">
-              <Eye className="w-3 h-3 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">{product.view_count}</span>
-              <span className="text-sm text-muted-foreground mx-2">|</span>
-              <Download className="w-3 h-3 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">{product.download_count}</span>
-            </div>
-
-            <div className="flex items-end justify-between">
-              <div>
-                {product.discount_price && product.main_price > product.discount_price && (
-                  <span className="text-sm text-muted-foreground line-through block">
-                    {formatPrice(product.main_price)}
-                  </span>
-                )}
-                <span className="text-xl font-bold text-army-400">
-                  {formatPrice(product.discount_price || product.main_price)}
-                </span>
-              </div>
-              <Button
-                size="sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleBuy();
-                }}
-                className="bg-army-700 hover:bg-army-600"
-              >
-                <ShoppingCart className="w-4 h-4 mr-1" />
-                Buy
-              </Button>
-            </div>
+          <div className="flex items-center gap-1 mb-4">
+            <Eye className="w-3 h-3 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">{product.view_count}</span>
+            <span className="text-sm text-muted-foreground mx-2">|</span>
+            <Download className="w-3 h-3 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">{product.download_count}</span>
           </div>
-        </Link>
+
+          <div className="mt-auto flex items-end justify-between">
+            <div>
+              {product.discount_price && product.main_price > product.discount_price && (
+                <span className="text-sm text-muted-foreground line-through block">
+                  {formatPrice(product.main_price)}
+                </span>
+              )}
+              <span className="text-xl font-bold text-army-400">
+                {formatPrice(product.discount_price || product.main_price)}
+              </span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="hover:bg-army-400 group-hover:text-white transition-colors h-8 rounded-sm text-xs"
+              asChild
+            >
+              <Link to={`/store/product/${slug}`}>
+                <Eye className="w-4 h-4 mr-1" />
+                Details
+              </Link>
+            </Button>
+          </div>
+        </div>
       </div>
     </SectionReveal>
   );
@@ -236,14 +225,12 @@ function ProductCard({
 
 // All Products Section with Filter
 function AllProductsSection({
-  onBuy,
   products,
   selectedCategory,
   setSelectedCategory,
   selectedSubCategory,
   setSelectedSubCategory
 }: {
-  onBuy: (product: Product) => void,
   products: Product[],
   selectedCategory: string,
   setSelectedCategory: (cat: string) => void,
@@ -382,7 +369,7 @@ function AllProductsSection({
             ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
             : 'grid-cols-1'}`}>
             {filteredProducts.map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} onBuy={onBuy} />
+              <ProductCard key={product.id} product={product} index={index} />
             ))}
           </div>
 
@@ -417,10 +404,7 @@ export default function Store() {
     fetchProducts();
   }, []);
 
-  const handleBuy = (product: Product) => {
-    setSelectedProduct(product);
-    setIsCheckoutOpen(true);
-  };
+  // handleBuy logic removed - grid button now links to details
 
   const handleCheckoutSuccess = () => {
     setIsCheckoutOpen(false);
@@ -444,7 +428,6 @@ export default function Store() {
       <div className="relative z-10 bg-background">
         <div id="all-products-section">
           <AllProductsSection
-            onBuy={handleBuy}
             products={products}
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}

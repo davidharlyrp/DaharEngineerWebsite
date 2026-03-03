@@ -1,8 +1,6 @@
-import PocketBase from 'pocketbase';
+import { pb } from '@/lib/pocketbase/client';
 import axios from 'axios';
 import type { Booking } from '@/types/courses';
-
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
 const API_URL = 'https://api.daharengineer.com/api';
 
 export const bookingService = {
@@ -27,6 +25,19 @@ export const bookingService = {
         } catch (error) {
             console.error('Error creating coin booking:', error);
             throw error;
+        }
+    },
+
+    async getTotalPaidBookings(): Promise<number> {
+        try {
+            const result = await pb.collection('bookings').getList(1, 1, {
+                filter: 'payment_status = "paid"',
+                fields: 'id',
+            });
+            return result.totalItems;
+        } catch (error) {
+            console.error('Error fetching total paid bookings:', error);
+            return 0;
         }
     }
 };

@@ -8,7 +8,6 @@ import {
   GraduationCap,
   Scale,
   FileDown,
-  Lock,
   Calendar,
   User,
   Loader2,
@@ -21,6 +20,8 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/context/AuthContext';
 import { resourceService } from '@/services/pb/resources';
 import type { Resource } from '@/types/resources';
+import { ResourceUploadModal } from '@/components/resources/ResourceUploadModal';
+import { Upload } from 'lucide-react';
 
 // Category definitions
 const categories = [
@@ -162,14 +163,18 @@ function ResourceCard({ resource, index }: { resource: Resource; index: number }
       // Track download in background
       resourceService.incrementDownload(resource.id, resource.download_count || 0).catch(console.error);
 
-      // Create a temporary link to trigger download (more robust against adblockers than window.open)
+      // Fetch as blob to force correct filename
+      const response = await fetch(downloadUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
       const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.target = '_blank';
-      link.download = resource.file_name || 'download';
+      link.href = url;
+      link.download = resource.file_name || resource.title || 'download';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download failed:', error);
     }
@@ -250,9 +255,9 @@ function ResourceCard({ resource, index }: { resource: Resource; index: number }
               className="w-full bg-army-700 hover:bg-army-600 h-8 text-[11px] rounded-sm transition-all"
             >
               {!isAuthenticated ? (
-                <><Lock className="w-3 h-3 mr-2" /> Login to Access</>
+                <><Download className="w-3 h-3 mr-2" /> Login to Download</>
               ) : (
-                <><Download className="w-3 h-3 mr-2" /> Download Document</>
+                <><Download className="w-3 h-3 mr-2" /> Download</>
               )}
             </Button>
           </div>
@@ -275,7 +280,7 @@ import {
 const ITEMS_PER_PAGE = 20;
 
 // Resources Listing Section
-function ResourcesListingSection({ resources, isLoading }: { resources: Resource[]; isLoading: boolean }) {
+function ResourcesListingSection({ resources, isLoading, onUploadClick }: { resources: Resource[]; isLoading: boolean; onUploadClick: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
@@ -384,14 +389,23 @@ function ResourcesListingSection({ resources, isLoading }: { resources: Resource
 
           {/* Search and Subcategory Selection */}
           <div className="flex flex-col md:flex-row gap-4 mb-6 items-start md:items-center justify-between">
-            <div className="relative w-full md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground opacity-50" />
-              <Input
-                placeholder="Search resources..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-secondary/5 border-border/20 h-9 text-xs rounded-sm"
-              />
+            <div className="flex flex-col md:flex-row gap-2 w-full">
+              <Button
+                onClick={onUploadClick}
+                className="bg-army-700 hover:bg-army-600 h-9 px-4 text-[11px] font-bold uppercase tracking-widest rounded-sm shrink-0 shadow-md flex items-center gap-2"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                Upload Resource
+              </Button>
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground opacity-50" />
+                <Input
+                  placeholder="Search resources..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 bg-secondary/5 border-border/20 h-9 text-xs rounded-sm"
+                />
+              </div>
             </div>
 
             {availableSubcategories.length > 0 && (
@@ -559,18 +573,21 @@ function StatsPreview({ resources }: { resources: Resource[] }) {
 export default function Resources() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  const fetchResources = async () => {
+    try {
+      setIsLoading(true);
+      const data = await resourceService.getResources();
+      setResources(data);
+    } catch (error) {
+      console.error('Failed to fetch resources:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchResources = async () => {
-      try {
-        const data = await resourceService.getResources();
-        setResources(data);
-      } catch (error) {
-        console.error('Failed to fetch resources:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchResources();
   }, []);
 
@@ -579,9 +596,19 @@ export default function Resources() {
       <HeroSection />
       <div className="h-screen pointer-events-none" />
       <div className="relative z-10 bg-background">
-        <ResourcesListingSection resources={resources} isLoading={isLoading} />
+        <ResourcesListingSection
+          resources={resources}
+          isLoading={isLoading}
+          onUploadClick={() => setIsUploadModalOpen(true)}
+        />
         <StatsPreview resources={resources} />
       </div>
+
+      <ResourceUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onSuccess={fetchResources}
+      />
     </div>
   );
 }

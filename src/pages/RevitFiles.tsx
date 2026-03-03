@@ -7,9 +7,9 @@ import {
   Grid3X3,
   List,
   FileText,
-  Lock,
   Loader2,
   ChevronDown,
+  Upload,
 } from 'lucide-react';
 import {
   Pagination,
@@ -28,6 +28,7 @@ import { useAuth } from '@/context/AuthContext';
 import { revitService } from '@/services/pb/revit';
 import type { RevitFile } from '@/types/revit';
 import { RevitCategory } from '@/types/revit';
+import { UploadModal } from '@/components/revit/UploadModal';
 
 // Hero Section
 function HeroSection() {
@@ -134,13 +135,17 @@ function FileCard({ file, index, viewMode }: { file: RevitFile; index: number; v
       revitService.incrementDownload(file.id, file.download_count || 0).catch(console.error);
 
       const downloadUrl = revitService.getDownloadUrl(file);
+      const response = await fetch(downloadUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
       const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.target = '_blank';
-      link.download = file.display_name || 'revit-file';
+      link.href = url;
+      link.download = file.file_name || file.display_name || 'revit-file';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download failed:', error);
     }
@@ -221,7 +226,7 @@ function FileCard({ file, index, viewMode }: { file: RevitFile; index: number; v
                 className="bg-army-700 hover:bg-army-600 h-8 text-[11px] rounded-sm"
               >
                 {!isAuthenticated ? (
-                  <><Lock className="w-3 h-3 mr-2" /> Login</>
+                  <><Download className="w-3 h-3 mr-2" /> Login to Download</>
                 ) : (
                   <><Download className="w-3 h-3 mr-2" /> Download</>
                 )}
@@ -246,13 +251,15 @@ function FilesSection({
   isLoading,
   selectedCategory,
   setSelectedCategory,
-  sectionRef
+  sectionRef,
+  onUploadClick
 }: {
   files: RevitFile[];
   isLoading: boolean;
   selectedCategory: string;
   setSelectedCategory: (cat: string) => void;
   sectionRef: React.RefObject<HTMLElement | null>;
+  onUploadClick: () => void;
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<string>('newest');
@@ -360,6 +367,13 @@ function FilesSection({
           {/* Toolbar */}
           <SectionReveal delay={0.1}>
             <div className="flex flex-col lg:flex-row gap-4 mb-8">
+              <Button
+                onClick={onUploadClick}
+                className="bg-army-700 hover:bg-army-600 h-10 px-6 text-xs font-bold uppercase tracking-widest rounded-sm shrink-0 shadow-md group"
+              >
+                <Upload className="w-4 h-4 mr-2 group-hover:-translate-y-0.5 transition-transform" />
+                Upload File
+              </Button>
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground opacity-50" />
                 <Input
@@ -605,11 +619,13 @@ export default function RevitFiles() {
   const [files, setFiles] = useState<RevitFile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const filesSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const fetchFiles = async () => {
       try {
+        setIsLoading(true);
         const data = await revitService.getRevitFiles();
         setFiles(data);
       } catch (error) {
@@ -620,6 +636,12 @@ export default function RevitFiles() {
     };
     fetchFiles();
   }, []);
+
+  const handleUploadSuccess = async () => {
+    // Refresh files
+    const data = await revitService.getRevitFiles();
+    setFiles(data);
+  };
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -637,10 +659,17 @@ export default function RevitFiles() {
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
           sectionRef={filesSectionRef}
+          onUploadClick={() => setIsUploadModalOpen(true)}
         />
         <StatsBar files={files} />
         <CategoriesDetailSection files={files} onCategorySelect={handleCategorySelect} />
       </div>
+
+      <UploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onSuccess={handleUploadSuccess}
+      />
     </div>
   );
 }

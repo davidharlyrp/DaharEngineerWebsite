@@ -100,11 +100,11 @@ function VisionSection() {
   const principles = [
     {
       id: 1,
-      text: "The need for civil engineering consultants who provide not only accurate designs but also transparent and well-documented technical justifications."
+      text: "The need for civil engineering consultants who provide not only accurate designs but also transparent and well documented technical justifications."
     },
     {
       id: 2,
-      text: "A gap in the market for planners who can bridge academic principles with real-world, practical solutions."
+      text: "A gap in the market for planners who can bridge academic principles with real world, practical solutions."
     },
     {
       id: 3,
@@ -116,7 +116,7 @@ function VisionSection() {
     },
     {
       id: 5,
-      text: "The importance of human-centered design — functional, safe, and efficient — that addresses Indonesia's evolving infrastructure challenges."
+      text: "The importance of human centered design functional, safe, and efficient that addresses Indonesia's evolving infrastructure challenges."
     }
   ];
 

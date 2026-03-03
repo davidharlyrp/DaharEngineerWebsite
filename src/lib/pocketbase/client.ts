@@ -21,6 +21,15 @@ export const collections = {
 };
 
 // File URL helper
-export const getFileUrl = (collection: string, recordId: string, filename: string, options?: { thumb?: string }) => {
-  return pb.files.getUrl({ collectionId: collection, id: recordId }, filename, options);
+export const getFileUrl = (
+  collection: string,
+  recordId: string,
+  filename: string,
+  options?: { thumb?: string; download?: boolean }
+) => {
+  let url = pb.files.getURL({ collectionId: collection, id: recordId }, filename, { thumb: options?.thumb });
+  if (options?.download) {
+    url += (url.includes('?') ? '&' : '?') + 'download=1';
+  }
+  return url;
 };

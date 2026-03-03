@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
   ArrowRight,
   Chrome,
   AlertCircle,
-  User
+  User,
+  Building2,
+  Phone
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -27,13 +29,17 @@ export default function Register() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    institution: '',
+    phone_number: '',
+    newsletter: true
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: type === 'checkbox' ? checked : value
     }));
     setError('');
   };
@@ -53,7 +59,14 @@ export default function Register() {
     }
 
     try {
-      await register(formData.email, formData.password, formData.name);
+      await register(
+        formData.email,
+        formData.password,
+        formData.name,
+        formData.institution,
+        formData.newsletter,
+        formData.phone_number
+      );
       navigate('/');
     } catch (err: any) {
       setError(err.message || 'Registration failed');
@@ -73,18 +86,18 @@ export default function Register() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="absolute inset-0 bg-grid opacity-20" />
       <div className="absolute inset-0 bg-noise" />
-      
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative z-10 w-full max-w-md px-6"
+        className="relative z-10 w-full max-w-lg px-6"
       >
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-army-700 flex items-center justify-center">
-              <span className="text-lg font-bold text-white">DE</span>
+            <div className="w-12 h-12 flex items-center justify-center">
+              <img src="/logo.png" alt="Logo" className="w-12 h-12" />
             </div>
             <div>
               <span className="text-xl font-semibold tracking-tight">DAHAR</span>
@@ -126,6 +139,23 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="institution">Institution / School</Label>
+              <div className="relative">
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  id="institution"
+                  name="institution"
+                  type="text"
+                  value={formData.institution}
+                  onChange={handleChange}
+                  placeholder="Your institution or company"
+                  required
+                  className="pl-10 bg-background border-border/50 focus:border-army-500"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -136,6 +166,23 @@ export default function Register() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="your@email.com"
+                  required
+                  className="pl-10 bg-background border-border/50 focus:border-army-500"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone_number">Phone Number</Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  id="phone_number"
+                  name="phone_number"
+                  type="tel"
+                  value={formData.phone_number}
+                  onChange={handleChange}
+                  placeholder="+62..."
                   required
                   className="pl-10 bg-background border-border/50 focus:border-army-500"
                 />
@@ -196,7 +243,7 @@ export default function Register() {
               </div>
             </div>
 
-            <div className="flex items-start gap-2 text-sm">
+            <div className="flex items-start gap-2 text-xs">
               <input type="checkbox" required className="mt-1 rounded border-border/50" />
               <span className="text-muted-foreground">
                 I agree to the{' '}
@@ -208,6 +255,20 @@ export default function Register() {
                   Privacy Policy
                 </Link>
               </span>
+            </div>
+
+            <div className="flex items-start gap-2 text-xs">
+              <input
+                type="checkbox"
+                id="newsletter"
+                name="newsletter"
+                checked={formData.newsletter}
+                onChange={handleChange}
+                className="mt-1 rounded border-border/50 accent-army-500"
+              />
+              <Label htmlFor="newsletter" className="text-muted-foreground font-normal">
+                I want to receive emails about new courses and updates
+              </Label>
             </div>
 
             <Button
@@ -258,7 +319,7 @@ export default function Register() {
         </p>
 
         {/* Back to Home */}
-        <Link 
+        <Link
           to="/"
           className="block text-center mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >

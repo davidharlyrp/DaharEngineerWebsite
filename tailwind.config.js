@@ -106,7 +106,69 @@ module.exports = {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            color: 'hsl(var(--foreground) / 0.8)',
+            'h1, h2, h3, h4, h5, h6': {
+              color: 'hsl(var(--foreground))',
+              marginTop: '1.5em',
+              marginBottom: '0.5em',
+              lineHeight: '1.2',
+              fontWeight: '700',
+              letterSpacing: '-0.02em',
+            },
+            h1: { fontSize: '1.75rem' },
+            h2: {
+              fontSize: '1.4rem',
+              marginTop: '2em',
+              borderBottom: '1px solid hsl(var(--border) / 0.3)',
+              paddingBottom: '0.3em',
+            },
+            h3: { fontSize: '1.2rem' },
+            'p, ul, ol': {
+              marginTop: '0.75em',
+              marginBottom: '0.75em',
+              lineHeight: '1.6',
+            },
+            'ul > li': {
+              listStyleType: 'disc',
+              paddingLeft: '0.25em',
+            },
+            'ol > li': {
+              listStyleType: 'decimal',
+              paddingLeft: '0.25em',
+            },
+            'li': {
+              marginTop: '0.3em',
+              marginBottom: '0.3em',
+            },
+            'li::marker': {
+              color: 'hsl(var(--primary))',
+              fontWeight: '700',
+            },
+            'img': {
+              marginTop: '2em',
+              marginBottom: '2em',
+              borderRadius: 'var(--radius)',
+            },
+            'strong': {
+              color: 'hsl(var(--foreground))',
+            },
+            'a': {
+              color: 'hsl(var(--primary))',
+              textDecoration: 'none',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@tailwindcss/typography"),
+  ],
 }

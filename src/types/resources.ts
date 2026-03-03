@@ -19,7 +19,7 @@ export interface Resource {
   updated: string;
 }
 
-export type ResourceCategory = 'ebooks' | 'modul' | 'regulations' | 'guides' | 'references';
+export type ResourceCategory = 'ebooks' | 'modul' | 'regulations';
 
 export interface ResourceCategoryInfo {
   id: ResourceCategory;

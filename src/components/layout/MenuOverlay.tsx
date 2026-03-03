@@ -16,23 +16,29 @@ import {
   BookOpen,
   FileText,
   LayoutDashboard,
-  Users
+  Users,
+  Phone,
+  MapPin
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { CONTACT_INFO, SOCIAL_LINKS } from '@/constants/contact';
 
 const menuItems = [
   { label: 'Home', href: '/', icon: Home },
-  { label: 'About', href: '/about', icon: User },
-  { label: 'Services', href: '/services', icon: Building2 },
-  { label: 'Software', href: '/software', icon: Code2 },
+  { label: 'About Us', href: '/about', icon: User },
+  { label: 'Portfolio', href: 'https://portfolio.daharengineer.com', icon: FolderOpen },
+  { label: 'FAQ', href: '/faq', icon: FileText },
+  { label: 'Contact', href: '/contact', icon: Mail },
+  { label: 'Building Design', href: '/building-design', icon: Building2 },
+  { label: 'Online Courses', href: '/courses/online-courses', icon: GraduationCap },
+  { label: 'Private Courses', href: '/courses/private-courses', icon: Users },
   { label: 'Store', href: '/store', icon: ShoppingBag },
+  { label: 'Software', href: '/software', icon: Code2 },
+  { label: 'Services', href: '/services', icon: Box },
+  { label: 'Blog', href: '/blog', icon: FileText },
   { label: 'Revit Files', href: '/community/revit-files', icon: Box },
   { label: 'Resources', href: '/community/resources', icon: BookOpen },
-  { label: 'Blog', href: '/blog', icon: FileText },
-  { label: 'Private Courses', href: '/private-courses', icon: Users },
-  { label: 'Online Courses', href: '/courses', icon: GraduationCap },
-  { label: 'Portfolio', href: '/portfolio', icon: FolderOpen },
-  { label: 'Contact', href: '/contact', icon: Mail },
+  { label: 'DELinxs', href: 'https://delinxs.com', icon: LayoutDashboard },
 ];
 
 export function MenuOverlay() {
@@ -67,11 +73,10 @@ export function MenuOverlay() {
             <X className="w-8 h-8" />
           </motion.button>
 
-          {/* Menu content */}
           <div className="flex-1 flex flex-col lg:flex-row">
             {/* Main navigation */}
-            <div className="flex-1 flex flex-col justify-center px-8 lg:px-20 py-16">
-              <nav className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 lg:gap-0">
+            <div className="flex-1 flex flex-col justify-center px-8 lg:px-20 py-16 overflow-y-auto">
+              <nav className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-1 gap-1 lg:gap-0">
                 {menuItems.map((item, index) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.href || location.pathname.startsWith(item.href + '/');
@@ -92,7 +97,7 @@ export function MenuOverlay() {
                         to={item.href}
                         onClick={close}
                         className={`
-                          group flex items-center gap-4 py-3 px-4 -mx-4
+                          group flex items-center gap-4 py-1.5 px-4 -mx-4
                           transition-all duration-300
                           ${isActive
                             ? 'text-army-400'
@@ -100,14 +105,14 @@ export function MenuOverlay() {
                           }
                         `}
                       >
-                        <Icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                        <span className="text-2xl lg:text-4xl font-light tracking-tight">
+                        <Icon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+                        <span className="text-sm lg:text-3xl font-light tracking-tight">
                           {item.label}
                         </span>
                         {isActive && (
                           <motion.div
                             layoutId="activeIndicator"
-                            className="w-2 h-2 bg-army-500"
+                            className="w-1.5 h-1.5 bg-army-500 ml-4"
                           />
                         )}
                       </Link>
@@ -128,7 +133,7 @@ export function MenuOverlay() {
             >
               {/* User section */}
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-6">
+                <h3 className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-6 border-b border-border/10 pb-1">
                   Account
                 </h3>
 
@@ -139,8 +144,8 @@ export function MenuOverlay() {
                         <User className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="font-medium">{user?.name}</p>
-                        <p className="text-sm text-muted-foreground">{user?.email}</p>
+                        <p className="text-sm md:text-base font-medium">{user?.name}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">{user?.email}</p>
                       </div>
                     </div>
                     <Link
@@ -183,47 +188,51 @@ export function MenuOverlay() {
               </div>
 
               {/* Contact info */}
-              <div className="mt-8 lg:mt-0">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-6">
+              <div className="mt-8 lg:mt-0 hidden md:block">
+                <h3 className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-6 border-b border-border/10 pb-1">
                   Get in Touch
                 </h3>
                 <div className="space-y-3 text-sm text-muted-foreground">
-                  <p>daharengineer@gmail.com</p>
-                  <p>+62 821-2086-7946</p>
-                  <p>Bandung, Indonesia</p>
+                  <a
+                    href={`mailto:${CONTACT_INFO.email}`}
+                    className="flex items-center gap-2 text-muted-foreground hover:text-army-400 transition-colors"
+                  >
+                    <Mail className="w-4 h-4" />
+                    {CONTACT_INFO.email}
+                  </a>
+                  <a
+                    href={CONTACT_INFO.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-muted-foreground hover:text-army-400 transition-colors"
+                  >
+                    <Phone className="w-4 h-4" />
+                    {CONTACT_INFO.phone}
+                  </a>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin className="w-4 h-4" />
+                    {CONTACT_INFO.location}
+                  </div>
                 </div>
               </div>
 
               {/* Social links */}
               <div className="mt-8 lg:mt-0">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
+                <h3 className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest mb-4 border-b border-border/10 pb-1">
                   Follow Us
                 </h3>
-                <div className="flex gap-4">
-                  <a
-                    href="https://instagram.com/dahar.engineer"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-army-400 transition-colors"
-                  >
-                    Instagram
-                  </a>
-                  <a
-                    href="https://linkedin.com/company/dahar-engineer"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-army-400 transition-colors"
-                  >
-                    LinkedIn
-                  </a>
-                  <a
-                    href="https://youtube.com/@daharengineer"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-army-400 transition-colors"
-                  >
-                    YouTube
-                  </a>
+                <div className="grid grid-cols-2 gap-4">
+                  {SOCIAL_LINKS.map((social) => (
+                    <a
+                      key={social.name}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-army-400 transition-colors"
+                    >
+                      {social.name}
+                    </a>
+                  ))}
                 </div>
               </div>
             </motion.div>

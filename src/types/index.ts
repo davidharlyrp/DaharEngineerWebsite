@@ -3,6 +3,7 @@ export * from './revit';
 export * from './resources';
 export * from './software';
 export * from './dashboard';
+export * from './blog';
 
 // User types
 export interface User {
@@ -12,6 +13,12 @@ export interface User {
   avatar?: string;
   role: 'user' | 'admin';
   total_coins?: number;
+  verified: boolean;
+  institution?: string;
+  newsletter?: boolean;
+  phone_number?: string;
+  display_name?: string;
+  username?: string;
   created: string;
   updated: string;
 }
@@ -65,10 +72,13 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  register: (email: string, password: string, name: string, institution?: string, newsletter?: boolean, phone_number?: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  confirmPasswordReset: (token: string, password: string) => Promise<void>;
+  changePassword: (oldPassword: string, newPassword: string) => Promise<void>;
   refreshUser: () => Promise<void>;
+  requestVerification: (email: string) => Promise<{ success: boolean }>;
 }
 
 // Menu state types
