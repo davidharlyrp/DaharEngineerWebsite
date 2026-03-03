@@ -1,5 +1,6 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { useRef, useState, useEffect, useMemo } from 'react';
 import {
     HelpCircle,
@@ -199,7 +200,7 @@ export default function FAQPage() {
                                                     <span className="group-hover:text-army-400 transition-colors pr-4">{faq.question}</span>
                                                 </AccordionTrigger>
                                                 <AccordionContent className="text-muted-foreground leading-relaxed text-xs pb-6 opacity-80 border-t border-border/5 pt-4">
-                                                    <div dangerouslySetInnerHTML={{ __html: faq.answer.replace(/\n/g, '<br />') }} />
+                                                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(faq.answer.replace(/\n/g, '<br />')) }} />
                                                     {faq.keyword && (
                                                         <div className="mt-4 flex flex-wrap gap-2">
                                                             {faq.keyword.split(',').map(tag => (

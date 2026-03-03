@@ -86,7 +86,12 @@ export function ResourceUploadModal({ isOpen, onClose, onSuccess, editResource }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0]);
+            const selectedFile = e.target.files[0];
+            if (selectedFile.type !== 'application/pdf' && !selectedFile.name.toLowerCase().endsWith('.pdf')) {
+                toast.error('Only PDF files are allowed');
+                return;
+            }
+            setFile(selectedFile);
         }
     };
 
@@ -115,7 +120,12 @@ export function ResourceUploadModal({ isOpen, onClose, onSuccess, editResource }
         setDragActive(false);
 
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            setFile(e.dataTransfer.files[0]);
+            const droppedFile = e.dataTransfer.files[0];
+            if (droppedFile.type !== 'application/pdf' && !droppedFile.name.toLowerCase().endsWith('.pdf')) {
+                toast.error('Only PDF files are allowed');
+                return;
+            }
+            setFile(droppedFile);
         }
     };
 
@@ -320,7 +330,7 @@ export function ResourceUploadModal({ isOpen, onClose, onSuccess, editResource }
                                     </SelectTrigger>
                                     <SelectContent className="bg-background border-border/20">
                                         <SelectItem value="ebooks" className="text-xs">E-Book</SelectItem>
-                                        <SelectItem value="moduls" className="text-xs">Module</SelectItem>
+                                        <SelectItem value="modul" className="text-xs">Module</SelectItem>
                                         <SelectItem value="regulations" className="text-xs">Regulation</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -353,6 +363,7 @@ export function ResourceUploadModal({ isOpen, onClose, onSuccess, editResource }
                                     type="file"
                                     ref={fileInputRef}
                                     onChange={handleFileChange}
+                                    accept=".pdf,application/pdf"
                                     className="hidden"
                                 />
                                 {file ? (

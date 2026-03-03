@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import DOMPurify from 'dompurify';
 
 interface LaTeXRendererProps {
     content: string;
@@ -79,7 +80,7 @@ export function LaTeXRenderer({ content, className }: LaTeXRendererProps) {
         <div
             ref={containerRef}
             className={className}
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
         />
     );
 }

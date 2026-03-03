@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { LaTeXRenderer } from '@/components/blog/LaTeXRenderer';
 import { CommentSection } from '@/components/blog/CommentSection';
 import { SectionReveal } from '@/components/ui-custom';
+import { SEO } from '@/components/seo/SEO';
 import { toast } from 'sonner';
 
 export default function BlogDetail() {
@@ -111,6 +112,14 @@ export default function BlogDetail() {
 
     return (
         <div ref={detailRef} className="relative bg-background min-h-screen pb-20">
+            <SEO
+                title={`${blog.title} | Dahar Engineer Blog`}
+                description={blog.content ? blog.content.substring(0, 160).replace(/(<([^>]+)>)/gi, "") : 'Read the latest insights and engineering tutorials from Dahar Engineer.'}
+                image={thumbnailUrl || undefined}
+                type="article"
+                url={`https://daharengineer.com/blog/${slug}`}
+                keywords={blog.tags_keyword || 'engineering blog, civil engineering articles, konstruksi, teknik sipil, dahar engineer'}
+            />
             {/* Reading Progress Indicator */}
             <motion.div
                 className="fixed top-0 left-0 h-1 bg-army-500 z-50 origin-left"

@@ -7,31 +7,30 @@ Disallow: /payment/*
 # Disallow authentication callback pages
 Disallow: /auth/*
 Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /_/*
 
 # Allow all other pages to be crawled
 Allow: /about
 Allow: /faq
-Allow: /services/courses
-Allow: /services/online-courses
-Allow: /services/building-design
-Allow: /tools/calculator
-Allow: /tools/steel-profile
-Allow: /tools/geotechnical-tools
+Allow: /contact
+Allow: /services
+Allow: /building-design
 Allow: /software
-Allow: /software/brickcost
-Allow: /software/terraid
-Allow: /software/terrapile
-Allow: /software/terrashallow
-Allow: /software/decolumn
+Allow: /courses/private-courses
 Allow: /store
-Allow: /product/*
-Allow: /resources
-Allow: /community
+Allow: /store/product/*
+Allow: /community/resources
 Allow: /community/revit-files
 Allow: /blog
 Allow: /blog/*
-Allow: /contact
-Allow: /signin
+Allow: /login
+Allow: /terms
+Allow: /privacy
+Allow: /refund
+Allow: /community-policy
 
 # Sitemap location
 Sitemap: https://daharengineer.com/sitemap.xml

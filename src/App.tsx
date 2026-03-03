@@ -64,6 +64,7 @@ function App() {
                     <Route path="/about" element={<About />} />
                     <Route path="/faq" element={<FAQ />} />
                     <Route path="/contact" element={<Contact />} />
+
                     <Route path="/services" element={<Services />} />
                     <Route path="/building-design" element={<BuildingDesign />} />
                     <Route path="/software" element={<SoftwareList />} />
@@ -71,6 +72,7 @@ function App() {
                     <Route path="/store" element={<Store />} />
                     <Route path="/store/:category" element={<Store />} />
                     <Route path="/store/product/:slug" element={<ProductDetail />} />
+
                     <Route path="/community/revit-files" element={<RevitFiles />} />
                     <Route path="/community/resources" element={<Resources />} />
                     <Route path="/blog" element={<Blog />} />

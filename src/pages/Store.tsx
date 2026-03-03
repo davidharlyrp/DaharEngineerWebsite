@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckoutModal } from '@/components/store/CheckoutModal';
 import { productsService } from '@/services/pb/products';
+import { SEO } from '@/components/seo/SEO';
 import type { Product } from '@/types/store';
 
 // No mock data - fetching from PocketBase
@@ -423,6 +424,12 @@ export default function Store() {
 
   return (
     <div className="relative">
+      <SEO
+        title="Dahar Engineer Store | Premium Engineering Resources"
+        description="Premium Revit families, Excel templates, calculation sheets, and more to accelerate your engineering workflow."
+        url="https://daharengineer.com/store"
+        keywords="civil engineering store, revit families, excel perhitungan struktur, template excel, excel teknik sipil, excel perhitungan pondasi, dahar engineer, teknik sipil"
+      />
       <HeroSection />
       <div className="h-screen" />
       <div className="relative z-10 bg-background">

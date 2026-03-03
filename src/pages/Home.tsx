@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { TextReveal, SectionReveal } from '@/components/ui-custom';
 import { NewsSlider } from '@/components/home/NewsSlider';
+import { SEO } from '@/components/seo/SEO';
 
 // Hero Section with News Slider
 function HeroSection() {
@@ -307,6 +308,10 @@ function BottomInfo() {
 export default function Home() {
   return (
     <div className="relative">
+      <SEO
+        title="Dahar Engineer | Complete Construction Solutions"
+        description="Providing top-tier structural analysis, architectural planning, specialized software, and civil engineering courses."
+      />
       {/* Hero with Fixed Effect */}
       <HeroSection />
 

@@ -112,6 +112,24 @@ export function UploadModal({ isOpen, onClose, onSuccess, type = 'revit', editFi
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fileType: 'revitFile' | 'previewImage') => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
+
+            if (fileType === 'revitFile' && !file.name.match(/\.(rfa|rvt)$/i)) {
+                toast.error('Only .rfa and .rvt files are allowed');
+                return;
+            }
+
+            if (fileType === 'previewImage') {
+                if (!file.type.startsWith('image/')) {
+                    toast.error('Only image files are allowed');
+                    return;
+                }
+                const isValidImageExt = file.name.match(/\.(jpg|jpeg|png|webp)$/i);
+                if (!isValidImageExt) {
+                    toast.error('Valid formats: JPG, PNG, WEBP');
+                    return;
+                }
+            }
+
             setFiles(prev => ({ ...prev, [fileType]: file }));
             if (fileType === 'previewImage') {
                 setPreviewUrl(URL.createObjectURL(file));
@@ -145,6 +163,24 @@ export function UploadModal({ isOpen, onClose, onSuccess, type = 'revit', editFi
 
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const file = e.dataTransfer.files[0];
+
+            if (fileType === 'revitFile' && !file.name.match(/\.(rfa|rvt)$/i)) {
+                toast.error('Only .rfa and .rvt files are allowed');
+                return;
+            }
+
+            if (fileType === 'previewImage') {
+                if (!file.type.startsWith('image/')) {
+                    toast.error('Only image files are allowed');
+                    return;
+                }
+                const isValidImageExt = file.name.match(/\.(jpg|jpeg|png|webp)$/i);
+                if (!isValidImageExt) {
+                    toast.error('Valid formats: JPG, PNG, WEBP');
+                    return;
+                }
+            }
+
             setFiles(prev => ({ ...prev, [fileType]: file }));
             if (fileType === 'previewImage') {
                 setPreviewUrl(URL.createObjectURL(file));
@@ -447,7 +483,7 @@ export function UploadModal({ isOpen, onClose, onSuccess, type = 'revit', editFi
                                         type="file"
                                         ref={imageInputRef}
                                         onChange={(e) => handleFileChange(e, 'previewImage')}
-                                        accept="image/*"
+                                        accept="image/jpeg, image/png, image/webp"
                                         className="hidden"
                                     />
                                     {previewUrl ? (

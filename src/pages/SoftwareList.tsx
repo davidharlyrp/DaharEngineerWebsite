@@ -15,6 +15,7 @@ import {
 import { TextReveal, SectionReveal } from '@/components/ui-custom';
 import { Button } from '@/components/ui/button';
 import { softwareService } from '@/services/pb/software';
+import { SEO } from '@/components/seo/SEO';
 import type { Software, SoftwareCategory } from '@/types/software';
 
 // Category definitions with icons
@@ -235,6 +236,12 @@ export default function SoftwareList() {
 
   return (
     <div className="relative">
+      <SEO
+        title="Engineering Software Suite | Dahar Engineer"
+        description="A curated ecosystem of digital tools built to empower the modern engineer in geotechnical, structural, and productivity flows."
+        url="https://daharengineer.com/software"
+        keywords="civil engineering software, geotechnical software, structural software, civil engineering apps, dahar engineer, teknik sipil, software, aplikasi, geoteknik, struktur, aplikasi teknik sipil, software teknik sipil"
+      />
       <HeroSection />
       <div className="h-screen" />
 

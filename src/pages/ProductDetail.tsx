@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import DOMPurify from 'dompurify';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
@@ -24,6 +25,7 @@ import { paymentApi } from '@/services/api/payment';
 import { CheckoutModal } from '@/components/store/CheckoutModal';
 import { useAuth } from '@/context/AuthContext';
 import { useSearchParams } from 'react-router-dom';
+import { SEO } from '@/components/seo/SEO';
 import type { Product } from '@/types/store';
 
 export default function ProductDetail() {
@@ -237,6 +239,14 @@ export default function ProductDetail() {
 
     return (
         <div className="pt-24 pb-16 lg:pb-32">
+            <SEO
+                title={`${product.name} | Dahar Engineer Store`}
+                description={product.short_description}
+                image={activeImage || undefined}
+                type="product"
+                url={`https://daharengineer.com/store/product/${slug}`}
+                keywords={`perhitungan, template excel, revit family, ${product.category.replace(/-/g, ' ')}, ${product.name.toLowerCase()}`}
+            />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
                 {/* Breadcrumbs */}
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4 lg:mb-12 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
@@ -401,7 +411,7 @@ export default function ProductDetail() {
                             </h2>
                             <div
                                 className="prose prose-invert max-w-none text-muted-foreground text-lg leading-relaxed whitespace-pre-wrap"
-                                dangerouslySetInnerHTML={{ __html: product.long_description }}
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.long_description) }}
                             />
                         </SectionReveal>
 

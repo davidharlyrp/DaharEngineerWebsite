@@ -22,6 +22,7 @@ import { resourceService } from '@/services/pb/resources';
 import type { Resource } from '@/types/resources';
 import { ResourceUploadModal } from '@/components/resources/ResourceUploadModal';
 import { Upload } from 'lucide-react';
+import { SEO } from '@/components/seo/SEO';
 
 // Category definitions
 const categories = [
@@ -593,6 +594,12 @@ export default function Resources() {
 
   return (
     <div className="relative">
+      <SEO
+        title="Engineering Resources | Dahar Engineer"
+        description="Access our collection of free e-books, learning modules, and regulatory documents to enhance your engineering knowledge."
+        url="https://daharengineer.com/community/resources"
+        keywords="civil engineering free ebooks, SNI regulations, engineering modules, peraturan SNI, ebooks teknik sipil, dahar engineer, teknik sipil, modul teknik sipil"
+      />
       <HeroSection />
       <div className="h-screen pointer-events-none" />
       <div className="relative z-10 bg-background">

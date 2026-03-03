@@ -29,6 +29,7 @@ import { revitService } from '@/services/pb/revit';
 import type { RevitFile } from '@/types/revit';
 import { RevitCategory } from '@/types/revit';
 import { UploadModal } from '@/components/revit/UploadModal';
+import { SEO } from '@/components/seo/SEO';
 
 // Hero Section
 function HeroSection() {
@@ -650,6 +651,12 @@ export default function RevitFiles() {
 
   return (
     <div className="relative">
+      <SEO
+        title="Revit Family Library | Dahar Engineer"
+        description="Download high-quality Revit families and templates for your BIM projects. All files are professionally created and regularly updated."
+        url="https://daharengineer.com/community/revit-files"
+        keywords="revit families, free revit templates, BIM resources, structural revit models, revit components, dahar engineer, teknik sipil, bim, revit family, revit template"
+      />
       <HeroSection />
       <div className="h-screen pointer-events-none" />
       <div className="relative z-10 bg-background">
