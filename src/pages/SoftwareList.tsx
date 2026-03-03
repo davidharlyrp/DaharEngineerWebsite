@@ -75,13 +75,13 @@ function HeroSection() {
           </motion.div>
 
           <TextReveal
-            text="Engineering"
+            text="Civil Engineering"
             tag="h1"
             className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
             delay={0.3}
           />
           <TextReveal
-            text="Applications"
+            text="Software Suite"
             tag="h1"
             className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-tight text-muted-foreground"
             delay={0.5}
@@ -93,7 +93,7 @@ function HeroSection() {
             transition={{ delay: 0.8, duration: 0.6 }}
             className="text-lg text-muted-foreground mt-8 max-w-2xl mx-auto"
           >
-            A curated ecosystem of digital tools built to empower the modern engineer.
+            A curated ecosystem of software applications built to empower a civil engineer.
           </motion.p>
         </div>
 
@@ -238,7 +238,7 @@ export default function SoftwareList() {
     <div className="relative">
       <SEO
         title="Engineering Software Suite | Dahar Engineer"
-        description="A curated ecosystem of digital tools built to empower the modern engineer in geotechnical, structural, and productivity flows."
+        description="A curated ecosystem of software applications built to empower a civil engineer."
         url="https://daharengineer.com/software"
         keywords="civil engineering software, geotechnical software, structural software, civil engineering apps, dahar engineer, teknik sipil, software, aplikasi, geoteknik, struktur, aplikasi teknik sipil, software teknik sipil"
       />

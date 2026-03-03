@@ -4,6 +4,7 @@ import {
   Mail,
   Send,
   CheckCircle2,
+  ChevronDown,
 } from 'lucide-react';
 import { TextReveal, LineReveal, SectionReveal } from '@/components/ui-custom';
 import { Button } from '@/components/ui/button';
@@ -71,6 +72,24 @@ function HeroSection() {
             delay={0.5}
           />
         </div>
+        
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.6 }}
+          className="absolute w-fit bottom-10"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="flex flex-col items-center gap-2 text-muted-foreground/30"
+          >
+            <p className="text-xs text-muted-foreground/60">Scroll Down</p>
+            <ChevronDown className="w-5 h-5" />
+          </motion.div>
+        </motion.div>
       </motion.div>
     </div>
   );
@@ -297,7 +316,7 @@ function ContactFormSection() {
 function MapSection() {
   return (
     <section className="h-[600px] relative bg-secondary/20 overflow-hidden">
-      <div className="absolute flex items-center justify-center inset-0 mx-auto h-full w-[80dvw] z-0">
+      <div className="absolute flex items-center justify-center inset-0 mx-auto h-full w-[80dvw] p-10 z-0">
         <iframe
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.0802851928574!2d107.59680829999999!3d-6.9998273!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e9228c3ed1fd%3A0xc9baa165d4a3cad8!2sDahar%20Engineer!5e0!3m2!1sid!2sid!4v1749789553737!5m2!1sid!2sid"
           width="100%"

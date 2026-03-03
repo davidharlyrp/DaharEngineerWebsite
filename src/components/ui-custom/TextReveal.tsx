@@ -25,7 +25,7 @@ export function TextReveal({
   return (
     <Tag ref={ref} className={className}>
       {words.map((word, wordIndex) => (
-        <span key={wordIndex} className="inline-block overflow-hidden mr-[0.25em] pb-4 -mb-4">
+        <span key={wordIndex} className="inline-block overflow-hidden mr-[0.25em] pb-4 -mb-4 p-1">
           <motion.span
             initial={{ y: '150%' }}
             animate={isInView ? { y: 0 } : {}}

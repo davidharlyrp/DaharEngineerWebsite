@@ -51,7 +51,7 @@ export default function Dashboard() {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="bg-secondary/30 p-1 flex flex-wrap h-auto">
+            <TabsList className="bg-secondary/30 p-1 flex gap-2 flex-wrap h-auto">
               <TabsTrigger value="profile" className="data-[state=active]:bg-army-700">
                 Profile
               </TabsTrigger>

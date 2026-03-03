@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { CONTACT_INFO, SOCIAL_LINKS } from '@/constants/contact';
+import type { UserProfile } from '@/types/dashboard';
 
 const menuItems = [
   { label: 'Home', href: '/', icon: Home },
@@ -50,7 +51,9 @@ export function MenuOverlay() {
     await logout();
     close();
   };
-
+  const getFileUrl = (record: UserProfile, fileName: string): string => {
+    return `${import.meta.env.VITE_POCKETBASE_URL}/api/files/_pb_users_auth_/${record.id}/${fileName}`;
+  };
   return (
     <AnimatePresence>
       {isOpen && (
@@ -106,7 +109,7 @@ export function MenuOverlay() {
                         `}
                       >
                         <Icon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-                        <span className="text-sm lg:text-3xl font-light tracking-tight">
+                        <span className="text-base lg:text-3xl font-light tracking-tight">
                           {item.label}
                         </span>
                         {isActive && (
@@ -140,8 +143,12 @@ export function MenuOverlay() {
                 {isAuthenticated ? (
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-army-700 flex items-center justify-center">
-                        <User className="w-5 h-5" />
+                      <div className={`w-10 h-10 flex items-center justify-center ${user?.avatar ? '' : 'bg-army-700'}`}>
+                        {user?.avatar ? (
+                          <img src={getFileUrl(user, user.avatar)} alt={user?.name} className="w-full h-full object-cover rounded-full" />
+                        ) : (
+                          <User className="w-5 h-5" />
+                        )}
                       </div>
                       <div>
                         <p className="text-sm md:text-base font-medium">{user?.name}</p>

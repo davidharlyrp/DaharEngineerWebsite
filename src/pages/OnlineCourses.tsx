@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Wrench } from 'lucide-react';
+import { Loader2, Wrench } from 'lucide-react';
 import { SEO } from '@/components/seo/SEO';
 
 export default function OnlineCourses() {
@@ -19,7 +19,10 @@ export default function OnlineCourses() {
                 <div className="w-12 h-12 bg-army-700/10 flex items-center justify-center rounded-sm text-army-400">
                     <Wrench className="w-5 h-5" />
                 </div>
-
+                <div className="flex items-center gap-2 animate-pulse text-army-500">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>MAINTENANCE</span>
+                </div>
                 <div>
                     <h1 className="text-xl font-semibold mb-2">Online Courses</h1>
                     <p className="text-sm text-muted-foreground opacity-90 leading-relaxed">

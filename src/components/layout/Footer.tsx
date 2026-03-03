@@ -34,9 +34,9 @@ const footerLinks = {
 export function Footer() {
 
   return (
-    <footer className="bg-background border-t border-border/30">
+    <footer className="bg-background border-t border-border/30 lg:h-fit h-screen flex flex-col items-center justify-between">
       {/* Main Footer */}
-      <div className="px-6 lg:px-20 py-16">
+      <div className="px-6 lg:px-20 py-16 ">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12">
             {/* Brand */}
@@ -158,11 +158,11 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-border/30 px-6 lg:px-20 py-6">
+      <div className="border-t border-border/30 px-6 lg:px-20 py-6 w-full">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Copyright */}
           <p className="text-sm text-muted-foreground">
-            {new Date().getFullYear()} Dahar Engineer. All rights reserved.
+            2024 Dahar Engineer. All rights reserved.
           </p>
 
           {/* Social Links */}

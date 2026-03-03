@@ -59,7 +59,7 @@ function HeroSection() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-20 flex flex-col justify-center h-full">
+        <div className="relative z-10 w-full max-w-7xl mx-auto pb-44 lg:pb-0 px-6 lg:px-20 flex flex-col justify-center h-full">
           <div className="max-w-3xl">
             {/* Badge */}
             <motion.div
@@ -127,7 +127,7 @@ function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, duration: 0.8 }}
-          className="absolute bottom-10 right-10 z-20 hidden lg:block"
+          className="absolute bottom-24 lg:bottom-10 right-10 z-20 block"
         >
           <NewsSlider />
         </motion.div>
@@ -137,7 +137,7 @@ function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 0.6 }}
-          className="absolute w-full bottom-10 left-10 lg:left-20"
+          className="absolute w-fit bottom-10"
         >
           <motion.div
             animate={{ y: [0, 8, 0] }}

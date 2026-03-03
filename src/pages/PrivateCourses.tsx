@@ -902,7 +902,7 @@ function CoursesListSection({
         <div className="max-w-7xl mx-auto">
           {/* Coin Balance Banner */}
           <div className="bg-secondary/40 border border-border/50 rounded-lg p-6 mb-12">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-army-700/20 flex items-center justify-center rounded-md">
                   <Wallet className="w-5 h-5 text-army-400" />
