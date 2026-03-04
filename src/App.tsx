@@ -32,6 +32,7 @@ import ConfirmVerification from '@/pages/ConfirmVerification';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ConfirmPasswordReset from '@/pages/ConfirmPasswordReset';
 import PBRedirectHandler from '@/pages/PBRedirectHandler';
+import VerifyCertificate from '@/pages/VerifyCertificate';
 
 // Components
 import { ScrollToTop } from '@/components/layout/ScrollToTop';
@@ -53,6 +54,7 @@ function App() {
 
             {/* Verification routes */}
             <Route path="/auth/confirm-verification/:token" element={<ConfirmVerification />} />
+            <Route path="/verify/*" element={<VerifyCertificate />} />
             <Route path="/_" element={<PBRedirectHandler />} />
 
             {/* Main routes with MainLayout */}
