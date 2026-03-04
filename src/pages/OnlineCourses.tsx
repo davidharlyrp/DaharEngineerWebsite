@@ -106,6 +106,7 @@ export default function OnlineCourses() {
     const [isLoading, setIsLoading] = useState(true);
     const [purchasedCourses, setPurchasedCourses] = useState<Record<string, boolean>>({});
     const [isProcessing, setIsProcessing] = useState<string | null>(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const { isAuthenticated, user } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -136,6 +137,7 @@ export default function OnlineCourses() {
             const courseId = searchParams.get('courseId');
             if (courseId) {
                 setPurchasedCourses(prev => ({ ...prev, [courseId]: true }));
+                setShowSuccessModal(true);
             }
             // Clean up URL
             const newParams = new URLSearchParams(searchParams);
@@ -358,6 +360,39 @@ export default function OnlineCourses() {
                     </div>
                 </section>
             </div>
+
+            {/* Payment Success Modal */}
+            {showSuccessModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-card border border-border/10 p-6 rounded-sm max-w-sm w-full text-center space-y-4 shadow-2xl relative overflow-hidden"
+                    >
+                        {/* Compact Decorative Background */}
+                        <div className="absolute top-0 left-0 w-full h-1 bg-army-500 opacity-50" />
+
+                        <div className="w-12 h-12 bg-army-500/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <CheckCircle2 className="w-6 h-6 text-army-500" />
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <h3 className="text-lg font-bold tracking-tight uppercase italic">Access Granted</h3>
+                            <p className="text-[11px] text-muted-foreground leading-relaxed px-4 opacity-80 font-light">
+                                Thank you for your purchase. You can now access the course content directly from the directory or your learning dashboard.
+                            </p>
+                        </div>
+
+                        <Button
+                            onClick={() => setShowSuccessModal(false)}
+                            className="w-full bg-army-700 hover:bg-army-600 h-10 text-[10px] uppercase tracking-[0.2em] font-bold rounded-none group transition-all"
+                        >
+                            Start Learning
+                            <ChevronRight className="w-3.5 h-3.5 ml-2 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                    </motion.div>
+                </div>
+            )}
         </div>
     );
 }
