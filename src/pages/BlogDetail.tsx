@@ -154,6 +154,25 @@ export default function BlogDetail() {
                             {blog.title}
                         </h1>
 
+                        <div className="flex items-center w-full justify-start md:justify-end gap-4 text-[9px] font-bold text-muted-foreground uppercase tracking-tight">
+                            <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 opacity-50" /> {blog.view_count || 0} Views</span>
+
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={handleLike}
+                                    className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-army-500' : 'text-muted-foreground/50 hover:text-army-500'}`}
+                                >
+                                    <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
+                                    {blog.like_count || 0}
+                                </button>
+                                <button
+                                    onClick={handleShare}
+                                    className="text-muted-foreground/50 hover:text-army-500 transition-colors"
+                                >
+                                    <Share2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
                         <div className="flex items-center gap-3 py-6 border-y border-border/5 mb-8">
                             <div className="w-10 h-10 bg-army-700/20 rounded-full flex items-center justify-center border border-army-500/10 shrink-0">
                                 <span className="text-xs font-bold text-army-400">
@@ -164,26 +183,8 @@ export default function BlogDetail() {
                                 <p className="text-xs font-bold tracking-tight">{blog.author}</p>
                                 <p className="text-[10px] text-muted-foreground font-medium opacity-40 uppercase tracking-tight">{blog.author_title}</p>
                             </div>
-                            <div className="hidden sm:flex items-center gap-4 text-[9px] font-bold text-muted-foreground uppercase tracking-tight">
-                                <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 opacity-50" /> {blog.view_count || 0} Views</span>
-
-                                <div className="flex items-center gap-4">
-                                    <button
-                                        onClick={handleLike}
-                                        className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-army-500' : 'text-muted-foreground/50 hover:text-army-500'}`}
-                                    >
-                                        <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
-                                        {blog.like_count || 0}
-                                    </button>
-                                    <button
-                                        onClick={handleShare}
-                                        className="text-muted-foreground/50 hover:text-army-500 transition-colors"
-                                    >
-                                        <Share2 className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            </div>
                         </div>
+
                     </SectionReveal>
 
                     {thumbnailUrl && (
