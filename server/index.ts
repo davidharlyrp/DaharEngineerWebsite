@@ -338,6 +338,77 @@ app.post('/api/booking/coin-payment', async (req, res) => {
     }
 });
 
+// Create Online Course Access Invoice
+app.post('/api/payment/course/create', async (req, res) => {
+    try {
+        const {
+            courseId,
+            userId,
+            userEmail,
+            userName,
+            amount,
+            courseName,
+            courseSlug
+        } = req.body;
+
+        const adminPb = await getAdminPB();
+
+        // 1. Create initial record in online_course_access
+        const record = await adminPb.collection('online_course_access').create({
+            user_id: userId,
+            online_course_id: courseId,
+            course_name: courseName,
+            payment_amount: amount,
+            payment_status: 'pending',
+            payment_currency: 'IDR'
+        });
+
+        // 2. Create Xendit Invoice
+        const invoice = await Invoice.createInvoice({
+            data: {
+                externalId: record.id,
+                amount: amount,
+                description: `Course Access: ${courseName}`,
+                invoiceDuration: 86400,
+                customer: {
+                    givenNames: userName,
+                    email: userEmail,
+                },
+                currency: 'IDR',
+                successRedirectUrl: `${process.env.FRONTEND_URL}/courses/online-courses?status=paid&courseId=${courseId}`,
+                failureRedirectUrl: `${process.env.FRONTEND_URL}/courses/online-courses?status=failed`,
+            }
+        });
+
+        // 3. Update record with Invoice ID and Xendit External ID
+        await adminPb.collection('online_course_access').update(record.id, {
+            xendit_payment_id: invoice.id,
+            external_id: record.id
+        });
+
+        res.json({ invoiceUrl: invoice.invoiceUrl });
+    } catch (error: any) {
+        console.error('Course Payment Creation Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Check course access status
+app.get('/api/payment/course/check/:courseId/:userId', async (req, res) => {
+    try {
+        const { courseId, userId } = req.params;
+        const adminPb = await getAdminPB();
+
+        const records = await adminPb.collection('online_course_access').getFullList({
+            filter: `online_course_id = "${courseId}" && user_id = "${userId}" && payment_status = "paid"`,
+        });
+
+        res.json({ hasAccess: records.length > 0 });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Xendit Webhook
 app.post('/api/payment/webhook', async (req, res) => {
     try {
