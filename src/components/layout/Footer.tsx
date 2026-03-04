@@ -162,7 +162,7 @@ export function Footer() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Copyright */}
           <p className="text-sm text-muted-foreground">
-            2024 Dahar Engineer. All rights reserved.
+            {new Date().getFullYear()} Dahar Engineer. All rights reserved.
           </p>
 
           {/* Social Links */}
