@@ -79,20 +79,21 @@ function App() {
                     <Route path="/community/resources" element={<Resources />} />
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blog/:slug" element={<BlogDetail />} />
-                    <Route
-                      path="/dashboard"
-                      element={
-                        <AuthGuard>
-                          <Dashboard />
-                        </AuthGuard>
-                      }
-                    />
+
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/refund" element={<Refund />} />
                     <Route path="/community-policy" element={<CommunityPolicy />} />
                   </Routes>
                 </MainLayout>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <AuthGuard>
+                  <Dashboard />
+                </AuthGuard>
               }
             />
           </Routes>
