@@ -362,40 +362,58 @@ app.post('/api/payment/webhook', async (req, res) => {
 
                 return res.status(200).send('OK (Product)');
             } catch (err: any) {
-                if (err.status !== 404) throw err;
+                if (err.status !== 404) {
+                    console.error('Webhook Error (Product):', err);
+                }
 
-                // Try updating bookings
+                // Try updating online_course_access
                 try {
-                    await adminPb.collection('bookings').update(external_id, {
+                    await adminPb.collection('online_course_access').update(external_id, {
                         payment_status: 'paid',
-                        payment_method: payment_method,
-                        payment_date: new Date().toISOString(),
-                        booking_status: 'pending'
+                        access_granted_at: new Date().toISOString(),
+                        xendit_payment_id: id
                     });
-                    return res.status(200).send('OK (Booking)');
-                } catch (bookErr: any) {
-                    if (bookErr.status !== 404) throw bookErr;
+                    return res.status(200).send('OK (Course Access)');
+                } catch (courseErr: any) {
+                    if (courseErr.status !== 404) {
+                        console.error('Webhook Error (Course Access):', courseErr);
+                    }
 
-                    // Try updating coin_purchases
+                    // Try updating bookings
                     try {
-                        const coinPurchase = await adminPb.collection('coin_purchases').update(external_id, {
+                        await adminPb.collection('bookings').update(external_id, {
                             payment_status: 'paid',
                             payment_method: payment_method,
-                            payment_date: new Date().toISOString()
+                            payment_date: new Date().toISOString(),
+                            booking_status: 'pending'
                         });
-
-                        // Update user's coin balance
-                        await adminPb.collection('users').update(coinPurchase.user_id, {
-                            'total_coins+': coinPurchase.coin_quantity
-                        });
-
-                        return res.status(200).send('OK (Coin Purchase)');
-                    } catch (coinErr: any) {
-                        if (coinErr.status === 404) {
-                            console.error(`Record ${external_id} not found in any collection.`);
-                            return res.status(200).send('Record not found, ignoring');
+                        return res.status(200).send('OK (Booking)');
+                    } catch (bookErr: any) {
+                        if (bookErr.status !== 404) {
+                            console.error('Webhook Error (Booking):', bookErr);
                         }
-                        throw coinErr;
+
+                        // Try updating coin_purchases
+                        try {
+                            const coinPurchase = await adminPb.collection('coin_purchases').update(external_id, {
+                                payment_status: 'paid',
+                                payment_method: payment_method,
+                                payment_date: new Date().toISOString()
+                            });
+
+                            // Update user's coin balance
+                            await adminPb.collection('users').update(coinPurchase.user_id, {
+                                'total_coins+': coinPurchase.coin_quantity
+                            });
+
+                            return res.status(200).send('OK (Coin Purchase)');
+                        } catch (coinErr: any) {
+                            if (coinErr.status === 404) {
+                                console.error(`Record ${external_id} not found in any collection.`);
+                                return res.status(200).send('Record not found, ignoring');
+                            }
+                            throw coinErr;
+                        }
                     }
                 }
             }

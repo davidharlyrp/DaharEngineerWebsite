@@ -31,6 +31,7 @@ async function generateSitemap() {
         '/building-design',
         '/software',
         '/courses/private-courses',
+        '/courses/online-courses',
         '/store',
         '/community/revit-files',
         '/community/resources',

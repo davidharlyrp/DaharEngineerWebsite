@@ -1,7 +1,24 @@
 import { pb } from '@/lib/pocketbase/client';
-import type { Course, Mentor, Booking, SessionReview, ClientReview } from '@/types/courses';
+import type { Course, Mentor, Booking, SessionReview, ClientReview, OnlineCourse } from '@/types/courses';
 
 export const courseService = {
+    async getOnlineCourses(): Promise<OnlineCourse[]> {
+        try {
+            const records = await pb.collection('online_courses').getFullList<OnlineCourse>({
+                filter: 'isActive = true',
+                sort: 'created',
+                expand: 'instructor',
+            });
+            return records;
+        } catch (error) {
+            console.error('Error fetching online courses:', error);
+            return [];
+        }
+    },
+
+    getOnlineCourseFileUrl(record: OnlineCourse, fileName: string): string {
+        return `${import.meta.env.VITE_POCKETBASE_URL}/api/files/${record.collectionId}/${record.id}/${fileName}`;
+    },
     async getActiveCourses(): Promise<Course[]> {
         try {
             const records = await pb.collection('course_list').getFullList<Course>({

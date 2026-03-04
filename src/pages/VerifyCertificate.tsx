@@ -30,28 +30,35 @@ export default function VerifyCertificate() {
 
             try {
                 setLoading(true);
-                // Ensure ID exactly matches what's in DB (including leading slash if present)
                 const decodedId = decodeURIComponent(certId || '');
-                const cleanId = decodedId.startsWith('DE/') ? `/${decodedId}` : decodedId;
+                let cleanId = decodedId.startsWith('DE/') ? `/${decodedId}` : decodedId;
 
-                console.group('--- DEBUG VERIFICATION ---');
-                console.log('Raw certId from URL:', certId);
-                console.log('Decoded certId:', decodedId);
-                console.log('Final Clean ID for Search:', cleanId);
-                console.log('PB URL:', pb.baseUrl);
-                console.log('Is User Auth:', pb.authStore.isValid);
+                // Helper search function
+                const searchCert = async (id: string) => {
+                    return await pb.collection('online_course_progress').getList(1, 1, {
+                        filter: `certificateId = "${id}"`,
+                        expand: 'userId,courseId'
+                    });
+                };
 
-                // 1. Try search with filter
-                const result = await pb.collection('online_course_progress').getList(1, 1, {
-                    filter: `certificateId = "${cleanId}"`,
-                    expand: 'userId,courseId'
-                });
+                // 1. Try exact match
+                let result = await searchCert(cleanId);
 
-                console.log('Search with filter result:', result);
+                // 2. Fallback for common O vs 0 mismatch
+                if (result.items.length === 0) {
+                    const altId = cleanId.includes('OMI')
+                        ? cleanId.replace('OMI', '0MI')
+                        : cleanId.includes('0MI')
+                            ? cleanId.replace('0MI', 'OMI')
+                            : null;
+
+                    if (altId) {
+                        result = await searchCert(altId);
+                    }
+                }
 
                 if (result.items.length > 0) {
                     const record = result.items[0];
-                    console.log('Match found!', record);
                     setCertificate({
                         id: record.id,
                         userName: record.expand?.userId?.name || 'Anonymous Student',
@@ -60,22 +67,9 @@ export default function VerifyCertificate() {
                         certificateId: record.certificateId
                     });
                 } else {
-                    console.warn('No record found with ID:', cleanId);
-
-                    // 2. Fall-back: Try to list ANY record to check collection accessibility
-                    console.log('Trying to list ANY record in online_course_progress...');
-                    const allRecords = await pb.collection('online_course_progress').getList(1, 5);
-                    console.log('Raw List (all):', allRecords);
-
-                    if (allRecords.items.length === 0) {
-                        setError('Database kosong atau akses ditolak. Periksa API Rules.');
-                    } else {
-                        setError('Sertifikat tidak ditemukan dalam database kami.');
-                    }
+                    setError('Sertifikat tidak ditemukan dalam database kami.');
                 }
-                console.groupEnd();
             } catch (err: any) {
-                console.groupEnd();
                 console.error('Detailed Verification Error:', err);
                 if (err.status === 403 || err.status === 400) {
                     setError('Akses ditolak oleh database. Silakan periksa API Rules di PocketBase.');

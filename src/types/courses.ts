@@ -16,6 +16,32 @@ export interface Course {
   mentors?: Mentor[];
 }
 
+export interface OnlineCourse {
+  id: string;
+  collectionId: string;
+  title: string;
+  slug: string;
+  thumbnail: string;
+  instructor: string;
+  duration: string;
+  level: 'beginner' | 'intermediate' | 'advanced';
+  totalModules: number;
+  totalSteps: number;
+  price: number;
+  discountPrice?: number;
+  description: string;
+  features: string;
+  deliverables: string;
+  isActive: boolean;
+  isNew: boolean;
+  created: string;
+  updated: string;
+  // UI derived fields
+  expand?: {
+    instructor?: Mentor;
+  };
+}
+
 export interface Mentor {
   id: string;
   collectionId: string;
