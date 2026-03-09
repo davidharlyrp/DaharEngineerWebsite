@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body style="margin:0;padding:0;background:#f4f4f7;font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+        style="background:#f4f4f7;padding:32px 16px;">
+        <tr>
+            <td align="center">
+
+                <!-- Main Container -->
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0"
+                    style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+
+                    <!-- Header -->
+                    <tr>
+                        <td style="background:#1e293b;padding:20px 32px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="text-align:left;vertical-align:middle;"><img
+                                            src="https://daharengineer.com/Logo.png" alt="Dahar Engineer" width="28"
+                                            height="28"
+                                            style="height:28px;width:28px;vertical-align:middle;margin-right:8px;display:inline-block;" /><span
+                                            style="font-size:16px;font-weight:700;color:#ffffff;vertical-align:middle;">Dahar
+                                            Engineer</span></td>
+                                    <td style="text-align:right;vertical-align:middle;"><span
+                                            style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:500;">Mentor
+                                            Notification</span></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Greeting -->
+                    <tr>
+                        <td style="padding:28px 32px 0;">
+                            <p style="margin:0 0 4px;font-size:14px;color:#111827;">Hi <strong>{{MENTOR_NAME}}</strong>,
+                            </p>
+                            <p style="margin:0;font-size:13px;color:#4b5563;line-height:1.5;">You have a new session
+                                booking that has been confirmed. Please review the details below and prepare
+                                accordingly.</p>
+                        </td>
+                    </tr>
+
+                    <!-- Session Details -->
+                    <tr>
+                        <td style="padding:20px 32px;">
+                            <p
+                                style="margin:0 0 8px;font-size:11px;font-weight:600;color:#727b56;text-transform:uppercase;letter-spacing:0.5px;">
+                                Session Details</p>
+
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:20px;">
+                                <tr>
+                                    <td style="padding:16px;background:#f9fafb;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td style="padding:5px 0;font-size:12px;color:#6b7280;width:110px;">
+                                                    Course</td>
+                                                <td style="padding:5px 0;font-size:12px;color:#111827;font-weight:600;">
+                                                    {{COURSE_TITLE}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:5px 0;font-size:12px;color:#6b7280;">Type</td>
+                                                <td style="padding:5px 0;font-size:12px;color:#111827;font-weight:500;">
+                                                    {{COURSE_TYPE}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:5px 0;font-size:12px;color:#6b7280;">Date</td>
+                                                <td style="padding:5px 0;font-size:12px;color:#111827;font-weight:600;">
+                                                    {{SESSION_DATE}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:5px 0;font-size:12px;color:#6b7280;">Time</td>
+                                                <td style="padding:5px 0;font-size:12px;color:#111827;font-weight:600;">
+                                                    {{SESSION_TIME}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:5px 0;font-size:12px;color:#6b7280;">Duration</td>
+                                                <td style="padding:5px 0;font-size:12px;color:#111827;font-weight:500;">
+                                                    {{DURATION}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:5px 0;font-size:12px;color:#6b7280;">Topic</td>
+                                                <td style="padding:5px 0;font-size:12px;color:#111827;font-weight:500;">
+                                                    {{TOPIC}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p
+                                style="margin:0 0 8px;font-size:11px;font-weight:600;color:#727b56;text-transform:uppercase;letter-spacing:0.5px;">
+                                Student Information</p>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:20px;">
+                                <tr>
+                                    <td style="padding:14px 16px;background:#f9fafb;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td style="padding:4px 0;font-size:12px;color:#6b7280;width:110px;">Name
+                                                </td>
+                                                <td style="padding:4px 0;font-size:12px;color:#111827;font-weight:600;">
+                                                    {{FULL_NAME}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:4px 0;font-size:12px;color:#6b7280;">Email</td>
+                                                <td style="padding:4px 0;font-size:12px;color:#111827;font-weight:500;">
+                                                    {{EMAIL}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:4px 0;font-size:12px;color:#6b7280;">WhatsApp</td>
+                                                <td style="padding:4px 0;font-size:12px;color:#111827;font-weight:500;">
+                                                    {{WHATSAPP}}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                                style="background:#f0f4e8;border-radius:8px;border:1px solid #cdd2bc;">
+                                <tr>
+                                    <td style="padding:14px 16px;text-align:center;">
+                                        <p style="margin:0;font-size:12px;color:#484d36;line-height:1.5;">Please ensure
+                                            you are available at the scheduled time. Contact the student via WhatsApp if
+                                            needed.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Footer -->
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="padding:20px 32px;text-align:center;">
+                            <p style="margin:0 0 4px;font-size:11px;color:#9ca3af;">If you have any questions, contact
+                                admin@daharengineer.com</p>
+                            <p style="margin:0;font-size:10px;color:#d1d5db;">Dahar Engineer &bull; daharengineer.com
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

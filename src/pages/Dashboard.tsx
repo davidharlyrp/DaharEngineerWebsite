@@ -42,7 +42,7 @@ export default function Dashboard() {
     if (typeof window === 'undefined') return true;
     return window.matchMedia('(min-width: 768px)').matches;
   });
-  const [ userpanelOpen, setUserpanelOpen] = useState(false);
+  const [userpanelOpen, setUserpanelOpen] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 768px)');
@@ -79,18 +79,16 @@ export default function Dashboard() {
           className="w-full mx-auto flex gap-0 items-end"
         >
           {/* Sidebar */}
-          <div 
-            className={`sticky relative top-0 right-0 bottom-0 z-20 ${
-              sidebarOpen ? 'left-[100dvw] md:left-[300px]' : 'left-0'
-            }`}
+          <div
+            className={`sticky relative top-0 right-0 bottom-0 z-20 ${sidebarOpen ? 'left-[100dvw] md:left-[300px]' : 'left-0'
+              }`}
           >
             {/* Toggle sidebar button (selalu terlihat) */}
-            <div className={`fixed bottom-0 top-0 z-20 h-full w-12 flex justify-center  ${
-              sidebarOpen ? 'left-[calc(100dvw-64px)] md:left-[300px] bg-transparent md:bg-secondary rounded-r-2xl' : 'left-0 bg-transparent'} transition-all duration-300 `}>
+            <div className={`fixed bottom-0 top-0 z-20 h-full w-12 flex justify-center  ${sidebarOpen ? 'left-[calc(100dvw-64px)] md:left-[300px] bg-transparent md:bg-secondary rounded-r-2xl' : 'left-0 bg-transparent'} transition-all duration-300 `}>
               <Button
                 variant="outline"
                 size="icon"
-                className="cursor-pointer w-8 h-8 mt-6 lg:mt-20 rounded-full shadow-md shadow-army-500"
+                className="cursor-pointer w-8 h-8 mt-6 lg:mt-[74px] rounded-full shadow-md shadow-army-500"
                 onClick={toggleSidebar}
               >
                 <ChevronLeft className={`w-4 h-4 text-army-500 transition-all duration-300 ${sidebarOpen ? 'rotate-0' : 'rotate-180'}`} />
@@ -98,9 +96,8 @@ export default function Dashboard() {
             </div>
 
             <TabsList
-              className={`fixed bottom-0 top-0 bg-secondary p-1 flex gap-2 flex-col items-center justify-between h-[100dvh] w-[100dvw] md:w-[300px] transition-all duration-300 ${
-                sidebarOpen ? 'left-0' : '-left-[100dvw] md:-left-[300px]'
-              }`}
+              className={`fixed bottom-0 top-0 bg-secondary p-1 flex gap-2 flex-col items-center justify-between h-[100dvh] w-[100dvw] md:w-[300px] transition-all duration-300 ${sidebarOpen ? 'left-0' : '-left-[100dvw] md:-left-[300px]'
+                }`}
             >
               <>
                 <div className="flex flex-col items-start justify-center gap-1.5 px-2 w-full">
@@ -127,8 +124,8 @@ export default function Dashboard() {
                     </motion.div>
                   </Link>
 
-                  <div className='h-1 border-t w-full'/>
-                  
+                  <div className='h-1 border-t w-full' />
+
                   {/* Nav items - teks rapat kiri; ikon + geser teks ke kanan hanya saat hover/aktif */}
                   <TabsTrigger
                     value="overview"
@@ -322,9 +319,8 @@ export default function Dashboard() {
                   className="flex w-full items-center gap-3 rounded-lg px-2 py-2 hover:bg-army-900/60 transition-colors duration-200 group"
                 >
                   <div
-                    className={`relative w-10 h-10 flex items-center justify-center rounded-full overflow-hidden bg-gradient-to-tr from-army-700 to-army-400 shadow-md shadow-black/40 ${
-                      user?.avatar ? '' : 'text-white'
-                    }`}
+                    className={`relative w-10 h-10 flex items-center justify-center rounded-full overflow-hidden bg-gradient-to-tr from-army-700 to-army-400 shadow-md shadow-black/40 ${user?.avatar ? '' : 'text-white'
+                      }`}
                   >
                     {user?.avatar ? (
                       <img

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f4f4f7;font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f7;padding:32px 16px;">
+<tr><td align="center">
+
+<!-- Main Container -->
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+
+<!-- Header -->
+<tr><td style="background:#1e293b;padding:20px 32px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+  <tr>
+    <td style="text-align:left;vertical-align:middle;"><img src="https://daharengineer.com/Logo.png" alt="Dahar Engineer" width="28" height="28" style="height:28px;width:28px;vertical-align:middle;margin-right:8px;display:inline-block;" /><span style="font-size:16px;font-weight:700;color:#ffffff;vertical-align:middle;">Dahar Engineer</span></td>
+    <td style="text-align:right;vertical-align:middle;"><span style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:500;">Admin Notification</span></td>
+  </tr>
+  </table>
+</td></tr>
+
+<!-- Status Banner -->
+<tr><td style="background:#727b56;padding:20px 32px;text-align:center;">
+  <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;">New Booking Payment Received</p>
+  <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,0.8);">A new booking has been paid and requires attention</p>
+</td></tr>
+
+<!-- Body -->
+<tr><td style="padding:28px 32px;">
+  <p style="margin:0 0 6px;font-size:11px;font-weight:600;color:#727b56;text-transform:uppercase;letter-spacing:0.5px;">Booking Details</p>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:20px;">
+    <tr><td style="padding:14px 16px;background:#f9fafb;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:5px 0;font-size:12px;color:#6b7280;width:120px;">Course</td>
+          <td style="padding:5px 0;font-size:12px;color:#111827;font-weight:600;">{{COURSE_TITLE}}</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;font-size:12px;color:#6b7280;">Type</td>
+          <td style="padding:5px 0;font-size:12px;color:#111827;font-weight:500;">{{COURSE_TYPE}}</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;font-size:12px;color:#6b7280;">Topic</td>
+          <td style="padding:5px 0;font-size:12px;color:#111827;font-weight:500;">{{TOPIC}}</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;font-size:12px;color:#6b7280;">Duration</td>
+          <td style="padding:5px 0;font-size:12px;color:#111827;font-weight:500;">{{DURATION}}</td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+    <tr>
+      <td width="48%" valign="top">
+        <p style="margin:0 0 6px;font-size:11px;font-weight:600;color:#727b56;text-transform:uppercase;letter-spacing:0.5px;">Student Info</p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+          <tr><td style="padding:12px 14px;background:#f9fafb;">
+            <p style="margin:0 0 3px;font-size:13px;color:#111827;font-weight:600;">{{FULL_NAME}}</p>
+            <p style="margin:0 0 2px;font-size:11px;color:#6b7280;">{{EMAIL}}</p>
+            <p style="margin:0;font-size:11px;color:#6b7280;">WA: {{WHATSAPP}}</p>
+          </td></tr>
+        </table>
+      </td>
+      <td width="4%"></td>
+      <td width="48%" valign="top">
+        <p style="margin:0 0 6px;font-size:11px;font-weight:600;color:#727b56;text-transform:uppercase;letter-spacing:0.5px;">Mentor</p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+          <tr><td style="padding:12px 14px;background:#f9fafb;">
+            <p style="margin:0 0 3px;font-size:13px;color:#111827;font-weight:600;">{{MENTOR_NAME}}</p>
+            <p style="margin:0;font-size:11px;color:#6b7280;">{{MENTOR_EMAIL}}</p>
+          </td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 6px;font-size:11px;font-weight:600;color:#727b56;text-transform:uppercase;letter-spacing:0.5px;">Schedule & Payment</p>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:20px;">
+    <tr><td style="padding:14px 16px;background:#f9fafb;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:4px 0;font-size:12px;color:#6b7280;width:120px;">Date</td>
+          <td style="padding:4px 0;font-size:12px;color:#111827;font-weight:500;">{{SESSION_DATE}}</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 0;font-size:12px;color:#6b7280;">Time</td>
+          <td style="padding:4px 0;font-size:12px;color:#111827;font-weight:500;">{{SESSION_TIME}}</td>
+        </tr>
+        <tr>
+          <td style="padding:4px 0;font-size:12px;color:#6b7280;">Payment Method</td>
+          <td style="padding:4px 0;font-size:12px;color:#111827;font-weight:500;">{{PAYMENT_METHOD}}</td>
+        </tr>
+        <tr><td colspan="2" style="padding:6px 0 2px;"><div style="border-top:1px solid #e5e7eb;"></div></td></tr>
+        <tr>
+          <td style="padding:4px 0;font-size:13px;color:#111827;font-weight:700;">Total Paid</td>
+          <td style="padding:4px 0;font-size:13px;color:#727b56;font-weight:700;">{{TOTAL_AMOUNT}}</td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+
+  <p style="margin:0;font-size:11px;color:#9ca3af;text-align:center;">Booking ID: {{BOOKING_ID}}</p>
+</td></tr>
+</table>
+
+<!-- Footer -->
+<table role="presentation" width="600" cellpadding="0" cellspacing="0">
+<tr><td style="padding:20px 32px;text-align:center;">
+  <p style="margin:0 0 4px;font-size:11px;color:#9ca3af;">This is an automated notification for admin.</p>
+  <p style="margin:0;font-size:10px;color:#d1d5db;">Dahar Engineer &bull; daharengineer.com</p>
+</td></tr>
+</table>
+
+</td></tr>
+</table>
+</body>
+</html>
