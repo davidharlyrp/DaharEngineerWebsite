@@ -491,7 +491,7 @@ async function createMeetingForBooking(bookingId: string) {
         host_name: booking.mentor_name,
         status: 'scheduled',
         scheduled_at: scheduledAt.toISOString(),
-        stared_at: null,
+        started_at: null,
         ended_at: null,
         meeting_name: `${booking.course_title} - ${booking.course_type}`,
         booking_id: bookingId

@@ -16,7 +16,7 @@
             "min": 15,
             "name": "id",
             "pattern": "^[a-z0-9]+$",
-            "presentable": false,
+            "presentable": true,
             "primaryKey": true,
             "required": true,
             "system": true,

@@ -9,7 +9,7 @@
  * Save this file as `pb_hooks/booking_payment_emails.pb.js`
  */
 
-console.log("[BookingEmail] Hook file loaded.");
+console.log("[BookingEmail] Hook file loaded 1.0.1.");
 
 // ─── UPDATE Hook ────────────────────────────────────────────────
 onRecordAfterUpdateSuccess(function (e) {
