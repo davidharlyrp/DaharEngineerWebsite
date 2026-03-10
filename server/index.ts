@@ -320,19 +320,24 @@ app.post('/api/booking/coin-payment', async (req, res) => {
             tax_percentage: 0,
             tax_amount: 0,
             total_amount: 0,
-            payment_status: 'paid',
+            payment_status: 'pending',
             booking_status: 'pending',
             payment_method: 'coin',
             payment_date: new Date().toISOString()
         });
 
-        // 4. Deduct 1 coin from user
+        // 4. Create meeting record
+        await createMeetingForBooking(record.id);
+
+        // 5. Deduct 1 coin from user
         await adminPb.collection('users').update(userId, {
             'total_coins-': 1
         });
 
-        // 5. Create meeting record
-        await createMeetingForBooking(record.id);
+        // 6. Update booking to paid (triggers email hook)
+        await adminPb.collection('bookings').update(record.id, {
+            payment_status: 'paid'
+        });
 
         res.json({ success: true, bookingId: record.id });
     } catch (error: any) {
@@ -369,15 +374,16 @@ app.post('/api/payment/webhook', async (req, res) => {
 
                 // Try updating bookings
                 try {
+                    // 1. Create meeting record first
+                    await createMeetingForBooking(external_id);
+
+                    // 2. Update booking to paid (triggers email hook)
                     await adminPb.collection('bookings').update(external_id, {
                         payment_status: 'paid',
                         payment_method: payment_method,
                         payment_date: new Date().toISOString(),
                         booking_status: 'pending'
                     });
-
-                    // Create meeting record
-                    await createMeetingForBooking(external_id);
 
                     return res.status(200).send('OK (Booking)');
                 } catch (bookErr: any) {
