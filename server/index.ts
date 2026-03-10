@@ -496,6 +496,11 @@ async function createMeetingForBooking(bookingId: string) {
         meeting_name: `${booking.course_title} - ${booking.course_type}`,
         booking_id: bookingId
     });
+
+    // Update the booking with the meeting link
+    await adminPb.collection('bookings').update(bookingId, {
+        meeting_link: `https://meet.daharengineer.com/meet/${meetingId}`
+    });
 }
 
 app.listen(port, () => {

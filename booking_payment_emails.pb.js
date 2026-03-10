@@ -9,7 +9,7 @@
  * Save this file as `pb_hooks/booking_payment_emails.pb.js`
  */
 
-console.log("[BookingEmail] Hook file loaded 1.0.1.");
+console.log("[BookingEmail] Hook file loaded 1.0.2.");
 
 // ─── UPDATE Hook ────────────────────────────────────────────────
 onRecordAfterUpdateSuccess(function (e) {
@@ -86,7 +86,7 @@ onRecordAfterUpdateSuccess(function (e) {
             i += '<tr><td style="background:#727b56;padding:20px 32px;text-align:center;"><p style="margin:0;font-size:20px;font-weight:700;color:#fff;">New Booking Payment Received</p><p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,0.8);">A new booking has been paid</p></td></tr>';
             i += '<tr><td style="padding:24px 32px;">';
             i += sl("Booking Details") + tc(irb("Course", b.course_title) + ir("Type", b.course_type) + ir("Topic", b.topic || "-") + ir("Duration", b.duration || "-"));
-            i += '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;"><tr><td width="48%" valign="top">' + sl("Student") + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;"><tr><td style="padding:12px 14px;background:#f9fafb;"><p style="margin:0 0 2px;font-size:13px;color:#111827;font-weight:600;">' + h(b.full_name) + '</p><p style="margin:0 0 2px;font-size:11px;color:#6b7280;">' + h(b.email) + '</p><p style="margin:0;font-size:11px;color:#6b7280;">WA: ' + h(b.whatsapp) + '</p></td></tr></table></td><td width="4%"></td><td width="48%" valign="top">' + sl("Mentor") + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;"><tr><td style="padding:12px 14px;background:#f9fafb;"><p style="margin:0 0 2px;font-size:13px;color:#111827;font-weight:600;">' + h(b.mentor_name) + '</p><p style="margin:0;font-size:11px;color:#6b7280;">' + h(b.mentor_email) + '</p></td></tr></table></td></tr></table>';
+            i += '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;"><tr><td width="48%" valign="top">' + sl("Student") + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;"><tr><td style="padding:12px 14px;background:#f9fafb;"><p style="margin:0 0 2px;font-size:13px;color:#111827;font-weight:600;">' + h(b.full_name) + '</p><p style="margin:0 0 2px;font-size:11px;color:#6b7280;">' + h(b.email) + '</p><p style="margin:0;font-size:11px;color:#6b7280;">WA: ' + h(b.whatsapp) + '</p></td></tr></table></td><td width="4%"></td><td width="48%" valign="top">' + sl("Mentor") + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;"><tr><td style="padding:12px 14px;background:#f9fafb;"><p style="margin:0 0 2px;font-size:13px;color:#111827;font-weight:600;">' + h(b.mentor_name) + '</p><p style="margin:0 0 2px;font-size:11px;color:#6b7280;">' + h(b.mentor_email) + '</p></td></tr></table></td></tr></table>';
             i += sl("Schedule & Payment") + tc(irb("Date", sd) + irb("Time", b.session_time || "-") + ir("Payment Method", b.payment_method) + dvd + '<tr><td style="padding:5px 0;font-size:13px;color:#111827;font-weight:700;width:120px;">Total Paid</td><td style="padding:5px 0;font-size:13px;color:#727b56;font-weight:700;">' + ta + '</td></tr>');
             i += '<p style="margin:0;font-size:10px;color:#9ca3af;text-align:center;">Booking ID: ' + h(b.id) + '</p></td></tr>';
             return wrap(i, "This is an automated notification for admin.");
@@ -100,14 +100,11 @@ onRecordAfterUpdateSuccess(function (e) {
             i += sl("Session Details") + tc(irb("Course", b.course_title) + ir("Type", b.course_type) + irb("Date", sd) + irb("Time", b.session_time || "-") + ir("Duration", b.duration || "-") + ir("Topic", b.topic || "-"));
             i += sl("Student Information") + tc(irb("Name", b.full_name) + ir("Email", b.email) + ir("WhatsApp", b.whatsapp));
 
-            // Fetch meeting link
-            try {
-                var meeting = e.app.dao().findFirstRecordByData("meetings", "booking_id", record.id);
-                if (meeting) {
-                    var mid = meeting.get("meeting_id");
-                    i += sl("Meeting Link") + nb('<a href="https://meet.daharengineer.com/meet/' + mid + '" style="color:#727b56;font-weight:700;text-decoration:none;">https://meet.daharengineer.com/meet/' + mid + '</a>');
-                }
-            } catch (_) { }
+            // Meeting link
+            var ml = record.get("meeting_link");
+            if (ml) {
+                i += sl("Meeting Link") + nb('<a href="' + ml + '" style="color:#727b56;font-weight:700;text-decoration:none;">' + ml + '</a>');
+            }
 
             i += nb("Please ensure you are available at the scheduled time. Contact the student via WhatsApp if needed.");
             i += '</td></tr>';
@@ -123,14 +120,11 @@ onRecordAfterUpdateSuccess(function (e) {
             i += sl("Session Information") + tc(irb("Course", b.course_title) + ir("Type", b.course_type) + irb("Mentor", b.mentor_name) + irb("Date", sd) + irb("Time", b.session_time || "-") + ir("Duration", b.duration || "-") + ir("Topic", b.topic || "-"));
             i += sl("Payment Summary") + tc(ir("Subtotal", fmtCur(b.subtotal)) + ir("Tax (" + String(b.tax_percentage || 0) + "%)", fmtCur(b.tax_amount)) + ir("Payment Method", b.payment_method) + dvd + '<tr><td style="padding:5px 0;font-size:14px;color:#111827;font-weight:700;width:120px;">Total Paid</td><td style="padding:5px 0;font-size:14px;color:#727b56;font-weight:700;">' + ta + '</td></tr>');
 
-            // Fetch meeting link
-            try {
-                var meeting = e.app.dao().findFirstRecordByData("meetings", "booking_id", record.id);
-                if (meeting) {
-                    var mid = meeting.get("meeting_id");
-                    i += sl("Meeting Link") + nb('<a href="https://meet.daharengineer.com/meet/' + mid + '" style="color:#727b56;font-weight:700;text-decoration:none;">https://meet.daharengineer.com/meet/' + mid + '</a>');
-                }
-            } catch (_) { }
+            // Meeting link
+            var ml = record.get("meeting_link");
+            if (ml) {
+                i += sl("Meeting Link") + nb('<a href="' + ml + '" style="color:#727b56;font-weight:700;text-decoration:none;">' + ml + '</a>');
+            }
 
             i += nb('Your mentor will contact you before the session. Make sure your WhatsApp is reachable at <strong>' + h(b.whatsapp) + '</strong>.');
             i += '<p style="margin:16px 0 0;font-size:10px;color:#9ca3af;text-align:center;">Booking ID: ' + h(b.id) + '</p></td></tr>';
@@ -250,14 +244,11 @@ onRecordAfterCreateSuccess(function (e) {
             i += sl("Session Details") + tc(irb("Course", b.course_title) + ir("Type", b.course_type) + irb("Date", sd) + irb("Time", b.session_time || "-") + ir("Duration", b.duration || "-") + ir("Topic", b.topic || "-"));
             i += sl("Student Information") + tc(irb("Name", b.full_name) + ir("Email", b.email) + ir("WhatsApp", b.whatsapp));
 
-            // Fetch meeting link
-            try {
-                var meeting = e.app.dao().findFirstRecordByData("meetings", "booking_id", record.id);
-                if (meeting) {
-                    var mid = meeting.get("meeting_id");
-                    i += sl("Meeting Link") + nb('<a href="https://meet.daharengineer.com/meet/' + mid + '" style="color:#727b56;font-weight:700;text-decoration:none;">https://meet.daharengineer.com/meet/' + mid + '</a>');
-                }
-            } catch (_) { }
+            // Meeting link
+            var ml = record.get("meeting_link");
+            if (ml) {
+                i += sl("Meeting Link") + nb('<a href="' + ml + '" style="color:#727b56;font-weight:700;text-decoration:none;">' + ml + '</a>');
+            }
 
             i += nb("Please ensure you are available at the scheduled time. Contact the student via WhatsApp if needed.");
             i += '</td></tr>';
@@ -273,14 +264,11 @@ onRecordAfterCreateSuccess(function (e) {
             i += sl("Session Information") + tc(irb("Course", b.course_title) + ir("Type", b.course_type) + irb("Mentor", b.mentor_name) + irb("Date", sd) + irb("Time", b.session_time || "-") + ir("Duration", b.duration || "-") + ir("Topic", b.topic || "-"));
             i += sl("Payment Summary") + tc(ir("Subtotal", fmtCur(b.subtotal)) + ir("Tax (" + String(b.tax_percentage || 0) + "%)", fmtCur(b.tax_amount)) + ir("Payment Method", b.payment_method) + dvd + '<tr><td style="padding:5px 0;font-size:14px;color:#111827;font-weight:700;width:120px;">Total Paid</td><td style="padding:5px 0;font-size:14px;color:#727b56;font-weight:700;">' + ta + '</td></tr>');
 
-            // Fetch meeting link
-            try {
-                var meeting = e.app.dao().findFirstRecordByData("meetings", "booking_id", record.id);
-                if (meeting) {
-                    var mid = meeting.get("meeting_id");
-                    i += sl("Meeting Link") + nb('<a href="https://meet.daharengineer.com/meet/' + mid + '" style="color:#727b56;font-weight:700;text-decoration:none;">https://meet.daharengineer.com/meet/' + mid + '</a>');
-                }
-            } catch (_) { }
+            // Meeting link
+            var ml = record.get("meeting_link");
+            if (ml) {
+                i += sl("Meeting Link") + nb('<a href="' + ml + '" style="color:#727b56;font-weight:700;text-decoration:none;">' + ml + '</a>');
+            }
 
             i += nb('Your mentor will contact you before the session. Make sure your WhatsApp is reachable at <strong>' + h(b.whatsapp) + '</strong>.');
             i += '<p style="margin:16px 0 0;font-size:10px;color:#9ca3af;text-align:center;">Booking ID: ' + h(b.id) + '</p></td></tr>';
