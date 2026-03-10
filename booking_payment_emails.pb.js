@@ -99,6 +99,16 @@ onRecordAfterUpdateSuccess(function (e) {
             i += '<tr><td style="padding:20px 32px;">';
             i += sl("Session Details") + tc(irb("Course", b.course_title) + ir("Type", b.course_type) + irb("Date", sd) + irb("Time", b.session_time || "-") + ir("Duration", b.duration || "-") + ir("Topic", b.topic || "-"));
             i += sl("Student Information") + tc(irb("Name", b.full_name) + ir("Email", b.email) + ir("WhatsApp", b.whatsapp));
+
+            // Fetch meeting link
+            try {
+                var meeting = e.app.dao().findFirstRecordByData("meetings", "booking_id", record.id);
+                if (meeting) {
+                    var mid = meeting.get("meeting_id");
+                    i += sl("Meeting Link") + nb('<a href="https://meet.daharengineer.com/meet/' + mid + '" style="color:#727b56;font-weight:700;text-decoration:none;">https://meet.daharengineer.com/meet/' + mid + '</a>');
+                }
+            } catch (_) { }
+
             i += nb("Please ensure you are available at the scheduled time. Contact the student via WhatsApp if needed.");
             i += '</td></tr>';
             return wrap(i, "If you have any questions, contact admin@daharengineer.com");
@@ -112,6 +122,16 @@ onRecordAfterUpdateSuccess(function (e) {
             i += '<tr><td style="padding:20px 32px;">';
             i += sl("Session Information") + tc(irb("Course", b.course_title) + ir("Type", b.course_type) + irb("Mentor", b.mentor_name) + irb("Date", sd) + irb("Time", b.session_time || "-") + ir("Duration", b.duration || "-") + ir("Topic", b.topic || "-"));
             i += sl("Payment Summary") + tc(ir("Subtotal", fmtCur(b.subtotal)) + ir("Tax (" + String(b.tax_percentage || 0) + "%)", fmtCur(b.tax_amount)) + ir("Payment Method", b.payment_method) + dvd + '<tr><td style="padding:5px 0;font-size:14px;color:#111827;font-weight:700;width:120px;">Total Paid</td><td style="padding:5px 0;font-size:14px;color:#727b56;font-weight:700;">' + ta + '</td></tr>');
+
+            // Fetch meeting link
+            try {
+                var meeting = e.app.dao().findFirstRecordByData("meetings", "booking_id", record.id);
+                if (meeting) {
+                    var mid = meeting.get("meeting_id");
+                    i += sl("Meeting Link") + nb('<a href="https://meet.daharengineer.com/meet/' + mid + '" style="color:#727b56;font-weight:700;text-decoration:none;">https://meet.daharengineer.com/meet/' + mid + '</a>');
+                }
+            } catch (_) { }
+
             i += nb('Your mentor will contact you before the session. Make sure your WhatsApp is reachable at <strong>' + h(b.whatsapp) + '</strong>.');
             i += '<p style="margin:16px 0 0;font-size:10px;color:#9ca3af;text-align:center;">Booking ID: ' + h(b.id) + '</p></td></tr>';
             return wrap(i, "If you have questions, contact us at admin@daharengineer.com");
@@ -229,6 +249,16 @@ onRecordAfterCreateSuccess(function (e) {
             i += '<tr><td style="padding:20px 32px;">';
             i += sl("Session Details") + tc(irb("Course", b.course_title) + ir("Type", b.course_type) + irb("Date", sd) + irb("Time", b.session_time || "-") + ir("Duration", b.duration || "-") + ir("Topic", b.topic || "-"));
             i += sl("Student Information") + tc(irb("Name", b.full_name) + ir("Email", b.email) + ir("WhatsApp", b.whatsapp));
+
+            // Fetch meeting link
+            try {
+                var meeting = e.app.dao().findFirstRecordByData("meetings", "booking_id", record.id);
+                if (meeting) {
+                    var mid = meeting.get("meeting_id");
+                    i += sl("Meeting Link") + nb('<a href="https://meet.daharengineer.com/meet/' + mid + '" style="color:#727b56;font-weight:700;text-decoration:none;">https://meet.daharengineer.com/meet/' + mid + '</a>');
+                }
+            } catch (_) { }
+
             i += nb("Please ensure you are available at the scheduled time. Contact the student via WhatsApp if needed.");
             i += '</td></tr>';
             return wrap(i, "If you have any questions, contact admin@daharengineer.com");
@@ -242,6 +272,16 @@ onRecordAfterCreateSuccess(function (e) {
             i += '<tr><td style="padding:20px 32px;">';
             i += sl("Session Information") + tc(irb("Course", b.course_title) + ir("Type", b.course_type) + irb("Mentor", b.mentor_name) + irb("Date", sd) + irb("Time", b.session_time || "-") + ir("Duration", b.duration || "-") + ir("Topic", b.topic || "-"));
             i += sl("Payment Summary") + tc(ir("Subtotal", fmtCur(b.subtotal)) + ir("Tax (" + String(b.tax_percentage || 0) + "%)", fmtCur(b.tax_amount)) + ir("Payment Method", b.payment_method) + dvd + '<tr><td style="padding:5px 0;font-size:14px;color:#111827;font-weight:700;width:120px;">Total Paid</td><td style="padding:5px 0;font-size:14px;color:#727b56;font-weight:700;">' + ta + '</td></tr>');
+
+            // Fetch meeting link
+            try {
+                var meeting = e.app.dao().findFirstRecordByData("meetings", "booking_id", record.id);
+                if (meeting) {
+                    var mid = meeting.get("meeting_id");
+                    i += sl("Meeting Link") + nb('<a href="https://meet.daharengineer.com/meet/' + mid + '" style="color:#727b56;font-weight:700;text-decoration:none;">https://meet.daharengineer.com/meet/' + mid + '</a>');
+                }
+            } catch (_) { }
+
             i += nb('Your mentor will contact you before the session. Make sure your WhatsApp is reachable at <strong>' + h(b.whatsapp) + '</strong>.');
             i += '<p style="margin:16px 0 0;font-size:10px;color:#9ca3af;text-align:center;">Booking ID: ' + h(b.id) + '</p></td></tr>';
             return wrap(i, "If you have questions, contact us at admin@daharengineer.com");

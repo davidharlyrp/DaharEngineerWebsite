@@ -331,80 +331,12 @@ app.post('/api/booking/coin-payment', async (req, res) => {
             'total_coins-': 1
         });
 
+        // 5. Create meeting record
+        await createMeetingForBooking(record.id);
+
         res.json({ success: true, bookingId: record.id });
     } catch (error: any) {
         console.error('Coin Booking Error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Create Online Course Access Invoice
-app.post('/api/payment/course/create', async (req, res) => {
-    try {
-        const {
-            courseId,
-            userId,
-            userEmail,
-            userName,
-            amount,
-            courseName,
-            courseSlug
-        } = req.body;
-
-        const adminPb = await getAdminPB();
-
-        // 1. Create initial record in online_course_access
-        const record = await adminPb.collection('online_course_access').create({
-            user_id: userId,
-            online_course_id: courseId,
-            course_name: courseName,
-            payment_amount: amount,
-            payment_status: 'pending',
-            payment_currency: 'IDR'
-        });
-
-        // 2. Create Xendit Invoice
-        const invoice = await Invoice.createInvoice({
-            data: {
-                externalId: record.id,
-                amount: amount,
-                description: `Course Access: ${courseName}`,
-                invoiceDuration: 86400,
-                customer: {
-                    givenNames: userName,
-                    email: userEmail,
-                },
-                currency: 'IDR',
-                successRedirectUrl: `${process.env.FRONTEND_URL}/courses/online-courses?status=paid&courseId=${courseId}`,
-                failureRedirectUrl: `${process.env.FRONTEND_URL}/courses/online-courses?status=failed`,
-            }
-        });
-
-        // 3. Update record with Invoice ID and Xendit External ID
-        await adminPb.collection('online_course_access').update(record.id, {
-            xendit_payment_id: invoice.id,
-            external_id: record.id
-        });
-
-        res.json({ invoiceUrl: invoice.invoiceUrl });
-    } catch (error: any) {
-        console.error('Course Payment Creation Error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Check course access status
-app.get('/api/payment/course/check/:courseId/:userId', async (req, res) => {
-    try {
-        const { courseId, userId } = req.params;
-        const adminPb = await getAdminPB();
-
-        const records = await adminPb.collection('online_course_access').getFullList({
-            filter: `online_course_id = "${courseId}" && user_id = "${userId}" && payment_status = "paid"`,
-        });
-
-        res.json({ hasAccess: records.length > 0 });
-    } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 });
@@ -433,58 +365,44 @@ app.post('/api/payment/webhook', async (req, res) => {
 
                 return res.status(200).send('OK (Product)');
             } catch (err: any) {
-                if (err.status !== 404) {
-                    console.error('Webhook Error (Product):', err);
-                }
+                if (err.status !== 404) throw err;
 
-                // Try updating online_course_access
+                // Try updating bookings
                 try {
-                    await adminPb.collection('online_course_access').update(external_id, {
+                    await adminPb.collection('bookings').update(external_id, {
                         payment_status: 'paid',
-                        access_granted_at: new Date().toISOString(),
-                        xendit_payment_id: id
+                        payment_method: payment_method,
+                        payment_date: new Date().toISOString(),
+                        booking_status: 'pending'
                     });
-                    return res.status(200).send('OK (Course Access)');
-                } catch (courseErr: any) {
-                    if (courseErr.status !== 404) {
-                        console.error('Webhook Error (Course Access):', courseErr);
-                    }
 
-                    // Try updating bookings
+                    // Create meeting record
+                    await createMeetingForBooking(external_id);
+
+                    return res.status(200).send('OK (Booking)');
+                } catch (bookErr: any) {
+                    if (bookErr.status !== 404) throw bookErr;
+
+                    // Try updating coin_purchases
                     try {
-                        await adminPb.collection('bookings').update(external_id, {
+                        const coinPurchase = await adminPb.collection('coin_purchases').update(external_id, {
                             payment_status: 'paid',
                             payment_method: payment_method,
-                            payment_date: new Date().toISOString(),
-                            booking_status: 'pending'
+                            payment_date: new Date().toISOString()
                         });
-                        return res.status(200).send('OK (Booking)');
-                    } catch (bookErr: any) {
-                        if (bookErr.status !== 404) {
-                            console.error('Webhook Error (Booking):', bookErr);
+
+                        // Update user's coin balance
+                        await adminPb.collection('users').update(coinPurchase.user_id, {
+                            'total_coins+': coinPurchase.coin_quantity
+                        });
+
+                        return res.status(200).send('OK (Coin Purchase)');
+                    } catch (coinErr: any) {
+                        if (coinErr.status === 404) {
+                            console.error(`Record ${external_id} not found in any collection.`);
+                            return res.status(200).send('Record not found, ignoring');
                         }
-
-                        // Try updating coin_purchases
-                        try {
-                            const coinPurchase = await adminPb.collection('coin_purchases').update(external_id, {
-                                payment_status: 'paid',
-                                payment_method: payment_method,
-                                payment_date: new Date().toISOString()
-                            });
-
-                            // Update user's coin balance
-                            await adminPb.collection('users').update(coinPurchase.user_id, {
-                                'total_coins+': coinPurchase.coin_quantity
-                            });
-
-                            return res.status(200).send('OK (Coin Purchase)');
-                        } catch (coinErr: any) {
-                            if (coinErr.status === 404) {
-                                console.error(`Record ${external_id} not found in any collection.`);
-                                return res.status(200).send('Record not found, ignoring');
-                            }
-                            throw coinErr;
-                        }
+                        throw coinErr;
                     }
                 }
             }
@@ -537,6 +455,42 @@ app.post('/api/payment/download', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// Helper to create a meeting for a successful booking
+async function createMeetingForBooking(bookingId: string) {
+    const adminPb = await getAdminPB();
+    const booking = await adminPb.collection('bookings').getOne(bookingId);
+
+    // Generate unique 8-digit meeting_id
+    const generateMeetingId = async (): Promise<string> => {
+        const id = Math.floor(10000000 + Math.random() * 90000000).toString();
+        const existing = await adminPb.collection('meetings').getList(1, 1, {
+            filter: `meeting_id = "${id}"`
+        });
+        if (existing.totalItems > 0) return generateMeetingId();
+        return id;
+    };
+
+    const meetingId = await generateMeetingId();
+    const passcode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Format scheduled_at
+    // session_date is likely ISO or YYYY-MM-DD
+    // session_time is likely HH:mm
+    const scheduledAt = new Date(`${booking.session_date.split(' ')[0]}T${booking.session_time}:00`);
+
+    await adminPb.collection('meetings').create({
+        meeting_id: meetingId,
+        passcode: passcode,
+        host_name: booking.mentor_name,
+        status: 'scheduled',
+        scheduled_at: scheduledAt.toISOString(),
+        stared_at: null,
+        ended_at: null,
+        meeting_name: `${booking.course_title} - ${booking.course_type}`,
+        booking_id: bookingId
+    });
+}
 
 app.listen(port, () => {
     console.log(`Dahar Engineer API running on port ${port}`);
