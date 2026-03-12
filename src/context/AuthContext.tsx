@@ -14,15 +14,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         // Check if user is already authenticated and refresh the model
         if (pb.authStore.isValid) {
-          const authData = await pb.collection('users').authRefresh();
-          setUser(authData.record as unknown as User);
+          try {
+            const authData = await pb.collection('users').authRefresh();
+            setUser(authData.record as unknown as User);
+          } catch (refreshError: any) {
+            // If refresh fails with 401, the token is invalid
+            if (refreshError.status === 401) {
+              pb.authStore.clear();
+              setUser(null);
+            } else {
+              // Fallback to local model for other errors if store is still valid
+              if (pb.authStore.isValid) {
+                setUser(pb.authStore.model as unknown as User);
+              }
+            }
+            throw refreshError;
+          }
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        // Fallback to local model if refresh fails but store is still valid
-        if (pb.authStore.isValid) {
-          setUser(pb.authStore.model as unknown as User);
-        }
       } finally {
         setIsLoading(false);
       }

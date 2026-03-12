@@ -346,6 +346,77 @@ app.post('/api/booking/coin-payment', async (req, res) => {
     }
 });
 
+// Create Online Course Access Invoice
+app.post('/api/payment/course/create', async (req, res) => {
+    try {
+        const {
+            courseId,
+            userId,
+            userEmail,
+            userName,
+            amount,
+            courseName,
+            courseSlug
+        } = req.body;
+
+        const adminPb = await getAdminPB();
+
+        // 1. Create initial record in online_course_access
+        const record = await adminPb.collection('online_course_access').create({
+            user_id: userId,
+            online_course_id: courseId,
+            course_name: courseName,
+            payment_amount: amount,
+            payment_status: 'pending',
+            payment_currency: 'IDR'
+        });
+
+        // 2. Create Xendit Invoice
+        const invoice = await Invoice.createInvoice({
+            data: {
+                externalId: record.id,
+                amount: amount,
+                description: `Course Access: ${courseName}`,
+                invoiceDuration: 86400,
+                customer: {
+                    givenNames: userName,
+                    email: userEmail,
+                },
+                currency: 'IDR',
+                successRedirectUrl: `${process.env.FRONTEND_URL}/courses/online-courses?status=paid&courseId=${courseId}`,
+                failureRedirectUrl: `${process.env.FRONTEND_URL}/courses/online-courses?status=failed`,
+            }
+        });
+
+        // 3. Update record with Invoice ID and Xendit External ID
+        await adminPb.collection('online_course_access').update(record.id, {
+            xendit_payment_id: invoice.id,
+            external_id: record.id
+        });
+
+        res.json({ invoiceUrl: invoice.invoiceUrl });
+    } catch (error: any) {
+        console.error('Course Payment Creation Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Check course access status
+app.get('/api/payment/course/check/:courseId/:userId', async (req, res) => {
+    try {
+        const { courseId, userId } = req.params;
+        const adminPb = await getAdminPB();
+
+        const records = await adminPb.collection('online_course_access').getFullList({
+            filter: `online_course_id = "${courseId}" && user_id = "${userId}" && payment_status = "paid"`,
+        });
+
+        res.json({ hasAccess: records.length > 0 });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Xendit Webhook
 app.post('/api/payment/webhook', async (req, res) => {
     try {
@@ -370,45 +441,64 @@ app.post('/api/payment/webhook', async (req, res) => {
 
                 return res.status(200).send('OK (Product)');
             } catch (err: any) {
-                if (err.status !== 404) throw err;
+                if (err.status !== 404) {
+                    console.error('Webhook Error (Product):', err);
+                }
 
-                // Try updating bookings
+                // Try updating online_course_access
                 try {
-                    // 1. Create meeting record first
-                    await createMeetingForBooking(external_id);
-
-                    // 2. Update booking to paid (triggers email hook)
-                    await adminPb.collection('bookings').update(external_id, {
+                    await adminPb.collection('online_course_access').update(external_id, {
                         payment_status: 'paid',
-                        payment_method: payment_method,
-                        payment_date: new Date().toISOString(),
-                        booking_status: 'pending'
+                        access_granted_at: new Date().toISOString(),
+                        xendit_payment_id: id
                     });
+                    return res.status(200).send('OK (Course Access)');
+                } catch (courseErr: any) {
+                    if (courseErr.status !== 404) {
+                        console.error('Webhook Error (Course Access):', courseErr);
+                    }
 
-                    return res.status(200).send('OK (Booking)');
-                } catch (bookErr: any) {
-                    if (bookErr.status !== 404) throw bookErr;
 
-                    // Try updating coin_purchases
+                    // Try updating bookings
                     try {
-                        const coinPurchase = await adminPb.collection('coin_purchases').update(external_id, {
+                        // 1. Create meeting record first
+                        await createMeetingForBooking(external_id);
+
+                        // 2. Update booking to paid (triggers email hook)
+                        await adminPb.collection('bookings').update(external_id, {
                             payment_status: 'paid',
                             payment_method: payment_method,
-                            payment_date: new Date().toISOString()
+                            payment_date: new Date().toISOString(),
+                            booking_status: 'pending'
                         });
 
-                        // Update user's coin balance
-                        await adminPb.collection('users').update(coinPurchase.user_id, {
-                            'total_coins+': coinPurchase.coin_quantity
-                        });
-
-                        return res.status(200).send('OK (Coin Purchase)');
-                    } catch (coinErr: any) {
-                        if (coinErr.status === 404) {
-                            console.error(`Record ${external_id} not found in any collection.`);
-                            return res.status(200).send('Record not found, ignoring');
+                        return res.status(200).send('OK (Booking)');
+                    } catch (bookErr: any) {
+                        if (bookErr.status !== 404) {
+                            console.error('Webhook Error (Booking):', bookErr);
                         }
-                        throw coinErr;
+
+                        // Try updating coin_purchases
+                        try {
+                            const coinPurchase = await adminPb.collection('coin_purchases').update(external_id, {
+                                payment_status: 'paid',
+                                payment_method: payment_method,
+                                payment_date: new Date().toISOString()
+                            });
+
+                            // Update user's coin balance
+                            await adminPb.collection('users').update(coinPurchase.user_id, {
+                                'total_coins+': coinPurchase.coin_quantity
+                            });
+
+                            return res.status(200).send('OK (Coin Purchase)');
+                        } catch (coinErr: any) {
+                            if (coinErr.status === 404) {
+                                console.error(`Record ${external_id} not found in any collection.`);
+                                return res.status(200).send('Record not found, ignoring');
+                            }
+                            throw coinErr;
+                        }
                     }
                 }
             }

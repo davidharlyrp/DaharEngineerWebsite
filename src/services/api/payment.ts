@@ -51,8 +51,8 @@ export const paymentApi = {
         try {
             const response = await axios.get(`${API_URL}/api/payment/course/check/${courseId}/${userId}`);
             return response.data.hasAccess;
-        } catch (error) {
-            console.error('Error checking course access:', error);
+        } catch (error: any) {
+            console.error('Error checking course access:', error.response?.status === 404 ? 'Endpoint not found (404)' : error);
             return false;
         }
     }
